@@ -294,12 +294,12 @@ Provider payloads remain authoritative. Normalization must preserve unknown valu
 
 These values require parent and legal review before implementation:
 
-- Keep normalized events only inside the selected import window (initially 30 days past through 365 days future). Purge events that leave the window after the next successful reconciliation.
-- A privacy reduction blocks access immediately and removes newly prohibited details from active stores, caches, embeddings, and summaries within 24 hours.
+- Keep normalized events only inside the selected import window (initially 30 days past through 365 days future). A daily provider-independent retention job purges events that leave the window even when a connection is paused, stale, revoked, or failing.
+- A privacy reduction blocks access immediately and removes newly prohibited details from active stores, caches, embeddings, and summaries within 24 hours. Encrypted backups containing those details expire within 30 days; restore procedures reapply the current disclosure policy and cleanup queue before any restored data becomes accessible.
 - Calendar deletion or disconnect makes data inaccessible immediately and removes credentials, cursors, normalized events, caches, embeddings, and summaries from active systems within 24 hours. Encrypted backup copies expire within 30 days and are not restored into active use.
 - Keep metadata-only security and consent audit records for one year unless legal review selects a shorter period. They contain actor/internal IDs, action, policy version, provider, outcome, and timestamp—not tokens, event content, attendee data, calendar IDs, URLs, queries, or child preferences.
 - Provide a downloadable UTF-8 JSON export containing connection/provider labels, represented-person labels, calendar disclosure settings, consent history, and normalized event records currently retained and visible to the requesting parent. Exclude secrets, tokens, sync cursors, encryption metadata, internal security logs, data outside the requester's audience, and purged content.
-- Activity requests and results are session-only by default. Persist a saved activity only after an explicit parent action, retaining its source URL, exact event/performance identity, cited facts, and parent-entered notes until the parent deletes it.
+- Activity requests and results are session-only by default. Persist a saved activity only after an explicit parent action. It is owned by and visible only to that parent unless they explicitly share it; retained fields are limited to its source URL, exact event/performance identity, cited facts, and parent-entered notes. Include visible saved activities in that parent's JSON export. Deletion blocks access immediately, removes active records and caches within 24 hours, and expires encrypted backup copies within 30 days without restoring them into active use.
 
 Validate disclosure rules with concrete scenarios before building a generalized permissions system:
 
