@@ -1,6 +1,59 @@
 # Outlook and Google Calendar integration plan
 
-## Decision summary
+## UX outcome
+
+Family Copilot should give a guardian one understandable view of family commitments without making them learn how calendar providers work. The first release answers questions such as “What does our family have tomorrow?”, “When are we both free?”, and “Will pickup overlap my meeting?” using a parent's Outlook calendar and a child's Google calendar.
+
+The experience is read-only and follows these principles:
+
+- **Explain value before asking for access.** State what schedule questions become possible and that Family Copilot cannot change events.
+- **Make consent specific.** Show which account, calendars, fields, family members, and retention rules apply before import.
+- **Let the guardian minimize access.** Calendars are off until selected, and each can expose event details or only busy times.
+- **Show provenance and freshness.** Answers distinguish Outlook from Google events and disclose stale or disconnected sources.
+- **Keep control reversible.** A guardian can pause sync, change visibility, disconnect, export, or delete imported data from one place.
+
+### Primary users
+
+- **Guardian:** connects provider accounts, confirms authority to use a child's calendar, chooses calendars and privacy levels, and manages or removes access.
+- **Family member:** asks schedule questions and sees only information allowed by the family's sharing policy. A child is never asked to provide credentials to Family Copilot.
+
+### Core journey
+
+1. **Discover:** Calendar settings explain the read-only benefit, supported providers, data use, and the difference between event details and busy-only access.
+2. **Connect Outlook:** The guardian selects **Connect Outlook**, reviews the requested read-only permission, completes Microsoft consent, and returns to Family Copilot.
+3. **Connect the child's calendar:** Family Copilot explains how to share the Google calendar read-only with a guardian-controlled account. The guardian attests that they are authorized, selects **Connect Google**, and completes Google consent.
+4. **Choose access:** Family Copilot lists calendars without importing events. The guardian selects calendars, labels whose schedule each represents, and chooses **Details** or **Busy only** for each.
+5. **Review and confirm:** A summary shows accounts, calendars, visibility choices, imported date range, retention, and affected family members. Import starts only after confirmation.
+6. **Verify:** Sync progress ends with a preview of representative upcoming events exactly as the agent will see them. The guardian can correct calendar ownership or privacy settings.
+7. **Use:** Agent answers include source labels and a “last updated” time. Private or busy-only events appear as unavailable time without revealing content.
+8. **Manage:** Calendar settings show connection health, selected calendars, visibility, last sync, and actions to retry, pause, reconnect, disconnect, export, or delete.
+
+### Required screens and states
+
+| Surface | Required content and behavior |
+| --- | --- |
+| Calendar overview | Provider connection cards, read-only badge, last successful sync, selected calendar count, and manage action |
+| Pre-consent explanation | Benefits, exact data uses, fields requested, retention summary, provider scopes, and cancel action |
+| Calendar picker | Account identity, calendar owner/label, selection toggle, Details/Busy-only choice, and child-calendar attestation |
+| Confirmation and preview | Access summary, date window, family visibility, sample normalized events, confirm and back actions |
+| Agent response | Human-readable source, freshness indicator, privacy-safe event display, and no claim of completeness when a source is stale |
+| Connection management | Pause/retry/reconnect, change selection or privacy, revoke and disconnect, export, and delete |
+
+Every asynchronous surface needs explicit loading, empty, partial, stale, permission-revoked, provider-unavailable, and unsupported-child-account states. Errors must explain whether existing results remain usable and offer a safe recovery action without exposing provider internals.
+
+### UX acceptance criteria
+
+- A guardian can understand the benefit and read-only boundary before leaving Family Copilot for provider consent.
+- No events are imported until the guardian selects calendars, chooses their visibility, records whose schedules they represent, and confirms.
+- The child-calendar flow establishes guardian authority and never requests the child's password.
+- The post-connection preview matches what the agent may disclose, including private and busy-only redaction.
+- Every schedule answer identifies its sources and freshness; stale or partial data is never presented as complete.
+- A guardian can pause, reconfigure, disconnect, export, and delete calendar data without contacting support.
+- Keyboard-only and screen-reader users can complete all steps, and status is not communicated by color alone.
+
+UX prototypes and usability testing with guardians must validate this journey and terminology before provider adapters are implemented.
+
+## Technical decisions derived from the UX
 
 The first release will import events read-only from a parent's Outlook calendar and a child's Google calendar. A parent or verified guardian connects both sources, selects the calendars to include, and can disconnect or erase either source at any time. Write access is explicitly deferred until there is a separate user experience, threat review, and consent flow.
 
@@ -133,17 +186,18 @@ Write actions are a later opt-in phase requiring narrow write scopes, explicit c
 
 ## Follow-up implementation issues
 
-These issues are ordered so that security and the shared contract land before provider-specific synchronization:
+These issues start with UX validation, then secure foundations, provider synchronization, and agent delivery:
 
-1. **Define calendar domain model and provider adapter contract:** Add the normalized schema, migrations, adapter interface, mapping rules, and contract tests for recurrence, all-day boundaries, time zones, privacy, and deletion.
-2. **Implement secure OAuth connection storage:** Implement Microsoft and Google PKCE callbacks, encrypted token storage and rotation, strict state/redirect validation, scope display, revocation, audit redaction, and family ownership checks.
-3. **Implement Microsoft Graph read-only calendar adapter:** Add calendar selection, bounded `calendarView` import, pagination, delta links, throttling, cancellation handling, and adapter contract tests using `Calendars.Read`.
-4. **Implement Google Calendar read-only adapter:** Add calendar selection, bounded event import, recurring-event expansion, pagination, sync tokens, `410` recovery, throttling, and adapter contract tests using the two read-only scopes.
-5. **Build sync orchestration and observability:** Add scheduled jobs, idempotent checkpoints, retries with jitter, daily reconciliation, stale-state reporting, content-free metrics, and disconnect cleanup.
-6. **Build guardian consent and calendar privacy controls:** Add guardian attestation, calendar-level selection, private/free-busy filtering, consent history, export, disconnect, deletion, and family-isolation tests.
-7. **Add read-only schedule context to the agent:** Add least-data event retrieval, freshness indicators, schedule/conflict tools, prompt-injection boundaries, and authorization tests; expose no calendar mutation tools.
+1. **Prototype and validate the calendar connection journey:** Create accessible prototypes for discovery, consent explanation, calendar selection, visibility, preview, errors, and connection management. Test terminology and trust with guardians before fixing the implementation contract.
+2. **Define calendar domain model and provider adapter contract:** Translate validated UX requirements into the normalized schema, migrations, adapter interface, mapping rules, and contract tests for recurrence, all-day boundaries, time zones, privacy, freshness, and deletion.
+3. **Implement secure OAuth connection storage:** Implement Microsoft and Google PKCE callbacks, encrypted token storage and rotation, strict state/redirect validation, scope display, revocation, audit redaction, and family ownership checks.
+4. **Build guardian consent and calendar privacy controls:** Implement guardian attestation, calendar-level selection, Details/Busy-only settings, consent history, preview, export, disconnect, deletion, and family-isolation tests.
+5. **Implement Microsoft Graph read-only calendar adapter:** Add calendar selection, bounded `calendarView` import, pagination, delta links, throttling, cancellation handling, and adapter contract tests using `Calendars.Read`.
+6. **Implement Google Calendar read-only adapter:** Add calendar selection, bounded event import, recurring-event expansion, pagination, sync tokens, `410` recovery, throttling, and adapter contract tests using the two read-only scopes.
+7. **Build sync orchestration and observability:** Add scheduled jobs, idempotent checkpoints, retries with jitter, daily reconciliation, user-facing freshness and recovery states, content-free metrics, and disconnect cleanup.
+8. **Add read-only schedule context to the agent:** Add least-data event retrieval, source and freshness indicators, schedule/conflict tools, prompt-injection boundaries, and authorization tests; expose no calendar mutation tools.
 
-Issues 1, 2, and 6 can start in parallel. Issues 3 and 4 depend on 1 and 2; issue 5 depends on both adapters; issue 7 depends on 5 and 6.
+Issue 1 comes first. Issues 2, 3, and 4 follow its validated decisions and can then proceed in parallel. Issues 5 and 6 depend on 2 and 3; issue 7 depends on both adapters; issue 8 depends on 4 and 7.
 
 ## References
 
