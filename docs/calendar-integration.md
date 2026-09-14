@@ -38,7 +38,7 @@ The experience is read-only and follows these principles:
 | Pre-import confirmation | Access summary, date window, family visibility, confirm and back actions; no event data is retrieved yet |
 | Post-sync preview | Representative upcoming events exactly as the agent may disclose them, with source and privacy redaction visible |
 | Agent response | Human-readable source, freshness indicator, privacy-safe event display, and no claim of completeness when a source is stale |
-| Connection management | Pause/retry/reconnect, change selection or privacy, revoke and disconnect, export, and delete |
+| Connection management | Pause/retry/reconnect, change selection or privacy, disconnect and revoke where supported, export, and delete |
 
 Every asynchronous surface needs explicit loading, empty, partial, stale, permission-revoked, provider-unavailable, and unsupported-child-account states. Errors must explain whether existing results remain usable and offer a safe recovery action without exposing provider internals.
 
@@ -99,7 +99,7 @@ Privacy reductions are fail-closed and atomic from the user's perspective. Chang
 
 - Keep client secrets and encryption keys in a managed secret store; never ship them to a browser or mobile client.
 - Encrypt refresh tokens with envelope encryption and a managed KMS key. Restrict decryption to the synchronization service, rotate keys, and keep production credentials out of source control.
-- Store access tokens in memory or an encrypted short-lived cache only. Rotate refresh tokens when a provider returns a replacement and revoke them on disconnect.
+- Store access tokens in memory or an encrypted short-lived cache only. Rotate refresh tokens when a provider returns a replacement. On disconnect, revoke Google tokens through Google's revocation endpoint; for Microsoft, which has no per-application token-revocation endpoint, immediately delete local credentials and offer instructions for removing the application's consent in the Microsoft account.
 - Never log authorization codes, tokens, opaque sync links, raw event bodies, attendee addresses, or calendar IDs. Use generated internal IDs and structured redaction.
 - Enforce tenant/family ownership on every connection and event query. Separate OAuth callback state from user-supplied return URLs to prevent account-linking and redirect attacks.
 - Record connect, scope change, calendar selection, sync, export, disconnect, and deletion actions in a metadata-only audit trail.
@@ -121,6 +121,8 @@ Privacy reductions are fail-closed and atomic from the user's perspective. Chang
 - For Google, re-fetch and reconcile the complete bounded window because its sync tokens cannot be combined with the required time bounds. Page consistently, replace the previous snapshot only after a successful complete fetch, and rate-limit polling.
 - Run a daily reconciliation import to recover from missed changes. Stop promptly when access is revoked or a calendar is deselected.
 - Add provider webhooks later as a latency optimization, not as the source of truth. Validate webhook authenticity, use opaque subscription IDs, renew subscriptions, and still reconcile through each provider's authoritative refresh mechanism.
+
+A delete action must atomically pause and deselect the affected calendar before purging its data so a scheduled refresh cannot re-import it. Resuming that source requires the guardian to select it again and complete a fresh access summary and confirmation.
 
 Store provider timestamps in UTC while preserving the provider time-zone identifier and the original all-day date boundaries. Recurrence exceptions, cancellations, and moved occurrences must remain distinguishable. The agent must not infer that imported events are current if a connection is in an error or stale state.
 
@@ -174,7 +176,7 @@ Provider payloads remain authoritative. Normalization must preserve unknown valu
 - Default to data minimization: import only the configured window and selected calendars, hide private-event details unless explicitly allowed, and send only request-relevant fields to the model.
 - Do not use calendar data for advertising, model training, or unrelated profiling. Do not expose one family member's private details to another without an explicit family-sharing policy.
 - Treat titles, descriptions, locations, links, and attendee text as untrusted data, never as agent instructions. Escape rendered content and prevent events from triggering tools or write actions without an independent authorization check.
-- Provide export, disconnect, and deletion controls. Privacy downgrades and deselection purge newly disallowed content; disconnect additionally revokes provider access and queues tokens, cursors, normalized events, caches, and derived embeddings/summaries for deletion under a documented retention SLA. Retain only legally required audit metadata.
+- Provide export, disconnect, and deletion controls. Privacy downgrades and deselection purge newly disallowed content. Disconnect revokes access where the provider supports per-app revocation, deletes local credentials, and queues tokens, cursors, normalized events, caches, and derived embeddings/summaries for deletion under a documented retention SLA. Retain only legally required audit metadata.
 - Encrypt data in transit and at rest, apply least-privilege service roles, audit privileged access, define incident response, and periodically review provider grants.
 - Complete legal review against the [Google API Services User Data Policy](https://developers.google.com/terms/api-services-user-data-policy), Microsoft platform terms, and applicable child-privacy law before production use.
 
@@ -198,7 +200,7 @@ These issues start with UX validation, then secure foundations, provider synchro
 1. **Prototype and validate the calendar connection journey:** Create accessible prototypes for discovery, consent explanation, calendar selection, visibility, preview, errors, and connection management. Test terminology and trust with guardians before fixing the implementation contract.
 2. **Define calendar domain model and provider adapter contract:** Translate validated UX requirements into the normalized schema, migrations, adapter interface, mapping rules, and contract tests for recurrence, all-day boundaries, time zones, privacy, freshness, and deletion.
 3. **Implement secure OAuth connection storage:** Implement Microsoft and Google PKCE callbacks, encrypted token storage and rotation, strict state/redirect validation, scope display, revocation, audit redaction, and family ownership checks.
-4. **Build guardian consent and calendar privacy controls:** Implement guardian attestation, calendar-level selection, Details/Busy-only settings, audience controls, consent history, pre-import confirmation, fail-closed policy changes, content purge on privacy downgrade or deselection, export, disconnect, deletion, and family-isolation tests.
+4. **Build guardian consent and calendar privacy controls:** Implement guardian attestation, calendar-level selection, Details/Busy-only settings, audience controls, consent history, pre-import confirmation, fail-closed policy changes, content purge on privacy downgrade or deselection, export, provider-specific disconnect, deletion that stops re-import, and family-isolation tests.
 5. **Implement Microsoft Graph read-only calendar adapter:** Add calendar selection, bounded `calendarView` import, primary-calendar delta, bounded snapshot reconciliation for other calendars, pagination, throttling, cancellation handling, and adapter contract tests using `Calendars.Read`.
 6. **Implement Google Calendar read-only adapter:** Add calendar selection, bounded snapshot reconciliation, recurring-event expansion, pagination, deletion detection, throttling, and adapter contract tests using the two read-only scopes.
 7. **Build sync orchestration and observability:** Add scheduled jobs, idempotent per-calendar checkpoints, retries with jitter, daily reconciliation, the post-sync privacy-safe preview, user-facing freshness and recovery states, content-free metrics, and disconnect cleanup.
