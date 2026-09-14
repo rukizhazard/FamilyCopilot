@@ -20,7 +20,7 @@ The experience is read-only and follows these principles:
 ### Core journey
 
 1. **Discover:** Calendar settings explain the read-only benefit, supported providers, data use, and the difference between event details and busy-only access.
-2. **Connect Outlook:** The guardian selects **Connect Outlook**, chooses whether to connect only their calendars or include calendars already shared with them, reviews the corresponding read-only permissions, completes Microsoft consent, and returns to Family Copilot.
+2. **Connect Outlook:** The guardian selects **Connect Outlook**, reviews the single read-only calendar permission, completes Microsoft consent, and returns to Family Copilot. The subsequent Family Copilot picker—not the OAuth grant—controls which owned or shared custom calendars are included.
 3. **Connect the child's calendar:** Family Copilot explains how to share the Google calendar read-only with a guardian-controlled account. The guardian attests that they are authorized, selects **Connect Google**, and completes Google consent.
 4. **Choose access:** Family Copilot lists calendars without importing events. The guardian selects calendars, labels whose schedule each represents, and chooses **Details** or **Busy only** for each.
 5. **Review and confirm:** A summary shows accounts, calendars, visibility choices, imported date range, retention, and affected family members. Import starts only after confirmation.
