@@ -232,6 +232,7 @@ Issue 1 comes first. Issues 2 and 3 follow its validated decisions and can proce
 ## References
 
 - [Microsoft Graph calendar overview](https://learn.microsoft.com/graph/outlook-calendar-concept-overview)
+- [Get shared or delegated Outlook calendars and events](https://learn.microsoft.com/graph/outlook-get-shared-events-calendars)
 - [Microsoft Graph permissions reference](https://learn.microsoft.com/graph/permissions-reference)
 - [Microsoft Graph calendar view delta](https://learn.microsoft.com/graph/delta-query-events)
 - [Google Calendar API authorization scopes](https://developers.google.com/workspace/calendar/api/auth)
