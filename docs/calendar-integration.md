@@ -104,9 +104,10 @@ Store one connection per provider account and family. The connection record cont
 ### Initial import
 
 1. After consent, list accessible calendars and require the guardian to select each source explicitly.
-2. Import a configurable bounded window (initially 30 days in the past through 365 days in the future), paging until complete.
-3. Upsert normalized events by `(connection_id, provider_calendar_id, provider_event_id, occurrence_key)` and apply provider cancellation/deletion markers.
-4. Save a sync cursor only after all pages commit successfully. If a page fails, retry idempotently without advancing the cursor.
+2. Show the access summary and persist the guardian's confirmation, calendar ownership labels, and visibility choices before retrieving any events.
+3. Import a configurable bounded window (initially 30 days in the past through 365 days in the future), paging until complete.
+4. Upsert normalized events by `(connection_id, provider_calendar_id, provider_event_id, occurrence_key)` and apply provider cancellation/deletion markers.
+5. Save a sync cursor only after all pages commit successfully. If a page fails, retry idempotently without advancing the cursor.
 
 ### Incremental refresh
 
