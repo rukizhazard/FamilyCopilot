@@ -72,17 +72,17 @@ The integration consists of provider adapters behind one synchronization service
 
 Use [Microsoft Graph Calendar](https://learn.microsoft.com/graph/api/resources/calendar) with an app registration in Microsoft Entra ID that supports the intended account type, including personal Microsoft accounts when required.
 
-- Use the OAuth 2.0 [authorization code flow with PKCE](https://learn.microsoft.com/entra/identity-platform/v2-oauth2-auth-code-flow). Generate and verify `state` and `nonce`, use an exact allowlisted HTTPS redirect URI, and perform the code exchange on the server.
-- Request delegated `Calendars.Read` for read-only calendar access and `offline_access` for a refresh token. Request OIDC `openid` and `profile` only when they are needed to identify the connected account.
-- Use `/me/calendars` for calendar selection and `/me/calendars/{calendar-id}/calendarView` to load occurrences from each selected calendar in a bounded time window. Use [calendar view delta](https://learn.microsoft.com/graph/delta-query-events) per calendar to track additions, updates, and deletions; store returned `@odata.nextLink` and `@odata.deltaLink` values as opaque secrets.
+- Use the OAuth 2.0 [authorization code flow with PKCE](https://learn.microsoft.com/entra/identity-platform/v2-oauth2-auth-code-flow). Generate and verify `state` and OIDC `nonce`, use an exact allowlisted HTTPS redirect URI, and perform the code exchange on the server.
+- Request delegated `Calendars.Read` for read-only calendar access, `offline_access` for a refresh token, and OIDC `openid` for a stable connected-account subject. Request `profile` only if the UX needs additional account display fields.
+- Use `/me/calendars` for calendar selection and `/me/calendars/{calendar-id}/calendarView` to load occurrences from each selected calendar in a bounded time window. Microsoft Graph v1.0 [calendar view delta](https://learn.microsoft.com/graph/delta-query-events) supports the primary calendar, so use it there and store returned `@odata.nextLink` and `@odata.deltaLink` values as opaque secrets. Reconcile complete bounded snapshots for other selected calendars rather than relying on a beta per-calendar delta endpoint.
 - Do not request application permissions or `Calendars.ReadWrite` in the first release. A future write feature must use a separate incremental-consent step for delegated `Calendars.ReadWrite`.
 
 ### Google Calendar
 
 Use [Google Calendar API v3](https://developers.google.com/workspace/calendar/api/v3/reference) in a Google Cloud project with an OAuth consent screen.
 
-- Use the OAuth 2.0 [web-server authorization flow](https://developers.google.com/identity/protocols/oauth2/web-server) with PKCE, `state`, an exact allowlisted HTTPS redirect URI, and offline access. The server exchanges the code and stores any refresh token.
-- Request `https://www.googleapis.com/auth/calendar.calendarlist.readonly` so the parent can select an accessible calendar and `https://www.googleapis.com/auth/calendar.events.readonly` to read its events. Do not request the broader `calendar` scope.
+- Use the OAuth 2.0 [web-server authorization flow](https://developers.google.com/identity/protocols/oauth2/web-server) with PKCE, `state`, OIDC `nonce`, an exact allowlisted HTTPS redirect URI, and offline access. The server exchanges the code, validates the ID token, and stores any refresh token.
+- Request OIDC `openid` for a stable connected-account subject and `email` so the confirmation UI can identify the account. Request `https://www.googleapis.com/auth/calendar.calendarlist.readonly` so the parent can select an accessible calendar and `https://www.googleapis.com/auth/calendar.events.readonly` to read its events. Do not request the broader `calendar` scope.
 - Use `calendarList.list` for selection and [`events.list`](https://developers.google.com/workspace/calendar/api/v3/reference/events/list) for loading. Expand recurring events with `singleEvents=true` and retain the series identifier.
 - Refresh Google calendars with bounded `events.list` queries using the same import window, `singleEvents=true`, and `showDeleted=true`, then reconcile the complete paged result. Do not combine `syncToken` with `timeMin` or `timeMax`; Google prohibits that combination. An unbounded sync-token strategy may be considered later only after a separate data-retention and privacy review.
 - Do not request write scopes in the first release. A future write feature must use a separate incremental-consent step for `https://www.googleapis.com/auth/calendar.events`.
@@ -112,12 +112,12 @@ Privacy reductions are fail-closed and atomic from the user's perspective. Chang
 2. Show the access summary and persist the guardian's confirmation, calendar ownership labels, and visibility choices before retrieving any events.
 3. Import a configurable bounded window (initially 30 days in the past through 365 days in the future), paging until complete.
 4. Upsert normalized events by `(connection_id, provider_calendar_id, provider_event_id, occurrence_key)` and apply provider cancellation/deletion markers.
-5. For Microsoft, save a sync cursor only after all pages commit successfully. If a page fails, retry idempotently without advancing the cursor.
+5. For the primary Microsoft calendar, save a sync cursor only after all pages commit successfully. If a page fails, retry idempotently without advancing the cursor.
 
 ### Incremental refresh
 
 - Poll each connected calendar initially every 15 minutes with jitter and exponential backoff. Respect provider throttling and `Retry-After`.
-- Use Microsoft calendar-view delta links per selected calendar. Treat each cursor as bound to its calendar, time window, and request parameters; when rejected, clear it and repeat the bounded import.
+- Use Microsoft calendar-view delta links for the primary calendar. Treat its cursor as bound to the time window and request parameters; when rejected, clear it and repeat the bounded import. Reconcile complete bounded snapshots for non-primary Microsoft calendars.
 - For Google, re-fetch and reconcile the complete bounded window because its sync tokens cannot be combined with the required time bounds. Page consistently, replace the previous snapshot only after a successful complete fetch, and rate-limit polling.
 - Run a daily reconciliation import to recover from missed changes. Stop promptly when access is revoked or a calendar is deselected.
 - Add provider webhooks later as a latency optimization, not as the source of truth. Validate webhook authenticity, use opaque subscription IDs, renew subscriptions, and still reconcile through each provider's authoritative refresh mechanism.
@@ -199,7 +199,7 @@ These issues start with UX validation, then secure foundations, provider synchro
 2. **Define calendar domain model and provider adapter contract:** Translate validated UX requirements into the normalized schema, migrations, adapter interface, mapping rules, and contract tests for recurrence, all-day boundaries, time zones, privacy, freshness, and deletion.
 3. **Implement secure OAuth connection storage:** Implement Microsoft and Google PKCE callbacks, encrypted token storage and rotation, strict state/redirect validation, scope display, revocation, audit redaction, and family ownership checks.
 4. **Build guardian consent and calendar privacy controls:** Implement guardian attestation, calendar-level selection, Details/Busy-only settings, audience controls, consent history, pre-import confirmation, fail-closed policy changes, content purge on privacy downgrade or deselection, export, disconnect, deletion, and family-isolation tests.
-5. **Implement Microsoft Graph read-only calendar adapter:** Add calendar selection, bounded `calendarView` import, pagination, delta links, throttling, cancellation handling, and adapter contract tests using `Calendars.Read`.
+5. **Implement Microsoft Graph read-only calendar adapter:** Add calendar selection, bounded `calendarView` import, primary-calendar delta, bounded snapshot reconciliation for other calendars, pagination, throttling, cancellation handling, and adapter contract tests using `Calendars.Read`.
 6. **Implement Google Calendar read-only adapter:** Add calendar selection, bounded snapshot reconciliation, recurring-event expansion, pagination, deletion detection, throttling, and adapter contract tests using the two read-only scopes.
 7. **Build sync orchestration and observability:** Add scheduled jobs, idempotent per-calendar checkpoints, retries with jitter, daily reconciliation, the post-sync privacy-safe preview, user-facing freshness and recovery states, content-free metrics, and disconnect cleanup.
 8. **Add read-only schedule context to the agent:** Add least-data event retrieval, source and freshness indicators, schedule/conflict tools, prompt-injection boundaries, and authorization tests; expose no calendar mutation tools.
