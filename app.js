@@ -6,8 +6,8 @@
     { id:"exhibition", type:"exhibition", age:"7-10", date:"2026-06-21", cost:0, title:"Build It! Materials Exhibition — 21 June, 11:00–16:00", venue:"Mock Museum, Riverside", guidance:"All ages; activity table best for 7–10", rationale:"Making table and material displays suit the selected age range.", source:"Local mock source panel: Museum listing", url:"https://mock.example.test/build-it" }
   ];
   const state = { scenario:"no-calendar", selected:[], disclosure:"busy", confirmed:false };
-  const text = value => String(value == null ? "" : value);
-  const escapeHtml = value => text(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+  const toSafeString = value => String(value == null ? "" : value);
+  const escapeHtml = value => toSafeString(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
   const safeHttpUrl = value => { try { const u = new URL(value); return /^https?:$/.test(u.protocol) ? u.href : null; } catch { return null; } };
   const canConfirmImport = (selected, attested) => selected.length > 0 && attested;
   const calendarCommitment = (disclosure, confirmed, title) => disclosure === "details" && confirmed ? `Alex sample: ${title}` : "Unavailable — busy-only block";
@@ -48,11 +48,29 @@
     out.innerHTML = card("Extracted local mock facts — simulated", `<p><strong>Exact identity:</strong> ${item.title}</p><p><strong>Venue:</strong> ${item.venue}; <strong>Age:</strong> ${item.guidance}; <strong>Cost:</strong> $${item.cost}</p><p><strong>Mock provenance:</strong> ${item.source}. <strong>Schedule comparison:</strong> ${availabilityMessage(state.scenario, state.selected)}</p>`, "ok");
   }
   function renderImportSummary() {
-    const out = document.querySelector("#import-summary"), chosen = [...document.querySelectorAll("[name=calendar]:checked")].map(x => x.value);
-    state.selected = chosen; state.disclosure = document.querySelector("#disclosure").value;
-    if (!canConfirmImport(chosen, document.querySelector("#authority").checked)) { out.innerHTML = card("Sample import not ready", "<p>Select at least one synthetic calendar and the fictional guardian attestation. Nothing has been loaded.</p>", "alert"); return; }
+    const out = document.querySelector("#import-summary");
+    const chosen = [...document.querySelectorAll("[name=calendar]:checked")].map(x => x.value);
+    const isAttested = document.querySelector("#authority").checked;
+    state.selected = chosen;
+    state.disclosure = document.querySelector("#disclosure").value;
+    if (!canConfirmImport(chosen, isAttested)) {
+      out.innerHTML = card("Sample import not ready", "<p>Select at least one synthetic calendar and the fictional guardian attestation. Nothing has been loaded.</p>", "alert");
+      return;
+    }
     state.confirmed = false;
-    out.innerHTML = card("Confirm sample import", `<p>Fictional account alex.demo@example.test · selected: ${chosen.join(", ")} · disclosure: ${state.disclosure === "busy" ? "Busy only" : "Details"} · sample window: 20–21 June 2026.</p><p><strong>Disclosure preview:</strong> ${state.disclosure === "busy" ? "Unavailable time only; no event titles, locations, attendees, or inferred purpose." : "Synthetic titles may appear only in this demo."}</p><button id="confirm-import">Confirm and load samples</button>`);
+    const article = document.createElement("article");
+    const heading = document.createElement("h3");
+    const summary = document.createElement("p");
+    const preview = document.createElement("p");
+    const confirm = document.createElement("button");
+    article.className = "result-card";
+    heading.textContent = "Confirm sample import";
+    summary.textContent = `Fictional account alex.demo@example.test · selected: ${chosen.includes("alex") ? "Alex" : ""}${chosen.length === 2 ? ", Sam" : chosen.includes("sam") ? "Sam" : ""} · disclosure: ${state.disclosure === "busy" ? "Busy only" : "Details"} · sample window: 20–21 June 2026.`;
+    preview.textContent = state.disclosure === "busy" ? "Disclosure preview: unavailable time only; no event titles, locations, attendees, or inferred purpose." : "Disclosure preview: synthetic titles may appear only in this demo.";
+    confirm.id = "confirm-import";
+    confirm.textContent = "Confirm and load samples";
+    article.append(heading, summary, preview, confirm);
+    out.replaceChildren(article);
   }
   function reset() { Object.assign(state, resetState()); document.querySelector("#scenario").value="no-calendar"; document.querySelectorAll("[name=calendar],#authority").forEach(x => x.checked=false); document.querySelector("#disclosure").value="busy"; document.querySelector("#import-summary").innerHTML=""; document.querySelector("#management-status").textContent="Demo reset. No sample calendars selected."; renderWeekend(); renderActivities(); }
   function init() {
