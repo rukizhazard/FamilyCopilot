@@ -84,7 +84,7 @@ Use [Google Calendar API v3](https://developers.google.com/workspace/calendar/ap
 - Use the OAuth 2.0 [web-server authorization flow](https://developers.google.com/identity/protocols/oauth2/web-server) with PKCE, `state`, an exact allowlisted HTTPS redirect URI, and offline access. The server exchanges the code and stores any refresh token.
 - Request `https://www.googleapis.com/auth/calendar.calendarlist.readonly` so the parent can select an accessible calendar and `https://www.googleapis.com/auth/calendar.events.readonly` to read its events. Do not request the broader `calendar` scope.
 - Use `calendarList.list` for selection and [`events.list`](https://developers.google.com/workspace/calendar/api/v3/reference/events/list) for loading. Expand recurring events with `singleEvents=true` and retain the series identifier.
-- Follow Google's [incremental synchronization](https://developers.google.com/workspace/calendar/api/guides/sync): retain `nextSyncToken`, reuse the same compatible query parameters, and perform a bounded full resync if Google returns HTTP `410 Gone`.
+- Refresh Google calendars with bounded `events.list` queries using the same import window, `singleEvents=true`, and `showDeleted=true`, then reconcile the complete paged result. Do not combine `syncToken` with `timeMin` or `timeMax`; Google prohibits that combination. An unbounded sync-token strategy may be considered later only after a separate data-retention and privacy review.
 - Do not request write scopes in the first release. A future write feature must use a separate incremental-consent step for `https://www.googleapis.com/auth/calendar.events`.
 
 For a child's calendar, the preferred setup is for its owner or administrator to share the calendar read-only with a guardian-controlled Google account. The guardian then authorizes Family Copilot and explicitly selects that calendar. The application must not ask a child to share a password or capture a child's credentials. Workspace or supervised-account restrictions may prevent sharing or third-party OAuth; the UI must report that limitation rather than bypass it.
@@ -94,6 +94,8 @@ For a child's calendar, the preferred setup is for its owner or administrator to
 Store one connection per provider account and family. The connection record contains the provider, provider account subject, granted scopes, token expiry, consent timestamps, and encrypted refresh credential.
 
 Store a separate selection record for every connected calendar. It contains an internal connection reference, encrypted provider calendar ID, guardian-assigned family member, disclosure mode (`details` or `busy_only`), allowed family audience, consent-policy version and timestamp, lifecycle state (`active`, `paused`, or `disconnected`), and that calendar's sync cursor. Authorization checks and redaction use this record rather than provider visibility alone.
+
+Privacy reductions are fail-closed and atomic from the user's perspective. Changing from Details to Busy-only, narrowing the audience, or deselecting a calendar immediately blocks the old disclosure policy and queues deletion of no-longer-permitted fields from normalized records, caches, embeddings, and summaries. The UI shows the change as pending until cleanup succeeds and retries failures without restoring broader access.
 
 - Keep client secrets and encryption keys in a managed secret store; never ship them to a browser or mobile client.
 - Encrypt refresh tokens with envelope encryption and a managed KMS key. Restrict decryption to the synchronization service, rotate keys, and keep production credentials out of source control.
@@ -110,13 +112,13 @@ Store a separate selection record for every connected calendar. It contains an i
 2. Show the access summary and persist the guardian's confirmation, calendar ownership labels, and visibility choices before retrieving any events.
 3. Import a configurable bounded window (initially 30 days in the past through 365 days in the future), paging until complete.
 4. Upsert normalized events by `(connection_id, provider_calendar_id, provider_event_id, occurrence_key)` and apply provider cancellation/deletion markers.
-5. Save a sync cursor only after all pages commit successfully. If a page fails, retry idempotently without advancing the cursor.
+5. For Microsoft, save a sync cursor only after all pages commit successfully. If a page fails, retry idempotently without advancing the cursor.
 
 ### Incremental refresh
 
 - Poll each connected calendar initially every 15 minutes with jitter and exponential backoff. Respect provider throttling and `Retry-After`.
-- Use Microsoft calendar-view delta links and Google sync tokens rather than repeatedly downloading the full window.
-- Treat cursors as bound to the calendar, time window, and request parameters. When a cursor expires or is rejected, clear it and repeat the bounded import.
+- Use Microsoft calendar-view delta links per selected calendar. Treat each cursor as bound to its calendar, time window, and request parameters; when rejected, clear it and repeat the bounded import.
+- For Google, re-fetch and reconcile the complete bounded window because its sync tokens cannot be combined with the required time bounds. Page consistently, replace the previous snapshot only after a successful complete fetch, and rate-limit polling.
 - Run a daily reconciliation import to recover from missed changes. Stop promptly when access is revoked or a calendar is deselected.
 - Add provider webhooks later as a latency optimization, not as the source of truth. Validate webhook authenticity, use opaque subscription IDs, renew subscriptions, and still reconcile by delta.
 
@@ -172,7 +174,7 @@ Provider payloads remain authoritative. Normalization must preserve unknown valu
 - Default to data minimization: import only the configured window and selected calendars, hide private-event details unless explicitly allowed, and send only request-relevant fields to the model.
 - Do not use calendar data for advertising, model training, or unrelated profiling. Do not expose one family member's private details to another without an explicit family-sharing policy.
 - Treat titles, descriptions, locations, links, and attendee text as untrusted data, never as agent instructions. Escape rendered content and prevent events from triggering tools or write actions without an independent authorization check.
-- Provide export, disconnect, and deletion controls. Disconnect revokes provider access and queues tokens, cursors, normalized events, caches, and derived embeddings/summaries for deletion under a documented retention SLA; retain only legally required audit metadata.
+- Provide export, disconnect, and deletion controls. Privacy downgrades and deselection purge newly disallowed content; disconnect additionally revokes provider access and queues tokens, cursors, normalized events, caches, and derived embeddings/summaries for deletion under a documented retention SLA. Retain only legally required audit metadata.
 - Encrypt data in transit and at rest, apply least-privilege service roles, audit privileged access, define incident response, and periodically review provider grants.
 - Complete legal review against the [Google API Services User Data Policy](https://developers.google.com/terms/api-services-user-data-policy), Microsoft platform terms, and applicable child-privacy law before production use.
 
@@ -196,9 +198,9 @@ These issues start with UX validation, then secure foundations, provider synchro
 1. **Prototype and validate the calendar connection journey:** Create accessible prototypes for discovery, consent explanation, calendar selection, visibility, preview, errors, and connection management. Test terminology and trust with guardians before fixing the implementation contract.
 2. **Define calendar domain model and provider adapter contract:** Translate validated UX requirements into the normalized schema, migrations, adapter interface, mapping rules, and contract tests for recurrence, all-day boundaries, time zones, privacy, freshness, and deletion.
 3. **Implement secure OAuth connection storage:** Implement Microsoft and Google PKCE callbacks, encrypted token storage and rotation, strict state/redirect validation, scope display, revocation, audit redaction, and family ownership checks.
-4. **Build guardian consent and calendar privacy controls:** Implement guardian attestation, calendar-level selection, Details/Busy-only settings, audience controls, consent history, pre-import confirmation, export, disconnect, deletion, and family-isolation tests.
+4. **Build guardian consent and calendar privacy controls:** Implement guardian attestation, calendar-level selection, Details/Busy-only settings, audience controls, consent history, pre-import confirmation, fail-closed policy changes, content purge on privacy downgrade or deselection, export, disconnect, deletion, and family-isolation tests.
 5. **Implement Microsoft Graph read-only calendar adapter:** Add calendar selection, bounded `calendarView` import, pagination, delta links, throttling, cancellation handling, and adapter contract tests using `Calendars.Read`.
-6. **Implement Google Calendar read-only adapter:** Add calendar selection, bounded event import, recurring-event expansion, pagination, sync tokens, `410` recovery, throttling, and adapter contract tests using the two read-only scopes.
+6. **Implement Google Calendar read-only adapter:** Add calendar selection, bounded snapshot reconciliation, recurring-event expansion, pagination, deletion detection, throttling, and adapter contract tests using the two read-only scopes.
 7. **Build sync orchestration and observability:** Add scheduled jobs, idempotent per-calendar checkpoints, retries with jitter, daily reconciliation, the post-sync privacy-safe preview, user-facing freshness and recovery states, content-free metrics, and disconnect cleanup.
 8. **Add read-only schedule context to the agent:** Add least-data event retrieval, source and freshness indicators, schedule/conflict tools, prompt-injection boundaries, and authorization tests; expose no calendar mutation tools.
 
@@ -210,5 +212,5 @@ Issue 1 comes first. Issues 2 and 3 follow its validated decisions and can proce
 - [Microsoft Graph permissions reference](https://learn.microsoft.com/graph/permissions-reference)
 - [Microsoft Graph calendar view delta](https://learn.microsoft.com/graph/delta-query-events)
 - [Google Calendar API authorization scopes](https://developers.google.com/workspace/calendar/api/auth)
-- [Google Calendar API incremental synchronization](https://developers.google.com/workspace/calendar/api/guides/sync)
+- [Google Calendar API synchronize resources](https://developers.google.com/workspace/calendar/api/guides/sync)
 - [Google Calendar API push notifications](https://developers.google.com/workspace/calendar/api/guides/push)
