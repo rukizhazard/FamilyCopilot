@@ -3,4 +3,4 @@ Family Copilot — 協助家長按需了解家庭行程、分析時間衝突，�
 
 ## Planning
 
-- [Parent-facing schedule and activity discovery](docs/calendar-integration.md)
+- [Parent-facing schedule and activity discovery](docs/parent-schedule-activity-discovery.md)
