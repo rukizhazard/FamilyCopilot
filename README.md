@@ -1,5 +1,5 @@
 # FamilyCopilot
-Family Copilot is an AI Chief of Staff for families. It understands what matters across school, work, activities, and personal interests, then proactively coordinates schedules, resolves conflicts, and helps families make better decisions before important moments are missed.。
+Family Copilot is an AI Chief of Staff for families. It understands what matters across school, work, activities, and personal interests, then proactively coordinates schedules, resolves conflicts, and helps families make better decisions before important moments are missed.
 
 ## Static UX prototype (sample data only)
 
