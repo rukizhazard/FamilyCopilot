@@ -40,7 +40,7 @@ The experience is read-only and follows these principles:
 - **Parent/guardian:** asks questions, connects provider accounts, confirms authority to use a child's calendar, chooses calendars and privacy levels, and manages or removes access.
 - **Other parent:** may connect their own account and receives only information allowed by the calendar owner's disclosure policy. Direct child use is outside the first version, and a child is never asked to provide credentials.
 
-The connected account, the person whose schedule a calendar represents, the fields Family Copilot may process, and the people who may receive those fields are separate decisions. A personal or work calendar defaults to busy-only disclosure to another parent. Its details may answer the calendar owner's own question but are not thereby authorized for disclosure to anyone else.
+The connected account, the person whose schedule a calendar represents, the fields Family Copilot may process, and the people who may receive those fields are separate decisions. In the first version, a personal or work calendar is always busy-only when disclosed to another parent or family member. Its details may answer the calendar owner's own question but are never disclosed cross-parent.
 
 ### Core journey
 
@@ -294,8 +294,8 @@ Validate disclosure rules with concrete scenarios before building a generalized 
 
 | Scenario | Allowed response |
 | --- | --- |
-| Parent asks about their own work calendar | Use authorized details for that parent's answer; do not disclose them to another parent by default |
-| Other parent asks when the calendar owner is available | Return busy intervals only unless the owner explicitly authorized broader family disclosure |
+| Parent asks about their own work calendar | Use authorized details for that parent's answer; never disclose those details to another parent in the first version |
+| Other parent asks when the calendar owner is available | Return busy intervals only; personal/work event details are never disclosed cross-parent in the first version |
 | Parent asks about an authorized child/activity calendar | Use only fields permitted by the provider share and recorded guardian policy |
 | Event is private, outside the requester's audience, or busy-only | Report unavailable time without title, location, attendees, description, or inferred purpose |
 | Child calendar is missing, stale, or unsupported | Name the missing context and say availability cannot be fully verified |
@@ -303,6 +303,8 @@ Validate disclosure rules with concrete scenarios before building a generalized 
 ## Planning review and eventual rollout criteria
 
 Before implementation, the parent reviews and agrees the scenarios, on-demand behavior, non-goals, privacy examples, calendar feasibility result, demo storyboard, activity result contract, and sample/mock labeling. Unresolved choices remain visibly marked; this plan is not approval to start coding.
+
+PR #2 reconciles the written proposal with the updated issue but does not complete the issue's validation acceptance criteria. Issue #1 must remain open until the parent review, actual Family Link/account feasibility test, and hosted-web storyboard usability review are completed and their outcomes are recorded here. Remove any automatic closing reference from the PR before merge if those gates are still open.
 
 An eventual first version can maintain a read-only schedule view, answer schedule questions, identify possible conflicts, research activities, and assess event pages. It cannot create, edit, delete, accept, or decline events; notify proactively; monitor tickets; book; register; or purchase. UI copy and agent tools must make those boundaries explicit.
 
