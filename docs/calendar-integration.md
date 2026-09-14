@@ -93,9 +93,9 @@ For a child's calendar, the preferred setup is for its owner or administrator to
 
 Store one connection per provider account and family. The connection record contains the provider, provider account subject, granted scopes, token expiry, consent timestamps, and encrypted refresh credential.
 
-Store a separate selection record for every connected calendar. It contains an internal connection reference, encrypted provider calendar ID, guardian-assigned family member, disclosure mode (`details` or `busy_only`), allowed family audience, consent-policy version and timestamp, lifecycle state (`active`, `paused`, or `disconnected`), and an optional per-calendar sync cursor. Authorization checks and redaction use this record rather than provider visibility alone.
+Store a separate selection record for every connected calendar. It contains an internal connection reference, encrypted provider calendar ID, guardian-assigned family member, disclosure mode (`details` or `busy_only`), allowed family audience, consent-policy version and timestamp, lifecycle state (`active`, `paused`, or `disconnected`), synchronization generation, and an optional per-calendar sync cursor. Authorization checks and redaction use this record rather than provider visibility alone.
 
-Privacy reductions are fail-closed and atomic from the user's perspective. Changing from Details to Busy-only, narrowing the audience, or deselecting a calendar immediately blocks the old disclosure policy and queues deletion of no-longer-permitted fields from normalized records, caches, embeddings, and summaries. The UI shows the change as pending until cleanup succeeds and retries failures without restoring broader access.
+Privacy reductions are fail-closed and atomic from the user's perspective. Changing from Details to Busy-only, narrowing the audience, or deselecting a calendar immediately blocks the old disclosure policy, advances its synchronization generation, and queues deletion of no-longer-permitted fields from normalized records, caches, embeddings, and summaries. The UI shows the change as pending until cleanup succeeds and retries failures without restoring broader access.
 
 - Keep client secrets and encryption keys in a managed secret store; never ship them to a browser or mobile client.
 - Encrypt refresh tokens with envelope encryption and a managed KMS key. Restrict decryption to the synchronization service, rotate keys, and keep production credentials out of source control.
@@ -117,12 +117,13 @@ Privacy reductions are fail-closed and atomic from the user's perspective. Chang
 ### Incremental refresh
 
 - Poll each connected calendar initially every 15 minutes with jitter and exponential backoff. Respect provider throttling and `Retry-After`.
+- Each job captures the selection's synchronization generation when it starts and may commit only while the selection is still active with the same generation. Privacy changes, pause, deselection, deletion, and disconnect advance the generation transactionally, fencing in-flight jobs before cleanup.
 - Use Microsoft calendar-view delta links for the primary calendar. Treat its cursor as bound to the time window and request parameters; when rejected, clear it and repeat the bounded import. Reconcile complete bounded snapshots for non-primary Microsoft calendars.
 - For Google, re-fetch and reconcile the complete bounded window because its sync tokens cannot be combined with the required time bounds. Page consistently, replace the previous snapshot only after a successful complete fetch, and rate-limit polling.
 - Run a daily reconciliation import to recover from missed changes. Stop promptly when access is revoked or a calendar is deselected.
 - Add provider webhooks later as a latency optimization, not as the source of truth. Validate webhook authenticity, use opaque subscription IDs, renew subscriptions, and still reconcile through each provider's authoritative refresh mechanism.
 
-A delete action must atomically pause and deselect the affected calendar before purging its data so a scheduled refresh cannot re-import it. Resuming that source requires the guardian to select it again and complete a fresh access summary and confirmation.
+A delete action must atomically pause and deselect the affected calendar, advance its synchronization generation, and then purge its data so scheduled or in-flight refreshes cannot re-import it. Resuming that source requires the guardian to select it again and complete a fresh access summary and confirmation.
 
 Store provider timestamps in UTC while preserving the provider time-zone identifier and the original all-day date boundaries. Recurrence exceptions, cancellations, and moved occurrences must remain distinguishable. The agent must not infer that imported events are current if a connection is in an error or stale state.
 
@@ -203,7 +204,7 @@ These issues start with UX validation, then secure foundations, provider synchro
 4. **Build guardian consent and calendar privacy controls:** Implement guardian attestation, calendar-level selection, Details/Busy-only settings, audience controls, consent history, pre-import confirmation, fail-closed policy changes, content purge on privacy downgrade or deselection, export, provider-specific disconnect, deletion that stops re-import, and family-isolation tests.
 5. **Implement Microsoft Graph read-only calendar adapter:** Add calendar selection, bounded `calendarView` import, primary-calendar delta, bounded snapshot reconciliation for other calendars, pagination, throttling, cancellation handling, and adapter contract tests using `Calendars.Read`.
 6. **Implement Google Calendar read-only adapter:** Add calendar selection, bounded snapshot reconciliation, recurring-event expansion, pagination, deletion detection, throttling, and adapter contract tests using the two read-only scopes.
-7. **Build sync orchestration and observability:** Add scheduled jobs, idempotent per-calendar checkpoints, retries with jitter, daily reconciliation, the post-sync privacy-safe preview, user-facing freshness and recovery states, content-free metrics, and disconnect cleanup.
+7. **Build sync orchestration and observability:** Add scheduled jobs, generation-fenced commits, idempotent per-calendar checkpoints, retries with jitter, daily reconciliation, the post-sync privacy-safe preview, user-facing freshness and recovery states, content-free metrics, and disconnect cleanup.
 8. **Add read-only schedule context to the agent:** Add least-data event retrieval, source and freshness indicators, schedule/conflict tools, prompt-injection boundaries, and authorization tests; expose no calendar mutation tools.
 
 Issue 1 comes first. Issues 2 and 3 follow its validated decisions and can proceed in parallel. Issue 4 depends on 2 and 3; issues 5 and 6 depend on 2 and 3; issue 7 depends on 4 and both adapters; issue 8 depends on 7.
