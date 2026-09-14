@@ -35,7 +35,8 @@ The experience is read-only and follows these principles:
 | Calendar overview | Provider connection cards, read-only badge, last successful sync, selected calendar count, and manage action |
 | Pre-consent explanation | Benefits, exact data uses, fields requested, retention summary, provider scopes, and cancel action |
 | Calendar picker | Account identity, calendar owner/label, selection toggle, Details/Busy-only choice, and child-calendar attestation |
-| Confirmation and preview | Access summary, date window, family visibility, sample normalized events, confirm and back actions |
+| Pre-import confirmation | Access summary, date window, family visibility, confirm and back actions; no event data is retrieved yet |
+| Post-sync preview | Representative upcoming events exactly as the agent may disclose them, with source and privacy redaction visible |
 | Agent response | Human-readable source, freshness indicator, privacy-safe event display, and no claim of completeness when a source is stale |
 | Connection management | Pause/retry/reconnect, change selection or privacy, revoke and disconnect, export, and delete |
 
@@ -73,7 +74,7 @@ Use [Microsoft Graph Calendar](https://learn.microsoft.com/graph/api/resources/c
 
 - Use the OAuth 2.0 [authorization code flow with PKCE](https://learn.microsoft.com/entra/identity-platform/v2-oauth2-auth-code-flow). Generate and verify `state` and `nonce`, use an exact allowlisted HTTPS redirect URI, and perform the code exchange on the server.
 - Request delegated `Calendars.Read` for read-only calendar access and `offline_access` for a refresh token. Request OIDC `openid` and `profile` only when they are needed to identify the connected account.
-- Use `/me/calendars` for calendar selection and `/me/calendarView` to load occurrences in a bounded time window. Use [calendar view delta](https://learn.microsoft.com/graph/delta-query-events) to track additions, updates, and deletions; store returned `@odata.nextLink` and `@odata.deltaLink` values as opaque secrets.
+- Use `/me/calendars` for calendar selection and `/me/calendars/{calendar-id}/calendarView` to load occurrences from each selected calendar in a bounded time window. Use [calendar view delta](https://learn.microsoft.com/graph/delta-query-events) per calendar to track additions, updates, and deletions; store returned `@odata.nextLink` and `@odata.deltaLink` values as opaque secrets.
 - Do not request application permissions or `Calendars.ReadWrite` in the first release. A future write feature must use a separate incremental-consent step for delegated `Calendars.ReadWrite`.
 
 ### Google Calendar
@@ -90,7 +91,9 @@ For a child's calendar, the preferred setup is for its owner or administrator to
 
 ## Secure connection and token handling
 
-Store one connection per provider account and family. The connection record contains the provider, provider account subject, selected calendar IDs, granted scopes, sync cursor, token expiry, consent timestamps, and encrypted refresh credential.
+Store one connection per provider account and family. The connection record contains the provider, provider account subject, granted scopes, token expiry, consent timestamps, and encrypted refresh credential.
+
+Store a separate selection record for every connected calendar. It contains an internal connection reference, encrypted provider calendar ID, guardian-assigned family member, disclosure mode (`details` or `busy_only`), allowed family audience, consent-policy version and timestamp, lifecycle state (`active`, `paused`, or `disconnected`), and that calendar's sync cursor. Authorization checks and redaction use this record rather than provider visibility alone.
 
 - Keep client secrets and encryption keys in a managed secret store; never ship them to a browser or mobile client.
 - Encrypt refresh tokens with envelope encryption and a managed KMS key. Restrict decryption to the synchronization service, rotate keys, and keep production credentials out of source control.
@@ -126,6 +129,7 @@ CalendarEvent
   id: UUID
   family_id: UUID
   connection_id: UUID
+  calendar_selection_id: UUID
   source: "microsoft" | "google"
   provider_calendar_id: encrypted string
   provider_event_id: encrypted string
@@ -192,13 +196,13 @@ These issues start with UX validation, then secure foundations, provider synchro
 1. **Prototype and validate the calendar connection journey:** Create accessible prototypes for discovery, consent explanation, calendar selection, visibility, preview, errors, and connection management. Test terminology and trust with guardians before fixing the implementation contract.
 2. **Define calendar domain model and provider adapter contract:** Translate validated UX requirements into the normalized schema, migrations, adapter interface, mapping rules, and contract tests for recurrence, all-day boundaries, time zones, privacy, freshness, and deletion.
 3. **Implement secure OAuth connection storage:** Implement Microsoft and Google PKCE callbacks, encrypted token storage and rotation, strict state/redirect validation, scope display, revocation, audit redaction, and family ownership checks.
-4. **Build guardian consent and calendar privacy controls:** Implement guardian attestation, calendar-level selection, Details/Busy-only settings, consent history, preview, export, disconnect, deletion, and family-isolation tests.
+4. **Build guardian consent and calendar privacy controls:** Implement guardian attestation, calendar-level selection, Details/Busy-only settings, audience controls, consent history, pre-import confirmation, export, disconnect, deletion, and family-isolation tests.
 5. **Implement Microsoft Graph read-only calendar adapter:** Add calendar selection, bounded `calendarView` import, pagination, delta links, throttling, cancellation handling, and adapter contract tests using `Calendars.Read`.
 6. **Implement Google Calendar read-only adapter:** Add calendar selection, bounded event import, recurring-event expansion, pagination, sync tokens, `410` recovery, throttling, and adapter contract tests using the two read-only scopes.
-7. **Build sync orchestration and observability:** Add scheduled jobs, idempotent checkpoints, retries with jitter, daily reconciliation, user-facing freshness and recovery states, content-free metrics, and disconnect cleanup.
+7. **Build sync orchestration and observability:** Add scheduled jobs, idempotent per-calendar checkpoints, retries with jitter, daily reconciliation, the post-sync privacy-safe preview, user-facing freshness and recovery states, content-free metrics, and disconnect cleanup.
 8. **Add read-only schedule context to the agent:** Add least-data event retrieval, source and freshness indicators, schedule/conflict tools, prompt-injection boundaries, and authorization tests; expose no calendar mutation tools.
 
-Issue 1 comes first. Issues 2, 3, and 4 follow its validated decisions and can then proceed in parallel. Issues 5 and 6 depend on 2 and 3; issue 7 depends on both adapters; issue 8 depends on 4 and 7.
+Issue 1 comes first. Issues 2 and 3 follow its validated decisions and can proceed in parallel. Issue 4 depends on 2 and 3; issues 5 and 6 depend on 2 and 3; issue 7 depends on 4 and both adapters; issue 8 depends on 7.
 
 ## References
 
