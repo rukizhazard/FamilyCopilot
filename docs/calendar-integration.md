@@ -20,7 +20,7 @@ The experience is read-only and follows these principles:
 ### Core journey
 
 1. **Discover:** Calendar settings explain the read-only benefit, supported providers, data use, and the difference between event details and busy-only access.
-2. **Connect Outlook:** The guardian selects **Connect Outlook**, reviews the requested read-only permission, completes Microsoft consent, and returns to Family Copilot.
+2. **Connect Outlook:** The guardian selects **Connect Outlook**, chooses whether to connect only their calendars or include calendars already shared with them, reviews the corresponding read-only permissions, completes Microsoft consent, and returns to Family Copilot.
 3. **Connect the child's calendar:** Family Copilot explains how to share the Google calendar read-only with a guardian-controlled account. The guardian attests that they are authorized, selects **Connect Google**, and completes Google consent.
 4. **Choose access:** Family Copilot lists calendars without importing events. The guardian selects calendars, labels whose schedule each represents, and chooses **Details** or **Busy only** for each.
 5. **Review and confirm:** A summary shows accounts, calendars, visibility choices, imported date range, retention, and affected family members. Import starts only after confirmation.
@@ -34,7 +34,7 @@ The experience is read-only and follows these principles:
 | --- | --- |
 | Calendar overview | Provider connection cards, read-only badge, last successful sync, selected calendar count, and manage action |
 | Pre-consent explanation | Benefits, exact data uses, fields requested, retention summary, provider scopes, and cancel action |
-| Calendar picker | Account identity, calendar owner/label, selection toggle, Details/Busy-only choice, and child-calendar attestation |
+| Calendar picker | Account identity, calendar owner/label, selection toggle, Details/Busy-only choice, sharing instructions when an expected family calendar is missing, and child-calendar attestation |
 | Pre-import confirmation | Access summary, date window, family visibility, confirm and back actions; no event data is retrieved yet |
 | Post-sync preview | Representative upcoming events exactly as the agent may disclose them, with source and privacy redaction visible |
 | Agent response | Human-readable source, freshness indicator, privacy-safe event display, and no claim of completeness when a source is stale |
@@ -47,6 +47,7 @@ Every asynchronous surface needs explicit loading, empty, partial, stale, permis
 - A guardian can understand the benefit and read-only boundary before leaving Family Copilot for provider consent.
 - No events are imported until the guardian selects calendars, chooses their visibility, records whose schedules they represent, and confirms.
 - The child-calendar flow establishes guardian authority and never requests the child's password.
+- A missing spouse or child Outlook calendar explains that Microsoft family membership alone does not grant calendar access and offers sharing or separate-account connection instructions.
 - The post-connection preview matches what the agent may disclose, including private and busy-only redaction.
 - Every schedule answer identifies its sources and freshness; stale or partial data is never presented as complete.
 - A guardian can pause, reconfigure, disconnect, export, and delete calendar data without contacting support.
@@ -73,9 +74,27 @@ The integration consists of provider adapters behind one synchronization service
 Use [Microsoft Graph Calendar](https://learn.microsoft.com/graph/api/resources/calendar) with an app registration in Microsoft Entra ID that supports the intended account type, including personal Microsoft accounts when required.
 
 - Use the OAuth 2.0 [authorization code flow with PKCE](https://learn.microsoft.com/entra/identity-platform/v2-oauth2-auth-code-flow). Generate and verify `state` and OIDC `nonce`, use an exact allowlisted HTTPS redirect URI, and perform the code exchange on the server.
-- Request delegated `Calendars.Read` for read-only calendar access, `offline_access` for a refresh token, and OIDC `openid` for a stable connected-account subject. Request `profile` only if the UX needs additional account display fields.
+- Request delegated `Calendars.Read` for the signed-in user's calendars, `offline_access` for a refresh token, and OIDC `openid` for a stable connected-account subject. Request `profile` only if the UX needs additional account display fields. A shared custom calendar added to the recipient's mailbox can be read through `/me/calendars` with `Calendars.Read`; request delegated `Calendars.Read.Shared` through incremental consent only when reading a shared primary calendar directly from its owner's mailbox.
 - Use `/me/calendars` for calendar selection and `/me/calendars/{calendar-id}/calendarView` to load occurrences from each selected calendar in a bounded time window. Microsoft Graph v1.0 [calendar view delta](https://learn.microsoft.com/graph/delta-query-events) supports the primary calendar, so use it there and store returned `@odata.nextLink` and `@odata.deltaLink` values as opaque secrets. Reconcile complete bounded snapshots for other selected calendars rather than relying on a beta per-calendar delta endpoint.
 - Do not request application permissions or `Calendars.ReadWrite` in the first release. A future write feature must use a separate incremental-consent step for delegated `Calendars.ReadWrite`.
+
+Microsoft family membership is not calendar consent. Access to a spouse's or child's Outlook calendar must follow one of these explicit paths:
+
+1. **Share with the guardian account:** The calendar owner, or an authorized adult managing the account, shares the calendar read-only in Outlook. The guardian accepts or adds it in Outlook before returning to Family Copilot. A shared custom calendar then appears in the guardian's calendar list; direct access to a shared primary calendar requires `Calendars.Read.Shared`. Family Copilot cannot create the share or elevate its sharing level.
+2. **Connect separately:** The spouse signs in to their own Microsoft account, consents to `Calendars.Read`, and selects their calendar. Each connection retains its own token and can be removed independently.
+
+Prefer the first path for a child's calendar only when a guardian is authorized to configure that account. Never ask the guardian for the spouse's or child's password, impersonate them, or use application-wide access. Work/school tenant policy, disabled user consent, cross-tenant sharing rules, personal-account age restrictions, or a supervised child account may block consent or sharing; the UX must identify the blocked step and direct the family to the Microsoft or organization administrator rather than attempting a workaround. A spouse's consent remains independent and revocable even when both adults belong to the same Family Copilot family.
+
+### Expected Microsoft family onboarding friction
+
+- The spouse or calendar owner must take an action in Outlook; adding people to a Microsoft Family group alone is insufficient.
+- The owner controls whether the recipient sees only free/busy, limited details, full non-private details, or private items. Family Copilot cannot display more than the owner shared, regardless of its own Details setting.
+- A sharing invitation may need to be accepted or the calendar explicitly added before Graph returns it. The calendar picker must offer **I've shared it—check again** and troubleshooting guidance.
+- A spouse who does not want to share with the guardian can use a separate connection and revoke it independently.
+- A child's age, account supervision, or organization/school policy may prevent OAuth consent or external calendar sharing. That is a blocking provider-policy outcome, not an application error.
+- Delegated access to shared calendars does not support Graph change notifications. Shared sources therefore use bounded reconciliation and may refresh less immediately than the guardian's primary calendar.
+
+The first-release UX should recommend read-only sharing with the guardian because it avoids handling credentials for every family member, while keeping separate account connections available for independent adult consent.
 
 ### Google Calendar
 
@@ -188,7 +207,7 @@ The first release can list selected calendars, maintain a reliable normalized re
 Before rollout:
 
 - OAuth threat-model tests cover CSRF, PKCE, callback replay, redirect validation, account linking, token leakage, and revocation.
-- Adapter contract tests cover pagination, recurrence, all-day events, time zones, cancellations, throttling, expired cursors, and idempotent retry.
+- Adapter contract tests cover owned and shared calendars, sharing-level redaction, pagination, recurrence, all-day events, time zones, cancellations, throttling, expired cursors, and idempotent retry.
 - Privacy tests confirm family isolation, private-field filtering, child-calendar deletion, audit redaction, and prompt-injection containment.
 - Operational metrics cover sync age and failures without event content or provider identifiers.
 
@@ -198,11 +217,11 @@ Write actions are a later opt-in phase requiring narrow write scopes, explicit c
 
 These issues start with UX validation, then secure foundations, provider synchronization, and agent delivery:
 
-1. **Prototype and validate the calendar connection journey:** Create accessible prototypes for discovery, consent explanation, calendar selection, visibility, preview, errors, and connection management. Test terminology and trust with guardians before fixing the implementation contract.
+1. **Prototype and validate the calendar connection journey:** Create accessible prototypes for discovery, consent explanation, owned/shared/separately connected family calendars, calendar selection, visibility, preview, errors, and connection management. Test terminology and trust with guardians before fixing the implementation contract.
 2. **Define calendar domain model and provider adapter contract:** Translate validated UX requirements into the normalized schema, migrations, adapter interface, mapping rules, and contract tests for recurrence, all-day boundaries, time zones, privacy, freshness, and deletion.
 3. **Implement secure OAuth connection storage:** Implement Microsoft and Google PKCE callbacks, encrypted token storage and rotation, strict state/redirect validation, scope display, revocation, audit redaction, and family ownership checks.
 4. **Build guardian consent and calendar privacy controls:** Implement guardian attestation, calendar-level selection, Details/Busy-only settings, audience controls, consent history, pre-import confirmation, fail-closed policy changes, content purge on privacy downgrade or deselection, export, provider-specific disconnect, deletion that stops re-import, and family-isolation tests.
-5. **Implement Microsoft Graph read-only calendar adapter:** Add calendar selection, bounded `calendarView` import, primary-calendar delta, bounded snapshot reconciliation for other calendars, pagination, throttling, cancellation handling, and adapter contract tests using `Calendars.Read`.
+5. **Implement Microsoft Graph read-only calendar adapter:** Add owned and shared calendar discovery, incremental `Calendars.Read.Shared` consent when needed, sharing-level enforcement, bounded `calendarView` import, primary-calendar delta, bounded snapshot reconciliation for other calendars, pagination, throttling, cancellation handling, and adapter contract tests.
 6. **Implement Google Calendar read-only adapter:** Add calendar selection, bounded snapshot reconciliation, recurring-event expansion, pagination, deletion detection, throttling, and adapter contract tests using the two read-only scopes.
 7. **Build sync orchestration and observability:** Add scheduled jobs, generation-fenced commits, idempotent per-calendar checkpoints, retries with jitter, daily reconciliation, the post-sync privacy-safe preview, user-facing freshness and recovery states, content-free metrics, and disconnect cleanup.
 8. **Add read-only schedule context to the agent:** Add least-data event retrieval, source and freshness indicators, schedule/conflict tools, prompt-injection boundaries, and authorization tests; expose no calendar mutation tools.
