@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Family Copilot static prototype with synthetic sample data.">
+  <title>Family Copilot — static prototype</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <p class="notice"><strong>Static prototype — sample data only.</strong> Do not enter real personal information. Nothing is saved or sent.</p>
+    <div class="brand"><span aria-hidden="true">✦</span><h1>Family Copilot</h1></div>
+    <p class="boundary">No calendars are connected. No live research or extraction occurs. This cannot book, purchase, monitor, notify, or modify calendar events.</p>
+    <nav aria-label="Prototype journeys">
+      <button class="nav-button" data-view="weekend" aria-current="page">Our weekend</button>
+      <button class="nav-button" data-view="discover">Find an activity</button>
+      <button class="nav-button" data-view="event">Check an event</button>
+      <button class="nav-button" data-view="settings">Sample calendar settings</button>
+    </nav>
+  </header>
+  <main>
+    <section class="card ask" aria-labelledby="ask-title">
+      <h2 id="ask-title">Try a deterministic sample question</h2>
+      <label for="question">Question (examples only)</label>
+      <textarea id="question" rows="2" placeholder="Try a sample prompt below; arbitrary questions are not understood."></textarea>
+      <div class="button-row">
+        <button data-prompt="weekend">What does our family have this weekend?</button>
+        <button data-prompt="discover">Find a science activity for ages 7–10.</button>
+        <button data-prompt="event">Does the sample exhibition fit Saturday?</button>
+      </div>
+      <p id="question-status" class="status" aria-live="polite"></p>
+      <label for="event-url">Event page URL (never fetched)</label>
+      <div class="input-row"><input id="event-url" inputmode="url" placeholder="Paste a URL or select a sample below"><button id="check-url">Assess sample</button></div>
+    </section>
+
+    <section class="demo-controls card" aria-labelledby="state-title">
+      <h2 id="state-title">Demo state controls</h2>
+      <label for="scenario">Show a simulated state</label>
+      <select id="scenario">
+        <option value="ready">Ready / selected sample context</option><option value="loading">Loading</option>
+        <option value="empty">Empty</option><option value="no-calendar" selected>No calendar</option>
+        <option value="partial">Partial / missing calendar</option><option value="stale">Stale calendar</option>
+        <option value="conflict">Possible conflict</option><option value="revoked">Permission revoked</option>
+        <option value="unavailable">Provider unavailable</option><option value="unsupported">Unsupported child account</option>
+      </select>
+      <button id="reset">Reset demo</button>
+      <p class="small">Controls affect session-only sample state. Recovery actions never contact a provider.</p>
+    </section>
+
+    <section id="weekend" class="view" aria-labelledby="weekend-title">
+      <h2 id="weekend-title">Our weekend <span class="tag">Synthetic schedule</span></h2>
+      <p class="meta">Sample range: Sat 20–Sun 21 June 2026 · America/New_York · simulated freshness: 19 June 2026, 18:00 EDT</p>
+      <div id="weekend-result" class="results" aria-live="polite"></div>
+    </section>
+
+    <section id="discover" class="view" hidden aria-labelledby="discover-title">
+      <h2 id="discover-title">Find an activity <span class="tag">Mock activity result — not live</span></h2>
+      <form id="filters" class="filter-grid">
+        <label>Age range <select name="age"><option value="all">Any sample age</option><option value="7-10">7–10</option><option value="9-13">9–13</option></select></label>
+        <label>Interest <select name="interest"><option value="all">Any sample interest</option><option value="science">Science</option><option value="concert">Concert</option><option value="exhibition">Exhibition</option></select></label>
+        <label>General starting area <input name="area" placeholder="e.g., Northside (sample only)"></label>
+        <label>Date <select name="date"><option value="all">Any sample date</option><option value="2026-06-20">Sat 20 June</option><option value="2026-06-21">Sun 21 June</option></select></label>
+        <label>Budget <select name="budget"><option value="all">Any sample cost</option><option value="low">Up to $15</option><option value="high">Up to $30</option></select></label>
+        <button>Filter local samples</button>
+      </form>
+      <p class="small">Fixed local sample coverage only; location and unsupported dates do not change results. Travel and tickets are unverified.</p>
+      <div id="activity-results" class="results" aria-live="polite"></div>
+    </section>
+
+    <section id="event" class="view" hidden aria-labelledby="event-title">
+      <h2 id="event-title">Check an event <span class="tag">Always simulated</span></h2>
+      <p>Choose a local mock page; arbitrary URLs are not fetched or matched to these facts.</p>
+      <div class="button-row"><button data-sample-url="science">Sample: Night Lab</button><button data-sample-url="ambiguous">Sample: concert (ambiguous)</button><button data-sample-url="failure">Sample: extraction failure</button></div>
+      <div id="event-result" class="results" aria-live="polite"></div>
+    </section>
+
+    <section id="settings" class="view" hidden aria-labelledby="settings-title">
+      <h2 id="settings-title">Sample calendar settings <span class="tag">Simulated consent walkthrough</span></h2>
+      <p>Value: compare selected schedules read-only. This demo has no provider connection, import, or verified Google Family Link/provider consent feasibility.</p>
+      <p>Fictional account: <strong>alex.demo@example.test</strong>. Calendars start off. Guardian authority is an attestation for this demo only.</p>
+      <fieldset><legend>Select synthetic calendars and disclosure</legend>
+        <label><input type="checkbox" name="calendar" value="alex"> Alex (fictional guardian) — sample Outlook</label>
+        <label><input type="checkbox" name="calendar" value="sam"> Sam (fictional child label) — sample Google</label>
+        <label for="disclosure">Disclosure</label><select id="disclosure"><option value="busy">Busy only</option><option value="details">Details (only within this sample)</option></select>
+        <label><input type="checkbox" id="authority"> I attest I am authorized to review this fictional child label in this demo.</label>
+      </fieldset>
+      <button id="review-import">Review sample import</button>
+      <div id="import-summary" class="results" aria-live="polite"></div>
+      <div class="button-row"><button data-management="pause">Pause sample</button><button data-management="retry">Retry sample</button><button data-management="reconnect">Reconnect sample</button><button data-management="disconnect">Disconnect sample</button><button data-management="export">Export sample state</button><button data-management="delete">Delete sample state</button></div>
+      <p id="management-status" class="status" aria-live="polite"></p>
+    </section>
+  </main>
+  <footer>All content is bundled synthetic fixture data. Session memory only; <button id="footer-reset">reset this demo</button>.</footer>
+  <script src="app.js"></script>
+</body>
+</html>
