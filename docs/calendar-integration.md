@@ -223,7 +223,9 @@ Privacy reductions are fail-closed and atomic from the user's perspective. Chang
 
 ### Incremental refresh
 
-- Poll each connected calendar initially every 15 minutes with jitter and exponential backoff. Respect provider throttling and `Retry-After`.
+Calendar refresh is data maintenance authorized by the parent's active connection, not proactive agent behavior. It must never produce a recommendation, message, notification, monitoring task, or external action. The consent screen discloses refresh frequency; pause or disconnect stops new jobs.
+
+- Poll each actively connected calendar initially every 15 minutes with jitter and exponential backoff solely to maintain freshness for later parent questions. Respect provider throttling and `Retry-After`.
 - Each job captures the selection's synchronization generation when it starts and may commit only while the selection is still active with the same generation. Privacy changes, pause, deselection, deletion, and disconnect advance the generation transactionally, fencing in-flight jobs before cleanup.
 - Use Microsoft calendar-view delta links for the primary calendar. Treat its cursor as bound to the time window and request parameters; when rejected, clear it and repeat the bounded import. Reconcile complete bounded snapshots for non-primary Microsoft calendars.
 - For Google, re-fetch and reconcile the complete bounded window because its sync tokens cannot be combined with the required time bounds. Page consistently, replace the previous snapshot only after a successful complete fetch, and rate-limit polling.
