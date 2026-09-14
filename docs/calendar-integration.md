@@ -93,7 +93,7 @@ For a child's calendar, the preferred setup is for its owner or administrator to
 
 Store one connection per provider account and family. The connection record contains the provider, provider account subject, granted scopes, token expiry, consent timestamps, and encrypted refresh credential.
 
-Store a separate selection record for every connected calendar. It contains an internal connection reference, encrypted provider calendar ID, guardian-assigned family member, disclosure mode (`details` or `busy_only`), allowed family audience, consent-policy version and timestamp, lifecycle state (`active`, `paused`, or `disconnected`), and that calendar's sync cursor. Authorization checks and redaction use this record rather than provider visibility alone.
+Store a separate selection record for every connected calendar. It contains an internal connection reference, encrypted provider calendar ID, guardian-assigned family member, disclosure mode (`details` or `busy_only`), allowed family audience, consent-policy version and timestamp, lifecycle state (`active`, `paused`, or `disconnected`), and an optional per-calendar sync cursor. Authorization checks and redaction use this record rather than provider visibility alone.
 
 Privacy reductions are fail-closed and atomic from the user's perspective. Changing from Details to Busy-only, narrowing the audience, or deselecting a calendar immediately blocks the old disclosure policy and queues deletion of no-longer-permitted fields from normalized records, caches, embeddings, and summaries. The UI shows the change as pending until cleanup succeeds and retries failures without restoring broader access.
 
@@ -120,7 +120,7 @@ Privacy reductions are fail-closed and atomic from the user's perspective. Chang
 - Use Microsoft calendar-view delta links per selected calendar. Treat each cursor as bound to its calendar, time window, and request parameters; when rejected, clear it and repeat the bounded import.
 - For Google, re-fetch and reconcile the complete bounded window because its sync tokens cannot be combined with the required time bounds. Page consistently, replace the previous snapshot only after a successful complete fetch, and rate-limit polling.
 - Run a daily reconciliation import to recover from missed changes. Stop promptly when access is revoked or a calendar is deselected.
-- Add provider webhooks later as a latency optimization, not as the source of truth. Validate webhook authenticity, use opaque subscription IDs, renew subscriptions, and still reconcile by delta.
+- Add provider webhooks later as a latency optimization, not as the source of truth. Validate webhook authenticity, use opaque subscription IDs, renew subscriptions, and still reconcile through each provider's authoritative refresh mechanism.
 
 Store provider timestamps in UTC while preserving the provider time-zone identifier and the original all-day date boundaries. Recurrence exceptions, cancellations, and moved occurrences must remain distinguishable. The agent must not infer that imported events are current if a connection is in an error or stale state.
 
