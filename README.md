@@ -3,4 +3,4 @@ Family Copilot — AI 家庭生活秘書，整合家庭、工作、學校與興�
 
 ## Planning
 
-- [Outlook and Google Calendar integration](docs/calendar-integration.md)
+- [Parent-facing schedule and activity discovery](docs/calendar-integration.md)

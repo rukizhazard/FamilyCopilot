@@ -1,8 +1,31 @@
-# Outlook and Google Calendar integration plan
+# Parent-facing schedule and activity discovery plan
+
+## Planning status and first-version contract
+
+This document is a proposal for review, not authorization to implement. Product behavior, privacy examples, the child's actual Google account type, supported calendar access, and the web-demo storyboard must be reviewed with the parent before implementation issues are opened.
+
+The first version is for parents. It responds only when asked and may:
+
+- answer schedule questions from currently permitted calendar data;
+- compare availability and identify possible conflicts without claiming missing time is free;
+- research science activities, concerts, exhibitions, and similar outings;
+- assess whether a pasted event page appears to fit the available schedule; and
+- explain sources, freshness, assumptions, missing context, and uncertainty.
+
+It must not send unsolicited recommendations or notifications; serve as a child-facing assistant; create, edit, delete, accept, or decline events; book activities; register children; buy tickets; or start monitoring an event. Calendar events and external pages are untrusted evidence, never instructions or authorization to act.
+
+### Representative parent scenarios
+
+1. **Understand the schedule:** “What does our family have this weekend?”
+2. **Discover an activity:** “Find a weekend science activity for my 8-year-old within a 30-minute drive.”
+3. **Fit an outing:** “Suggest a kid-friendly concert or exhibition that fits our Saturday schedule.”
+4. **Assess a known event:** Paste an event URL and ask, “Does this exhibition fit our schedule?”
+
+Age, location, interests, budget, and travel time in these prompts are examples, not stored facts about a child or family.
 
 ## UX outcome
 
-Family Copilot should give a guardian one understandable view of family commitments without making them learn how calendar providers work. The first release answers questions such as “What does our family have tomorrow?”, “When are we both free?”, and “Will pickup overlap my meeting?” using a parent's Outlook calendar and a child's Google calendar.
+Family Copilot should let a parent understand family commitments and evaluate outings without making them learn provider internals. A parent can try activity discovery without connecting a calendar; calendar connection is offered when schedule-fit analysis needs it.
 
 The experience is read-only and follows these principles:
 
@@ -14,8 +37,10 @@ The experience is read-only and follows these principles:
 
 ### Primary users
 
-- **Guardian:** connects provider accounts, confirms authority to use a child's calendar, chooses calendars and privacy levels, and manages or removes access.
-- **Family member:** asks schedule questions and sees only information allowed by the family's sharing policy. A child is never asked to provide credentials to Family Copilot.
+- **Parent/guardian:** asks questions, connects provider accounts, confirms authority to use a child's calendar, chooses calendars and privacy levels, and manages or removes access.
+- **Other parent:** may connect their own account and receives only information allowed by the calendar owner's disclosure policy. Direct child use is outside the first version, and a child is never asked to provide credentials.
+
+The connected account, the person whose schedule a calendar represents, the fields Family Copilot may process, and the people who may receive those fields are separate decisions. A personal or work calendar defaults to busy-only disclosure to another parent. Its details may answer the calendar owner's own question but are not thereby authorized for disclosure to anyone else.
 
 ### Core journey
 
@@ -37,7 +62,9 @@ The experience is read-only and follows these principles:
 | Calendar picker | Account identity, calendar owner/label, selection toggle, Details/Busy-only choice, sharing instructions when an expected family calendar is missing, and child-calendar attestation |
 | Pre-import confirmation | Access summary, date window, family visibility, confirm and back actions; no event data is retrieved yet |
 | Post-sync preview | Representative upcoming events exactly as the agent may disclose them, with source and privacy redaction visible |
-| Agent response | Human-readable source, freshness indicator, privacy-safe event display, and no claim of completeness when a source is stale |
+| Schedule result | Structured commitments and conflicts, human-readable sources, freshness, privacy-safe event display, and no claim of completeness when a source is stale |
+| Activity result | Suitability rationale, date/time, age guidance, cost, estimated travel, source links, calendar fit, and explicit unknown/unverified labels |
+| Event-URL assessment | Identified event/performance, page source, extracted facts, schedule comparison, uncertainty, and no booking or monitoring action |
 | Connection management | Pause/retry/reconnect, change selection or privacy, disconnect and revoke where supported, export, and delete |
 
 Every asynchronous surface needs explicit loading, empty, partial, stale, permission-revoked, provider-unavailable, and unsupported-child-account states. Errors must explain whether existing results remain usable and offer a safe recovery action without exposing provider internals.
@@ -50,14 +77,74 @@ Every asynchronous surface needs explicit loading, empty, partial, stale, permis
 - A missing spouse or child Outlook calendar explains that Microsoft family membership alone does not grant calendar access and offers sharing or separate-account connection instructions.
 - The post-connection preview matches what the agent may disclose, including private and busy-only redaction.
 - Every schedule answer identifies its sources and freshness; stale or partial data is never presented as complete.
+- “No conflict found” is shown only for the calendars and time range actually checked; incomplete context is labeled “cannot verify availability,” never “free.”
 - A guardian can pause, reconfigure, disconnect, export, and delete calendar data without contacting support.
 - Keyboard-only and screen-reader users can complete all steps, and status is not communicated by color alone.
 
-UX prototypes and usability testing with guardians must validate this journey and terminology before provider adapters are implemented.
+UX prototypes and usability testing with parents must validate this journey and terminology before provider adapters are implemented.
 
-## Technical decisions derived from the UX
+## Activity discovery and event assessment
 
-The first release will import events read-only from a parent's Outlook calendar and a child's Google calendar. A parent or verified guardian connects both sources, selects the calendars to include, and can disconnect or erase either source at any time. Write access is explicitly deferred until there is a separate user experience, threat review, and consent flow.
+Activity discovery is sourced research, not a recommendation engine acting autonomously. Ask only for preferences needed for the current request: age range, interests, general starting area, dates, budget, accessibility needs, and travel preference. Do not require a child's name, exact birth date, school, home address, or persistent profile.
+
+For every option:
+
+- retain and show the source URL and the exact event/performance identity;
+- show date/time, venue or area, published age guidance, stated cost, and why it may suit the request;
+- estimate travel only from a parent-provided general starting area and a cited routing/map result when available;
+- identify whether ticket availability was actually verified, merely listed, stale, or unknown;
+- compare against only fresh, authorized calendar context and name calendars that are missing or stale; and
+- label inferred, conflicting, or unverified details rather than silently resolving them.
+
+A “within 30 minutes” request is a preference, not a guarantee. Without reliable travel evidence, return the known distance/location and mark travel time unverified. Without a connected calendar, discovery still works, but the result says schedule compatibility was not checked. A failed search returns what was searched, which filters may be relaxed, and no fabricated alternatives.
+
+External page content is sanitized and treated as data. It cannot override system policy, request calendar disclosure, initiate tools, or authorize a booking. A pasted URL supports assessment of the identified event only.
+
+## Mobile-friendly hosted web demo
+
+The agreed demo entry point is a dedicated hosted web app optimized for mobile browsers. Browser extensions, native apps, messaging integrations, API-only delivery, PWA installation, proactive notifications, and TicketForge monitoring are outside the demo.
+
+The main page contains a question box, representative prompts, a separate event-URL input, and structured results rather than chat-only prose. Calendar discovery is optional and uses dedicated consent/settings surfaces.
+
+### End-to-end storyboard
+
+1. **Understand a family schedule:** Select a schedule example, optionally connect calendars, review source/freshness labels, and receive commitments plus conflicts. Loading, empty, partial, stale, permission-denied, and disconnected states never turn missing data into free time.
+2. **Discover suitable activities:** Enter minimal age/interests/location/date/budget preferences, review sourced activity cards, and inspect suitability, timing, cost, estimated travel, verification state, and calendar fit. This journey works without calendar access.
+3. **Assess an event URL:** Paste a page, verify the extracted event/performance, and compare it with available schedule context. Unsupported pages, ambiguous performances, extraction failures, stale listings, and missing calendars produce recoverable explanations.
+
+### Truthful demo labeling
+
+- **Sample calendar:** clearly labeled synthetic data; never represented as the family's schedule.
+- **Connected calendar:** shows provider, represented person, disclosure mode, and last successful sync.
+- **Mock activity result:** labeled example data and never described as live research or current availability.
+- **Live source:** links to the source and distinguishes published facts from Family Copilot estimates or inferences.
+- **Unknown:** displayed explicitly; absence of evidence is not converted to availability, suitability, or a free schedule.
+
+The usability test succeeds when a parent, without facilitator explanation, can find a plausible activity, understand why it may fit, open its supporting sources, identify what calendar context was checked, and distinguish sample data, verified facts, estimates, and assumptions. The parent must also understand that Family Copilot cannot book, purchase, alter calendars, or monitor tickets.
+
+## Child Google Calendar feasibility gate
+
+The child likely uses a Family Link-supervised Google account, but this must be confirmed. Family Link supervision does not itself give a parent access to Calendar content, and the parent currently cannot see the child's calendar or titles. Therefore, the Google connection design below is provisional.
+
+Before selecting a production path, test with the actual account configuration:
+
+1. record whether it is a supervised consumer account, Workspace for Education account, or another managed account;
+2. determine whether Calendar sharing is available and whether a parent-controlled Google account can receive and read event details;
+3. determine whether third-party OAuth is allowed and which account can legally and technically provide consent;
+4. verify what private-event and title fields the Calendar API returns; and
+5. document provider errors, age/supervision restrictions, and revocation behavior.
+
+Do not ask for the child's password or bypass supervision. If no supported parent-authorized path exists, the safe first-version fallback uses the parent's Outlook calendar and clearly labeled sample or otherwise available calendars. Every answer identifies the child's schedule as missing and says availability cannot be fully verified.
+
+## Future TicketForge boundary
+
+TicketForge is a possible later handoff after a parent selects one exact event/performance. Family Copilot would pass the source page and selected performance only after explicit confirmation; TicketForge would own monitor investigation, generation, validation, deterministic checks, reduced-capability/refusal states, staleness, failures, and repair.
+
+Family Copilot must not duplicate that monitoring system. A TicketForge failure is not “sold out,” monitoring does not authorize purchasing or calendar changes, and background checks or alerts require a separate opt-in design. TicketForge integration is not part of this demo or first version.
+
+## Provisional technical decisions derived from the UX
+
+The intended sources are a parent's Outlook calendar and, only if the feasibility gate identifies a supported path, a child's Google calendar. A parent or verified guardian selects calendars to include and can disconnect or erase either source. These proposals remain provisional until product, privacy, feasibility, and UX decisions are reviewed. Write access is explicitly deferred.
 
 The integration consists of provider adapters behind one synchronization service:
 
@@ -107,7 +194,7 @@ Use [Google Calendar API v3](https://developers.google.com/workspace/calendar/ap
 - Refresh Google calendars with bounded `events.list` queries using the same import window, `singleEvents=true`, and `showDeleted=true`, then reconcile the complete paged result. Do not combine `syncToken` with `timeMin` or `timeMax`; Google prohibits that combination. An unbounded sync-token strategy may be considered later only after a separate data-retention and privacy review.
 - Do not request write scopes in the first release. A future write feature must use a separate incremental-consent step for `https://www.googleapis.com/auth/calendar.events`.
 
-For a child's calendar, the preferred setup is for its owner or administrator to share the calendar read-only with a guardian-controlled Google account. The guardian then authorizes Family Copilot and explicitly selects that calendar. The application must not ask a child to share a password or capture a child's credentials. Workspace or supervised-account restrictions may prevent sharing or third-party OAuth; the UI must report that limitation rather than bypass it.
+For a child's calendar, sharing read-only with a guardian-controlled Google account is only a candidate path to validate through the feasibility gate; it is not assumed to work for a Family Link-supervised or managed account. If supported, the guardian authorizes Family Copilot and explicitly selects that calendar. The application must not ask a child to share a password or capture a child's credentials. Workspace or supervised-account restrictions may prevent sharing or third-party OAuth; the UI must report that limitation rather than bypass it.
 
 ## Secure connection and token handling
 
@@ -201,33 +288,52 @@ Provider payloads remain authoritative. Normalization must preserve unknown valu
 - Encrypt data in transit and at rest, apply least-privilege service roles, audit privileged access, define incident response, and periodically review provider grants.
 - Complete legal review against the [Google API Services User Data Policy](https://developers.google.com/terms/api-services-user-data-policy), Microsoft platform terms, and applicable child-privacy law before production use.
 
-## Read-only rollout and success criteria
+Validate disclosure rules with concrete scenarios before building a generalized permissions system:
 
-The first release can list selected calendars, maintain a reliable normalized read model, answer schedule questions, and identify conflicts. It cannot create, edit, delete, accept, or decline events. UI copy and agent tools must make that boundary explicit.
+| Scenario | Allowed response |
+| --- | --- |
+| Parent asks about their own work calendar | Use authorized details for that parent's answer; do not disclose them to another parent by default |
+| Other parent asks when the calendar owner is available | Return busy intervals only unless the owner explicitly authorized broader family disclosure |
+| Parent asks about an authorized child/activity calendar | Use only fields permitted by the provider share and recorded guardian policy |
+| Event is private, outside the requester's audience, or busy-only | Report unavailable time without title, location, attendees, description, or inferred purpose |
+| Child calendar is missing, stale, or unsupported | Name the missing context and say availability cannot be fully verified |
 
-Before rollout:
+## Planning review and eventual rollout criteria
+
+Before implementation, the parent reviews and agrees the scenarios, on-demand behavior, non-goals, privacy examples, calendar feasibility result, demo storyboard, activity result contract, and sample/mock labeling. Unresolved choices remain visibly marked; this plan is not approval to start coding.
+
+An eventual first version can maintain a read-only schedule view, answer schedule questions, identify possible conflicts, research activities, and assess event pages. It cannot create, edit, delete, accept, or decline events; notify proactively; monitor tickets; book; register; or purchase. UI copy and agent tools must make those boundaries explicit.
+
+Before an eventual rollout:
 
 - OAuth threat-model tests cover CSRF, PKCE, callback replay, redirect validation, account linking, token leakage, and revocation.
 - Adapter contract tests cover owned and shared calendars, sharing-level redaction, pagination, recurrence, all-day events, time zones, cancellations, throttling, expired cursors, and idempotent retry.
 - Privacy tests confirm family isolation, private-field filtering, child-calendar deletion, audit redaction, and prompt-injection containment.
+- Activity tests cover source attribution, exact performance identity, uncertainty, failed extraction/searches, missing calendar context, travel estimates, and untrusted-page containment.
 - Operational metrics cover sync age and failures without event content or provider identifiers.
 
 Write actions are a later opt-in phase requiring narrow write scopes, explicit confirmation for every user-visible change, idempotency, conflict handling, a durable audit trail, and a rollback/correction experience.
 
-## Follow-up implementation issues
+## Follow-up issue plan
 
-These issues start with UX validation, then secure foundations, provider synchronization, and agent delivery:
+Do not create implementation issues until the parent has reviewed and agreed the product, privacy, feasibility, and UX decisions above. First create and complete planning/validation issues:
 
-1. **Prototype and validate the calendar connection journey:** Create accessible prototypes for discovery, consent explanation, owned/shared/separately connected family calendars, calendar selection, visibility, preview, errors, and connection management. Test terminology and trust with guardians before fixing the implementation contract.
-2. **Define calendar domain model and provider adapter contract:** Translate validated UX requirements into the normalized schema, migrations, adapter interface, mapping rules, and contract tests for recurrence, all-day boundaries, time zones, privacy, freshness, and deletion.
-3. **Implement secure OAuth connection storage:** Implement Microsoft and Google PKCE callbacks, encrypted token storage and rotation, strict state/redirect validation, scope display, revocation, audit redaction, and family ownership checks.
-4. **Build guardian consent and calendar privacy controls:** Implement guardian attestation, calendar-level selection, Details/Busy-only settings, audience controls, consent history, pre-import confirmation, fail-closed policy changes, content purge on privacy downgrade or deselection, export, provider-specific disconnect, deletion that stops re-import, and family-isolation tests.
-5. **Implement Microsoft Graph read-only calendar adapter:** Add owned and shared custom-calendar discovery, sharing-level and private-event redaction, bounded `calendarView` import, primary-calendar delta, bounded snapshot reconciliation for other calendars, pagination, throttling, cancellation handling, and adapter contract tests. Exclude direct shared-primary and Microsoft Family group calendars.
-6. **Implement Google Calendar read-only adapter:** Add calendar selection, bounded snapshot reconciliation, recurring-event expansion, pagination, deletion detection, throttling, and adapter contract tests using the two read-only scopes.
-7. **Build sync orchestration and observability:** Add scheduled jobs, generation-fenced commits, idempotent per-calendar checkpoints, retries with jitter, daily reconciliation, the post-sync privacy-safe preview, user-facing freshness and recovery states, content-free metrics, and disconnect cleanup.
-8. **Add read-only schedule context to the agent:** Add least-data event retrieval, source and freshness indicators, schedule/conflict tools, prompt-injection boundaries, and authorization tests; expose no calendar mutation tools.
+1. **Review parent scenarios and behavior boundaries:** Confirm usefulness, on-demand behavior, non-goals, privacy examples, and required activity fields.
+2. **Investigate the actual child Google account:** Record account type and test parent-authorized Calendar sharing/OAuth with the real configuration; produce a supported path or documented unresolved limitation.
+3. **Prototype and usability-test the hosted web demo:** Cover all three journeys, consent and disclosure preview, structured results, sample/mock/live labels, accessibility, missing/stale calendars, empty searches, unsupported pages/accounts, and removal of access/data.
 
-Issue 1 comes first. Issues 2 and 3 follow its validated decisions and can proceed in parallel. Issue 4 depends on 2 and 3; issues 5 and 6 depend on 2 and 3; issue 7 depends on 4 and both adapters; issue 8 depends on 7.
+After those decisions are approved, split implementation into independently scoped issues:
+
+1. **Define the calendar domain model and provider adapter contract.**
+2. **Implement secure OAuth connection storage and privacy controls.**
+3. **Implement the approved Microsoft read-only calendar path.**
+4. **Implement Google Calendar only if feasibility identifies a supported child-calendar path.**
+5. **Build synchronization, freshness, observability, and cleanup.**
+6. **Build read-only schedule answers and conflict analysis.**
+7. **Build sourced activity discovery and event-URL assessment.**
+8. **Build the reviewed mobile-friendly hosted web demo.**
+
+Calendar and activity-discovery work remain separate so either can ship or be tested without the other. TicketForge monitoring, proactive behavior, calendar writes, booking, purchasing, native apps, extensions, and messaging integrations require later issues and explicit scope approval.
 
 ## References
 
@@ -238,3 +344,5 @@ Issue 1 comes first. Issues 2 and 3 follow its validated decisions and can proce
 - [Google Calendar API authorization scopes](https://developers.google.com/workspace/calendar/api/auth)
 - [Google Calendar API synchronize resources](https://developers.google.com/workspace/calendar/api/guides/sync)
 - [Google Calendar API push notifications](https://developers.google.com/workspace/calendar/api/guides/push)
+- [Google Calendar sharing](https://support.google.com/calendar/answer/37082)
+- [Google Family Link account management](https://support.google.com/families/answer/7103262)
