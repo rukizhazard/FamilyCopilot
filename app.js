@@ -53,11 +53,12 @@
     const isAttested = document.querySelector("#authority").checked;
     state.selected = chosen;
     state.disclosure = document.querySelector("#disclosure").value;
+    state.confirmed = false;
     if (!canConfirmImport(chosen, isAttested)) {
       out.innerHTML = card("Sample import not ready", "<p>Select at least one synthetic calendar and the fictional guardian attestation. Nothing has been loaded.</p>", "alert");
       return;
     }
-    state.confirmed = false;
+    const labels = chosen.map(value => value === "alex" ? "Alex" : "Sam").join(", ");
     const article = document.createElement("article");
     const heading = document.createElement("h3");
     const summary = document.createElement("p");
@@ -65,7 +66,7 @@
     const confirm = document.createElement("button");
     article.className = "result-card";
     heading.textContent = "Confirm sample import";
-    summary.textContent = `Fictional account alex.demo@example.test · selected: ${chosen.includes("alex") ? "Alex" : ""}${chosen.length === 2 ? ", Sam" : chosen.includes("sam") ? "Sam" : ""} · disclosure: ${state.disclosure === "busy" ? "Busy only" : "Details"} · sample window: 20–21 June 2026.`;
+    summary.textContent = `Fictional account alex.demo@example.test · selected: ${labels} · disclosure: ${state.disclosure === "busy" ? "Busy only" : "Details"} · sample window: 20–21 June 2026.`;
     preview.textContent = state.disclosure === "busy" ? "Disclosure preview: unavailable time only; no event titles, locations, attendees, or inferred purpose." : "Disclosure preview: synthetic titles may appear only in this demo.";
     confirm.id = "confirm-import";
     confirm.textContent = "Confirm and load samples";
