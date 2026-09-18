@@ -1,0 +1,42 @@
+"use strict";
+const test = require("node:test"), assert = require("node:assert/strict");
+const { sampleWeek, syntheticMarkup, story } = require("../scripts/record-integrated-demo");
+const { wavInfo, escapeXML, stamp, chunks, narrationDelay } = require("../scripts/finish-integrated-demo");
+const A = require("../owner/availability-core");
+test("video calendar fixture is synthetic and bounded; unchanged latest UI gets explicit sample metadata", () => {
+  const data = sampleWeek(); assert.equal(data.synthetic, true);
+  assert.deepEqual(A.project(data, A.liveWindow).people, data.people);
+  assert.deepEqual(Object.keys(data.people[0]).sort(), ["person", "slots", "status"]);
+  const html = require("node:fs").readFileSync(require.resolve("../owner/index.html"), "utf8");
+  const output = syntheticMarkup(html);
+  assert.match(output, /name="owner-mode" content="synthetic"/);
+  assert.match(output, /name="owner-csrf" content="synthetic-video-only"/);
+  assert.match(output, /name="child-cache" content="child-saved-v1-memory"/);
+  assert.throws(() => syntheticMarkup("<html></html>"));
+});
+test("family story introduces interests before basketball and ends at the source without technical narration", () => {
+  assert.equal(story.length, 8);
+  assert.match(story[0].text, /family time.*when could we go.*everyone enjoy/is);
+  assert.doesNotMatch(story.slice(0, 4).map(s => s.title + s.text).join(" "), /basketball|T P B L|C T B C|official public schedule/i);
+  assert.match(story[4].text, /Basketball it is.*family loves.*C T B C/s);
+  assert.doesNotMatch(story[4].title, /basketball/i);
+  assert(narrationDelay(4, true) > 5.8);
+  assert.equal(narrationDelay(3, true), 0.15);
+  assert.equal(narrationDelay(4, false), 0.15);
+  assert.match(story[2].text, /consider.*might fit.*check Kimi's plans/s);
+  assert.match(story[7].text, /official game page/);
+  assert.doesNotMatch(story.map(s => s.text).join(" "), /Start over|invented game|Synthetic Away|fictional|sample calendars|saved profile|automatically.*free/i);
+  for (const s of story) assert.equal(chunks(s.text).join(" "), s.text);
+  assert.equal(stamp(59.9996), "00:01:00,000");
+  assert.equal(stamp(59.9996, true), "0:01:00.00");
+  assert.equal(escapeXML('<&"\''), "&lt;&amp;&quot;&apos;");
+});
+test("narration WAV validation rejects silence, truncation and incompatible formats", () => {
+  const b = Buffer.alloc(46); b.write("RIFF"); b.writeUInt32LE(38, 4); b.write("WAVEfmt ", 8); b.writeUInt32LE(16, 16);
+  b.writeUInt16LE(1, 20); b.writeUInt16LE(1, 22); b.writeUInt32LE(48000, 24); b.writeUInt32LE(96000, 28);
+  b.writeUInt16LE(2, 32); b.writeUInt16LE(16, 34); b.write("data", 36); b.writeUInt32LE(2, 40); b.writeInt16LE(500, 44);
+  assert.equal(wavInfo(b).seconds, 1 / 48000);
+  assert.throws(() => wavInfo(b.subarray(0, 45)));
+  b.writeUInt16LE(2, 22); assert.throws(() => wavInfo(b)); b.writeUInt16LE(1, 22);
+  b.writeInt16LE(0, 44); assert.throws(() => wavInfo(b));
+});

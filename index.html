@@ -9,89 +9,110 @@
 </head>
 <body>
   <header class="site-header">
-    <p class="notice"><strong>Static prototype — sample data only.</strong> Do not enter real personal information. Nothing is saved or sent.</p>
+    <aside class="notice" aria-label="Demo notice">
+      <p><strong>Interactive demo</strong> · No real calendars connected. Data is fictional and stays in this tab. Do not enter personal information.</p>
+      <details><summary>About this prototype</summary><p>No live research or page extraction occurs. No real permissions are requested. This cannot book, purchase, monitor, notify, or modify calendar events. Reload or reset clears this tab's changes.</p></details>
+    </aside>
     <div class="brand"><span aria-hidden="true">✦</span><h1>Family Copilot</h1></div>
-    <p class="boundary">No calendars are connected. No live research or extraction occurs. This cannot book, purchase, monitor, notify, or modify calendar events.</p>
+    <p class="boundary">A little more space for your weekend.</p>
     <nav aria-label="Prototype journeys">
       <button class="nav-button" data-view="weekend" aria-current="page">Our weekend</button>
       <button class="nav-button" data-view="discover">Find an activity</button>
       <button class="nav-button" data-view="event">Check an event</button>
-      <button class="nav-button" data-view="settings">Sample calendar settings</button>
     </nav>
   </header>
   <main>
+    <section id="calendar-overview" class="card" aria-labelledby="calendar-title">
+      <div class="calendar-heading"><h2 id="calendar-title">Calendars</h2><button id="add-calendar" class="icon-button" type="button" aria-label="Invite an adult" title="Invite an adult" aria-haspopup="dialog"><span aria-hidden="true">+</span></button></div>
+      <p class="small">Developer/owner on this computer? <a href="http://localhost:8002/" rel="noreferrer">Open local owner calendars</a> for available names and a local selection summary only. Requires the owner UI task; this fictional demo stays separate. No events.</p>
+      <ul id="subject-list" class="subject-list"></ul>
+      <p id="management-status" class="status" aria-live="polite"></p>
+      <dialog id="invitation-dialog" aria-labelledby="invitation-title" aria-describedby="invitation-boundary">
+        <h2 id="invitation-title" tabindex="-1">Invite an adult</h2>
+        <p id="invitation-boundary">Email-first preview only. Sending and recipient onboarding are unavailable. Use a fictional .test address, not a real person's email.</p>
+        <form id="invitation-form" novalidate autocomplete="off">
+          <label for="invitation-email">Adult email (preview only)</label>
+          <input id="invitation-email" type="email" inputmode="email" maxlength="254" required autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="adult@example.test" aria-describedby="invitation-boundary invitation-error">
+          <p class="small">This previews an onboarding request, not a meeting invitation. An email address proves neither identity nor calendar consent. Nothing is transmitted or saved; closing clears the entry.</p>
+          <button type="submit">Review invitation</button>
+        </form>
+        <p id="invitation-error" class="status" role="alert"></p>
+        <div id="invitation-review" aria-live="polite"></div>
+        <button id="close-invitation" type="button">Cancel</button>
+      </dialog>
+      <dialog id="consent-dialog" aria-labelledby="consent-title" aria-describedby="consent-boundary">
+        <h2 id="consent-title" tabindex="-1">Calendar settings</h2>
+        <p id="consent-boundary">Demo settings only. No real permission is requested and no real calendar is connected.</p>
+        <div id="consent-content"></div>
+        <p id="consent-error" class="status" role="alert"></p>
+        <button id="close-settings">Close</button>
+      </dialog>
+    </section>
     <section class="card ask" aria-labelledby="ask-title">
-      <h2 id="ask-title">Try a deterministic sample question</h2>
+      <h2 id="ask-title">Ask about your plans</h2>
       <label for="question">Question (examples only)</label>
-      <textarea id="question" rows="2" placeholder="Try a sample prompt below; arbitrary questions are not understood."></textarea>
+      <textarea id="question" rows="2" placeholder="Choose a question below; other questions are not understood yet."></textarea>
       <div class="button-row">
         <button data-prompt="weekend">What does our family have this weekend?</button>
         <button data-prompt="discover">Find a science activity for ages 7–10.</button>
-        <button data-prompt="event">Does the sample exhibition fit Saturday?</button>
+        <button data-prompt="event">Does the exhibition fit Saturday?</button>
       </div>
       <p id="question-status" class="status" aria-live="polite"></p>
       <label for="event-url">Event page URL (never fetched)</label>
-      <div class="input-row"><input id="event-url" inputmode="url" placeholder="Paste a URL or select a sample below"><button id="check-url">Assess sample</button></div>
+      <div class="input-row"><input id="event-url" inputmode="url" placeholder="Paste a URL or choose an event below"><button id="check-url">Assess event</button></div>
     </section>
 
-    <section class="demo-controls card" aria-labelledby="state-title">
-      <h2 id="state-title">Demo state controls</h2>
+    <details class="demo-controls card">
+      <summary>Demo state controls</summary>
+      <div class="demo-control-fields">
       <label for="scenario">Show a simulated state</label>
       <select id="scenario">
-        <option value="ready">Ready / selected sample context</option><option value="loading">Loading</option>
+        <option value="ready">Ready / selected context</option><option value="loading">Loading</option>
         <option value="empty">Empty</option><option value="no-calendar" selected>No calendar</option>
         <option value="partial">Partial / missing calendar</option><option value="stale">Stale calendar</option>
         <option value="conflict">Possible conflict</option><option value="revoked">Permission revoked</option>
         <option value="unavailable">Provider unavailable</option><option value="unsupported">Unsupported child account</option>
       </select>
       <button id="reset">Reset demo</button>
-      <p class="small">Controls affect session-only sample state. Recovery actions never contact a provider.</p>
-    </section>
+      <p class="small">Scenarios never authorize import. Ready/conflict need confirmed choices. Partial omits Google; revoked removes all grants and requires fresh consent. Recovery never contacts a provider.</p>
+      </div>
+      <form id="add-subject" class="add-subject">
+        <label for="subject-name">Fictional alias (demo calendars only)</label>
+        <div class="input-row"><input id="subject-name" maxlength="60" required autocomplete="off" placeholder="Choose a fictional alias" aria-describedby="name-error"><button type="submit">Add demo alias</button></div>
+        <p class="small">This separate demo control adds fictional calendar settings, not an invitation or a real account.</p>
+        <p id="name-error" class="status" role="alert"></p>
+      </form>
+    </details>
 
     <section id="weekend" class="view" aria-labelledby="weekend-title">
-      <h2 id="weekend-title">Our weekend <span class="tag">Synthetic schedule</span></h2>
-      <p class="meta">Sample range: Sat 20–Sun 21 June 2026 · America/New_York · simulated freshness: 19 June 2026, 18:00 EDT</p>
+      <h2 id="weekend-title">Our weekend <span class="tag">Demo schedule</span></h2>
+      <p class="meta">Sat 20–Sun 21 June 2026 · America/New_York. Fictional dates, not current calendar facts. Checked sources and freshness appear below.</p>
       <div id="weekend-result" class="results" aria-live="polite"></div>
     </section>
 
     <section id="discover" class="view" hidden aria-labelledby="discover-title">
-      <h2 id="discover-title">Find an activity <span class="tag">Mock activity result — not live</span></h2>
+      <h2 id="discover-title">Find an activity <span class="tag">Fictional events · not live research</span></h2>
       <form id="filters" class="filter-grid">
-        <label>Age range <select name="age"><option value="all">Any sample age</option><option value="7-10">7–10</option><option value="9-13">9–13</option></select></label>
-        <label>Interest <select name="interest"><option value="all">Any sample interest</option><option value="science">Science</option><option value="concert">Concert</option><option value="exhibition">Exhibition</option></select></label>
-        <label>General starting area <input name="area" placeholder="e.g., Northside (sample only)"></label>
-        <label>Date <select name="date"><option value="all">Any sample date</option><option value="2026-06-20">Sat 20 June</option><option value="2026-06-21">Sun 21 June</option></select></label>
-        <label>Budget <select name="budget"><option value="all">Any sample cost</option><option value="low">Up to $15</option><option value="high">Up to $30</option></select></label>
-        <button>Filter local samples</button>
+        <label>Age range <select name="age"><option value="all">Any age</option><option value="7-10">7–10</option><option value="9-13">9–13</option></select></label>
+        <label>Interest <select name="interest"><option value="all">Any interest</option><option value="science">Science</option><option value="concert">Concert</option><option value="exhibition">Exhibition</option></select></label>
+        <label>General starting area <input name="area" placeholder="e.g., Northside"></label>
+        <label>Date <select name="date"><option value="all">Any listed date</option><option value="2026-06-20">Sat 20 June</option><option value="2026-06-21">Sun 21 June</option></select></label>
+        <label>Budget <select name="budget"><option value="all">Any cost</option><option value="low">Up to $15</option><option value="high">Up to $30</option></select></label>
+        <button>Find activities</button>
       </form>
-      <p class="small">Fixed local sample coverage only; location and unsupported dates do not change results. Travel and tickets are unverified.</p>
+      <p class="small">Only the listed age ranges, interests, dates, and budgets filter these events. Starting area does not change results. Travel and tickets are unverified.</p>
       <div id="activity-results" class="results" aria-live="polite"></div>
     </section>
 
     <section id="event" class="view" hidden aria-labelledby="event-title">
-      <h2 id="event-title">Check an event <span class="tag">Always simulated</span></h2>
-      <p>Choose a local mock page; arbitrary URLs are not fetched or matched to these facts.</p>
-      <div class="button-row"><button data-sample-url="science">Sample: Night Lab</button><button data-sample-url="ambiguous">Sample: concert (ambiguous)</button><button data-sample-url="failure">Sample: extraction failure</button></div>
+      <h2 id="event-title">Check an event <span class="tag">Demo assessment</span></h2>
+      <p>Choose a fictional event below. Other URLs are not fetched or matched to these facts.</p>
+      <div class="button-row"><button data-sample-url="science">Night Lab</button><button data-sample-url="ambiguous">Concert (ambiguous)</button><button data-sample-url="failure">Extraction failure</button></div>
       <div id="event-result" class="results" aria-live="polite"></div>
     </section>
 
-    <section id="settings" class="view" hidden aria-labelledby="settings-title">
-      <h2 id="settings-title">Sample calendar settings <span class="tag">Simulated consent walkthrough</span></h2>
-      <p>Value: compare selected schedules read-only. This demo has no provider connection, import, or verified Google Family Link/provider consent feasibility.</p>
-      <p>Fictional account: <strong>alex.demo@example.test</strong>. Calendars start off. Guardian authority is an attestation for this demo only.</p>
-      <fieldset><legend>Select synthetic calendars and disclosure</legend>
-        <label><input type="checkbox" name="calendar" value="alex"> Alex (fictional guardian) — sample Outlook</label>
-        <label><input type="checkbox" name="calendar" value="sam"> Sam (fictional child label) — sample Google</label>
-        <label for="disclosure">Disclosure</label><select id="disclosure"><option value="busy">Busy only</option><option value="details">Details (only within this sample)</option></select>
-        <label><input type="checkbox" id="authority"> I attest I am authorized to review this fictional child label in this demo.</label>
-      </fieldset>
-      <button id="review-import">Review sample import</button>
-      <div id="import-summary" class="results" aria-live="polite"></div>
-      <div class="button-row"><button data-management="pause">Pause sample</button><button data-management="retry">Retry sample</button><button data-management="reconnect">Reconnect sample</button><button data-management="disconnect">Disconnect sample</button><button data-management="export">Export sample state</button><button data-management="delete">Delete sample state</button></div>
-      <p id="management-status" class="status" aria-live="polite"></p>
-    </section>
   </main>
-  <footer>All content is bundled synthetic fixture data. Session memory only; <button id="footer-reset">reset this demo</button>.</footer>
+  <footer>Family Copilot · Prototype <button id="footer-reset">Reset demo</button></footer>
   <script src="app.js"></script>
 </body>
 </html>

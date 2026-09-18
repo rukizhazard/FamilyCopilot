@@ -4,6 +4,356 @@
 
 This document is a proposal for review, not authorization to implement. Product behavior, privacy examples, the child's actual Google account type, supported calendar access, and the web-demo storyboard must be reviewed with the parent before implementation issues are opened.
 
+### Approved child saved-view exception, 17 September 2026
+
+**Later narrow approval, 18 September:** the user approved remembering the exact
+confirmed Kimi source for the common on-demand Sync action, without repeated
+confirmation controls. Implemented offline: native caller-bound SHA256 reference
+plus minimal reviewed access/window in a separate private local file until Clear.
+This supersedes the prohibition on retaining a source reference only for this
+fixed-window local-owner slice; raw IDs, session seals, keys, tokens, credentials,
+browser/cloud persistence and background work remain excluded. Only a new explicit
+reviewed import enrolls it; cached source names cannot establish identity. No live
+query, migration, shared restart or deployment occurred. One-time enrollment/setup
+and coordinated activation remain open. [Implementation evidence](our-week.md#remembered-source-sync-implemented-offline-18-september-2026).
+
+The user explicitly approved saving permitted Kimi event names/times and minimal
+reviewed access privately on this device **until Clear**, separate from the parent
+busy-only cache. This narrowly supersedes child nonpersistence below for the
+existing fixed October local-owner view. Source IDs, credentials, handles and
+review tokens remain unsaved; no new cloud/browser storage or background refresh.
+Offline saved viewing cannot detect Outlook revocation and never authorizes a new
+live source. Privacy/source changes and explicit deletion fail closed; completed
+views survive page exit/date changes/restart without broadening their original
+window. The common Calendar access dialog retains source/person/guardian/disclosure
+review. Agent access to real child results is not approved.
+
+Offline/synthetic integration passed, including original freshness after reload,
+no provider fallback, independent parent/child storage, temporary-write cleanup,
+keyboard and 375px layout checks. **325 focused tests per timezone** passed.
+The subsequent explicit shared restart-window approval was completed: the existing
+Windows-auth task on 8002 independently verified safe idle and the new child disk
+marker, with metadata-only preflight and no calendar query, cloud mutation or
+private saved-file access. User-reviewed import remains separate; old session-only
+results are not migrated. [Implementation and acceptance record](our-week.md#saved-view-activation-completed-17-september-2026).
+
+### Kimi native deployment and coordinated local activation, 17 September 2026
+
+The later narrow child approval has now been used: one protected bounded workflow
+was deployed Disabled and independently verified, consuming that one-shot
+deployment approval. The user then explicitly handed the shared 8002 activation
+window to Auth. The reviewed native activator and existing task enabled the
+separate child boundary; live/disk safe idle, parent/child execution and protocol
+markers, locked metadata preflight and current activity assets passed. Full
+offline suite: **786/786**. Builder's frozen UI files and browser event/session/
+cleanup contracts were not changed during this follow-up.
+
+No real child source listing/import or private snapshot read occurred. User-only
+Find/select/guardian/disclosure/review/import, exact October week, cloud redaction
+and child nonpersistence remain required. Native authentication and deployed
+metadata do not establish shared-source visibility. This checkpoint supersedes
+older undeployed/unused-approval/launcher-blocked statements below, not broader
+privacy or production gates. [Evidence and user test](kimi-calendar-import.md#shared-local-service-activated-17-september-2026).
+
+### Approved parent authentication repair and live refresh, 17 September 2026
+
+The owner subsequently requested verification and repair of the existing
+Mike/Debby Update path. The local 8002 service now uses existing Windows-native
+Azure CLI authentication with bounded native IPC; no new OAuth, permission,
+policy, connector, target or deployment change. A single repaired October
+refresh returned HTTP 200, non-cached, both people checked/336 slots each,
+followed by independent Disabled/SAS-disabled and protected-resource checks
+and local idle. The normal successful refresh retained storage at its existing
+WSL busy-only snapshot location; no diagnostic file read or Clear occurred.
+Full offline suite passed 642/642. Fresh browser/parent usability is separate.
+This is a narrow later query authorization, not arbitrary dates or child access.
+[Evidence and verification contract](owner-availability.md#windows-native-parent-update-repair-17-september-2026).
+Kimi is still not deployed/activated; the older native script-launcher failure
+below is historical. Parent success does not establish shared-source visibility.
+
+### Approved Kimi shared-Outlook exception, 17 September 2026
+
+The guardian explicitly approved replacing the School calendar UI with direct
+import of Kimi's shared Outlook calendar, using the existing authorized connection
+and **one new bounded read-only child workflow** in the existing Azure scope.
+This supersedes the broader integration gate only for this local-parent-only
+slice, not Google feasibility, production sharing or other integrations.
+Only the user may initiate listing, select one returned calendar, acknowledge
+guardian authority, choose disclosure and confirm a visible summary before import.
+Dates are fixed to **9–15 October 2026 Taipei**, ending 16 October 00:00 exclusive.
+Normal titles/times are allowed locally; private/unknown/personal/confidential
+events are busy-only, redacted in cloud before response. No descriptions,
+locations, attendees, assistant access, cross-parent disclosure, child persistence,
+calendar writes or automatic queries. Protected Azure history is not zero retention.
+The parent availability file and private school source files must be preserved.
+
+**Offline implemented, not deployed/activated:** consent-gated source selection,
+review tokens, session lifecycle, UI/routes and a candidate protected workflow now
+exist. The combined offline suite passed 595/595; synthetic browser functional
+checks do not establish keyboard/desktop or parent usability approval. Windows
+identity lookup succeeded for the user, but the native preflight launcher is
+blocked by script-execution policy; no policy bypass or credential transfer was
+performed. The one new-workflow deployment approval remains unused; no real listing or import
+is approved for agent validation. Official connector V3 does support calendarView
+and sensitivity; previous contrary research is incorrect. Shared visibility still
+needs the user's eventual explicit listing, not screenshot-based inference.
+See [scope, evidence and checkpoint](kimi-calendar-import.md). Parent usability
+and broader production-readiness reviews remain separate.
+
+### Approved bounded October demo (supersedes September live bounds)
+
+The owner approved exactly one migration of the existing availability workflow
+from v4 to v5 for **9–15 October 2026**, matching local UI/cache changes and safe
+idle-only activation, using the same protected Mike/Debby targets and existing
+official basketball discovery. Approval is already granted for this narrow
+migration, not for arbitrary live ranges, additional resources, real validation
+queries or agent access to the private snapshot. Real calendar access remains
+the owner's separate **Confirm** action. **Cloud migration and local activation
+completed on 16 September 2026:** exactly one existing-resource PUT, independent
+Disabled v5/SAS-disabled readback, and the original port-8002 persistent task
+verified live/disk and safe-idle with the v5 marker. No calendar query or private
+snapshot inspection was performed. Current full offline rerun passed **473/473**;
+earlier suites also passed in America/Los_Angeles, from a **460/460** baseline.
+Fresh live-browser readiness remains unverified because browser tooling failed;
+HTTP page/assets and safe local status passed. This is the bounded local demo,
+not broader production deployment or parent usability approval.
+
+The exact Taipei window ends **16 October 00:00 exclusive** (336 half-hours per
+person). Empty tabs default to October; remembered date selections are preserved.
+September snapshots keep their original window and binding, are not relabelled,
+and count only as an October saved-only miss without provider fallback. The
+single file is replaced only after a successful matching October result; generic
+failure returns no old data, while Clear and known access/contract/cleanup failure
+still invalidate. No cache existence is assumed or inspected during validation.
+Activities remains dates-only and works without calendar access. Parent usability,
+Google child-account feasibility and broader integration/deployment gates remain
+separate. [Implementation and actual operation evidence](owner-availability.md#approved-october-demo).
+
+### Approved date-selection confirmation UX, 16 September 2026
+
+**Later approved saved-view repair:** date-only changes now retain a completed
+snapshot under its original exact window and authorization, while hiding tab data
+and cancelling/fencing pending work. They are not consent withdrawal. Explicit
+Clear/deletion and known access/contract/cleanup failures still fail closed.
+**View saved only** confirms the displayed scope but cannot invoke a provider on
+a miss. Unsupported live dates are blocked locally; an explicit button selects
+20–26 September 2026 without loading anything. No prior busy pattern is shifted
+to new dates, no cache existence is assumed, and no synthetic fallback is automatic.
+This supersedes the destructive date-edit semantics below, not broader storage or
+live-range approvals. [Repair record](owner-availability.md#saved-week-recovery-16-september-2026).
+
+The owner requested **select start/end dates → Confirm → load calendars**, removing
+the separate owner-attestation checkbox. Confirm explicitly requests the visibly
+named two default calendars, busy-only, for 1–7 inclusive Taipei days. This changes
+the control used to confirm access, not the existing owner-only authorization,
+audience, calendar identities, disclosure, storage permissions or provider scopes.
+Calendar requests send dates only on Confirm; the later dates-only basketball
+handoff below also sends dates on Find games. Edits after a request hide results immediately
+and fence/cancel pending work before reconfirmation, retaining completed snapshots.
+
+This local implementation is tested with synthetic calendars. It does **not**
+authorize deployment, new live queries, provider changes or arbitrary-range disk
+storage. The deployed fixed-window workflow still limits live reads to 20–26
+September 2026; other ranges fail explicitly before cache/provider access. The
+original date-UX increment left the running service untouched. The later basketball
+handoff safely restarted the idle local server only; a separately approved workflow
+update is still needed for other live calendar ranges. Activity discovery now shares
+only the selected start/end dates, never calendar state or availability.
+See [scope and validation](owner-availability.md#date-selection-and-confirm-16-september-2026).
+
+### Approved sample activity inspiration increment, 16 September 2026
+
+**Later approved public basketball exception:** the parent authorized an on-demand
+Taiwan basketball search using the existing local Node backend and official public
+sources, without paid/AI services, CLI installation, new cloud resources, calendar
+data/cache access or child-preference transfer. The [implemented TPBL slice](basketball-search.md)
+has an independent exact dates-only POST, bounded credential-free HTTPS reads, attributed
+minimal facts, page-only selection, explicit unknowns and separate sample mode.
+P. LEAGUE+ is linked but not searched. This supersedes the sample-only restriction
+only for that narrow public discovery path, not calendar comparison or deployment.
+
+**Approved dates-only handoff:** Our week edits remember a validated start/end pair
+(1–7 inclusive Taipei days, 2000–2100) in the dedicated `familycopilot.dates.v1`
+`sessionStorage` key, with version/state only. Invalid edits store a tombstone so
+Activities cannot silently reuse old dates. Dates restore before any calendar
+confirmation/query, and calendar access is not required. Ages, names, statuses,
+credentials, consent and results are never included. The key survives same-tab,
+same-origin navigation/reload; independent tabs/origins do not synchronize. Reset
+dates removes only that key; Start over clears activity choices/results, not dates.
+Denied storage is visibly blocked. This narrowly supersedes the previous no-browser-
+storage restriction for selected dates only, not calendars, profiles or results.
+
+Find games sends exactly `startDate` and `endDate`; the backend validates them with
+the same pure `dateRange` before source work. Fresh Activities without a selection
+displays the configured default. Focus/history/date changes hide prior results and
+fence in-flight responses without re-searching. The fixed September samples remain
+separate. This does not authorize schedule comparison or new live calendar ranges.
+
+Combined offline tests passed **397/397** in UTC and America/Los_Angeles and the
+idle disk-backed local server was safely restarted without calendar/cache access.
+A separate diagnostic October 9–15 public query displayed seven TPBL games; the
+earlier September default was `outside_coverage`. No missing date is inferred
+free or game-free. PLG remains unsearched. Parent usability approval and production
+source permission remain open; this is not an all-Taiwan search or deployment.
+
+The parent approved simplifying the existing preview now, then addressing real
+activity search and calendar comparison separately. Implemented: **Who's coming?**
+(optional ages 4–17, at most eight, no names/birth dates), multi-select **What sounds
+fun?**, explicit **Surprise us** (no interest restriction) and **Find ideas**.
+Day/time, sample USD budget, indoor/outdoor and format remain under closed **More
+options**. Every selected age must fit one event's known guidance; uncertain
+required guidance/price is separately **Needs checking**, never a verified match.
+Skipping ages explicitly leaves age unchecked. Return only actual matches, at most
+six, and never silently relax filters or fabricate alternatives.
+
+The six invented activities/venues use **20–26 September 2026, Asia/Taipei (UTC+8)**.
+That matches the owner page's presentation, not a calendar-derived selection or
+schedule comparison. USD prices are invented, not conversions. No real location
+lookup, travel estimate, spaces verification, live research or booking exists.
+
+The owner **Activities** links lead to `/activities`, an allowlisted page with
+scoped assets; the original `/demo` remains unchanged. The later basketball mode
+loads the pure owner date utilities (not its controller/authentication scripts),
+and makes only its explicit public-search API request. It imports no owner
+session, calendar or cached data. The sample controller remains offline. The
+static page has no name, birth date, address or persistent profile. Ages and
+interests remain only in this page, clear on reset/reload/exit, and changing any
+choice hides prior results. This route approval does not authorize data sharing,
+new provider work, storage, infrastructure or live activity services. An idle-only
+graceful owner-server restart enabled the routes without reading its cache or
+querying calendars. Existing loaded calendar browser tabs were not inspected.
+
+See [implementation and validation](activity-ux-refresh.md#approved-current-increment-simple-activity-inspiration-16-september-2026).
+Parent usability, source feasibility and calendar-comparison authorization remain
+distinct gates; automated/browser testing does not establish parent approval.
+
+### Approved current POC copy, 16 September 2026
+
+The owner approved **Our week** as the weekly heading and **Mike / Debby** as
+presentation labels, superseding the historical Dad/Mom copy only. The mapping
+remains **Mike → Mike Lee; Debby → Debby**, with unchanged protected targets,
+authorization, fixed **20–26 September 2026 Taipei** week, all 336 slots each,
+layout and snapshot/cache binding. No identity or family relationship is inferred.
+Synthetic review uses **Mike (sample) / Debby (sample)** for the existing fictional
+Alex/Sam fixtures, retaining prominent sample/source notices.
+
+This approval does not include optional nickname settings, Add someone, multiuser
+onboarding, cloud operations, real queries or cache access/change. Static assets
+are read per request, so the copy needs only a page reload, not a backend restart
+or snapshot invalidation. Historical milestones below retain their original copy.
+See [the current copy record](owner-availability.md#our-week-presentation-copy).
+
+### Approved local-file retention extension, 15 September 2026
+
+The owner explicitly approved keeping the snapshot even while the backend is
+stopped. This supersedes the RAM-only/restart-deletes policy **only for the existing
+fixed-owner availability POC**. No new database, cloud storage, OAuth, live query,
+deployment, background work or wider production architecture is authorized here.
+
+One bounded private JSON file outside the repository retains only projected busy
+enums, fixed window, original `checkedAt`, and non-sensitive contract/local-context
+binding fingerprints. No credentials, events/details, names, addresses or provider
+IDs. Directory 0700/file 0600 and atomic replacement, no encryption-service layer.
+No TTL: a completed snapshot survives graceful backend stop/restart; cached use
+still requires the running backend, a fresh valid local session, exact Host/Origin,
+CSRF and explicit acknowledgement/Check week. No startup file read or query.
+Refresh invalidates the prior snapshot before querying; failures have no fallback.
+Clear/withdrawal fences RAM and late writers before file I/O and removes the file.
+Deletion failure is visibly unconfirmed and blocks reuse; never claim secure erase,
+deletion of other displayed copies, backups, credentials or Azure service history.
+
+The stored original verified caller/config-version digest is bound to the same
+local OS owner, workspace, fixed workflow/contract/window and indices 0/1. This is
+the existing single-owner assumption, not new cloud identity verification after
+restart: permissions and remote configuration changes cannot be detected offline.
+Clear before changing the owner/provider configuration; deliberate Refresh retains
+all current cloud checks. Known access/contract/cleanup failures invalidate cache.
+Original timestamp and stale-after-five-minutes warnings remain, independently of
+the 30-minute page session. Corrupt/mismatched/oversized files or I/O failure never
+become free time or an implicit network query. Synthetic/test stores are isolated.
+See [path, limitations, validation and activation](owner-availability.md#local-file-snapshot-no-ttl).
+
+### Historical approved simple RAM-cache and Sunday-week POC, 15 September 2026
+
+The owner explicitly approved this narrow extension, without new login/settings,
+storage infrastructure or further architecture approval: **20–26 September 2026,
+Sunday–Saturday**, ending 27 September 00:00 exclusive in Taipei, same protected
+Dad/Mom targets, 336 slots each. One exact Disabled v3 → v4 workflow configuration
+update is authorized, **no true calendar query or workflow enabling this increment**.
+
+One redacted process-RAM snapshot survives reload with **no retention time limit**.
+Explicit acknowledgement plus Check week loads it without a provider query, or
+queries once if absent; explicit Refresh bypasses it. No automatic startup load,
+background query, disk/browser storage or multiuser cache. Clear/withdrawal empties
+RAM and fences pending work across sessions; restart empties it. Page exit clears
+tab state/cancels its work without deleting a completed snapshot. The existing
+30-minute authentication session remains independent of retention. Original
+last-updated time and stale-after-five-minutes warning remain visible. Provider
+permissions are **not rechecked for cached snapshots**; offline provider revocation
+cannot be detected. Known access/contract failures clear the cache; cleanup failure
+remains sticky and a failed Refresh never falls back to prior data. Details remain
+in protected Azure processing only, not the RAM snapshot or assistant. This is a
+local POC exception, not production retention or parent usability approval.
+See [the current implementation record](owner-availability.md#sunday-week-and-ram-cache).
+
+### Historical approved presentation-only simplification, 15 September 2026
+
+The owner requested **Dad** instead of Mike Lee, **Mom** instead of Debby, and
+one seven-day calendar diagram rather than many daily lists. The local UI now
+uses these display aliases, explicitly preserving their prior-name mapping in
+the access summary. They establish no new identities, parent relationship,
+guardian authority, provider target or permission. Each day has two parallel
+tracks along a shared time axis, with equal adjacent statuses merged only within
+that day. Mobile scroll and textual/hatched unknown states preserve readability.
+The fixed Taipei week, exact two default calendars, 336 slots each, explicit
+pre-query confirmation, privacy and fail-closed states remain unchanged.
+
+This approval is **presentation only**, with synthetic validation: no live query,
+cloud read/write, contract/authentication change or server restart is performed.
+Technical explanations are collapsed, not removed; the fictional demo remains
+separate. Parent usability and screen-reader validation are still separate gates.
+See [the current UI record](owner-availability.md#presentation-only-weekly-diagram-15-september-2026).
+
+### Latest approved fixed-week availability exception, 15 September 2026
+
+The owner explicitly approved hiding the initial calendar-selection UI (retaining
+its backend/cleanup capability), replacing the first protected target with **Mike Lee**,
+retaining **Debby**, and a fixed **2026-09-15 00:00 through 2026-09-22 00:00 exclusive
+Asia/Taipei (UTC+8)** window. Seven full days at 30 minutes produce **336 slots per
+person**. Default calendars only; owner-only busy-status use through the existing
+connector. A named access summary confirms the window and all slots before a
+request. One exact guarded Disabled v2 → v3 update and **one true live verification**
+are approved, not mail, calendar writes, other queries, background sync or broader
+integration. Real addresses remain protected operator parameters, not repo/UI inputs.
+The exact update is deployed and the single approved true live verification passed:
+**Mike Lee true / 336 slots; Debby true / 336 slots**, followed by independent
+Disabled/SAS-disabled contract, preserved-resource, cleared-session and idle checks.
+No further provider query was made; secure values cannot be read back from ARM.
+See [the current execution record](owner-availability.md). Parent usability, provider
+feasibility outside this narrow path and production readiness remain separate gates.
+
+### Historical approved single-day two-person availability exception, 15 September 2026
+
+The owner explicitly approved implementation/deployment through the existing authorized Outlook connector for two exact operator-supplied adults, fixed **2026-09-15 09:00–17:00 Asia/Taipei**, 30-minute intervals, busy-status disclosure to the local owner for scheduling. The actors, purpose and architecture no longer await approval. The [implementation and runtime record](owner-availability.md) covers the isolated Disabled/SAS-disabled availability workflow, cloud-side projection/protected processing and two-row local UI. **Earlier live verification passed:** a narrowly authorized, exact-contract v1 → v2 repair replaced the runtime-unsupported Parse JSON `pattern` keyword with equivalent protected WDL validation. The first actual authorized getSchedule query verified both people, 16 slots each, with independent cleanup and preserved-resource checks. **The later user-requested Load failed locally:** HTTP 403 at page age 130 minutes exceeded the 30-minute page session. The smallest local repair distinguishes expired/unavailable sessions from cleanup failure and offers explicit reload guidance. Reload never retries a query or clears a genuine backend cleanup block. Independent Azure reads still confirm Disabled/SAS Disabled; this diagnosis and repair made no new mailbox query or cloud change. Schedule contents were neither logged nor shared with the agent. The local page starts empty. Parent review, Google child-account feasibility, broader imports/sharing, live activity discovery and production retention/readiness remain separate gates. No mail, calendar writes, booking, new registration, connector recreation, persistent storage or background refresh is included.
+
+### Historical two-person availability feasibility, 15 September 2026
+
+The owner requested at least two people's schedules and approved **verification of the existing connector's Free/Busy capability without reading the other person's data**. [The feasibility record](availability-feasibility.md) distinguishes official API contracts, successful read-only Azure metadata evidence, offline tests and unverified runtime authorization. Existing Outlook `HttpRequest` is a candidate for `getSchedule`; meeting suggestions are not a complete grid. Default-calendar coverage, potentially returned subject/location fields, cloud-side busy-only projection and protected service history remain explicit constraints. This approval adds no live schedule request, deployment, permission change or multi-person integration. The intended UI requires independent named-person checked/missing/error states; missing context is never free. Existing owner-list approvals below remain unchanged.
+
+### Later approved owner-only list-only exception, 15 September 2026
+
+The subsequent owner approval adds a loopback-only **explicit Load → Select → Local summary** UI and permits a narrowly guarded update to return minimal calendar labels to that local owner browser. This uses the developer's already authorized account, not visitor sign-in or family sharing. Provider IDs are discarded by the backend, selections stay in the tab, and no event/grant/import action exists. Activity discovery remains independent. The owner-label v2 update is now deployed and independently verified Disabled, with SAS disabled and unchanged authentication/history protections. The documented standard PUT uses local exclusive-operation coordination and immediate pre-/post-read verification, not atomic Azure compare-and-swap; the earlier ETag requirement was a tooling assumption. After a narrow connector-timestamp comparison fix, a separately reauthorized live E2E reported success; its current calendar count was not preserved in the execution summary. Synthetic UI checks and live listing do not establish parent usability approval. [The detailed current boundary and execution evidence](owner-calendar-list.md#local-owner-ui-increment) supersede the earlier count-only output restriction only for this explicitly approved local browser path, never for agent/log output.
+
+The owner subsequently approved reuse of the existing authorized Outlook connection through a **separate owner-only Logic App**, including deployment and one controlled live list verification. [The scoped implementation and execution record](owner-calendar-list.md) is limited to available-calendar metadata, with only counts/status returned to the operator and protected workflow history. It requires no new OAuth app, event access, mail, background refresh, database, sharing, or child-account access. This is an explicit narrow prototype exception to the broader review gate, not completion or approval of the full plan. Calendar selection and pre-import consent remain mandatory before any future event retrieval. Parent usability, provider completeness/ownership and production privacy/retention reviews remain open.
+
+### Earlier explicitly approved narrow exception, 15 September 2026
+
+The parent separately approved an **own Microsoft account browser OAuth PKCE picker**, superseding the earlier server-side architecture for this slice only: explicit sign-in, account confirmation, bounded own-calendar listing, off-by-default selection, and a local summary. No events, background refresh/sync, sharing, invitation acceptance, mail or persistence are authorized by this exception. The initial audience is the owner's corporate home tenant, not general adult/personal/guest Microsoft accounts. Browser-held tokens are an explicitly approved limited experiment, not the storage design for future production imports.
+
+The separate implementation and [actual registration/validation record](microsoft-browser-picker.md) do not complete this plan's broader journey. The app uses delegated `Calendars.ReadBasic` for calendar metadata; that provider permission also permits basic event reading and is not limited to selected calendars, which the UI discloses. The public client ID remains unconfigured after a failed one-shot registration attempt; no real sign-in or calendar access was performed through tools. Secret/certificate restrictions do not themselves block a credential-free SPA. No Functions or Storage are necessary for this picker.
+
+All later server-side adapters, credential/data persistence, event import, date ranges, represented-person/guardian/disclosure choices, family authorization and deployment still require their applicable approvals and reviews below. Parent usability and actual Google child-account feasibility remain unverified. Discovery continues to work independently in the unchanged fictional demo.
+
 The first version is for parents. It responds only when asked and may:
 
 - answer schedule questions from currently permitted calendar data;

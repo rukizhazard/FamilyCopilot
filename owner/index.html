@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="owner-csrf" content="OWNER_CSRF">
+  <meta name="owner-mode" content="OWNER_MODE">
+  <meta name="owner-cache" content="OWNER_CACHE">
+  <meta name="owner-range" content="OWNER_RANGE">
+  <meta name="owner-saved" content="OWNER_SAVED">
+  <meta name="owner-contract" content="OWNER_CONTRACT">
+  <meta name="child-mode" content="CHILD_MODE">
+  <meta name="child-cache" content="CHILD_CACHE">
+  <meta name="child-sync" content="CHILD_SYNC">
+  <title>Family Copilot · Calendar source not verified</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/owner.css">
+  <link rel="stylesheet" href="/shell.css">
+  <script src="/owner-core.js" defer></script>
+  <script src="/availability-core.js" defer></script>
+  <script src="/shared/date-selection.js" defer></script>
+  <script src="/availability-ui.js" defer></script>
+  <script src="/child-calendar-core.js" defer></script>
+  <script src="/child-calendar-ui.js" defer></script>
+  <script src="/owner-ui.js" defer></script>
+</head>
+<body class="owner-page">
+  <a class="shell-skip" href="#main">Skip to content</a>
+  <header class="family-shell">
+    <div class="shell-heading">
+      <div class="shell-brand"><span class="shell-mark" aria-hidden="true">✿</span><div><strong class="shell-name">Family Copilot</strong><p class="shell-tagline">A little more room for happy days.</p></div></div>
+      <nav class="shell-nav" aria-label="Family Copilot"><a href="/" aria-current="page">Our week</a><a href="/activities">Activities</a></nav>
+    </div>
+    <div class="shell-source-row" id="owner-source-row" hidden><span class="shell-source" id="owner-source-badge" aria-label="Calendar source">Source not verified</span></div>
+  </header>
+  <main id="main" class="shell-main">
+    <section class="shell-card calendar-card" aria-labelledby="availability-title">
+      <div class="shell-intro"><div><h1 id="availability-title" class="shell-title">Our week</h1></div><span class="shell-decoration week-decoration" aria-hidden="true">☀️</span></div>
+      <div class="calendar-people" role="group" aria-label="Calendar loading status">
+        <span id="member-row-0" class="member-chip"><button id="calendar-person-0" type="button" aria-label="Mike · Not loaded" disabled>Mike</button><button id="member-remove-0" class="member-remove" type="button" aria-label="Remove Mike from demo member list">−</button></span>
+        <span id="member-row-1" class="member-chip"><button id="calendar-person-1" type="button" aria-label="Debby · Not loaded" disabled>Debby</button><button id="member-remove-1" class="member-remove" type="button" aria-label="Remove Debby from demo member list">−</button></span>
+        <span id="member-row-2" class="member-chip"><button id="calendar-person-2" type="button" aria-label="Kimi · Not loaded" disabled>Kimi</button><button id="member-remove-2" class="member-remove" type="button" aria-label="Remove Kimi from demo member list">−</button></span>
+        <span id="member-demo-list" class="member-demo-list"></span>
+        <button id="member-add" class="member-add" type="button" aria-label="Add demo member" aria-expanded="false" aria-controls="member-editor">+</button>
+      </div>
+      <div id="member-editor" class="member-editor" role="group" aria-label="Add demo member" hidden>
+        <label for="member-name">Member name<input id="member-name" type="text" maxlength="40" autocomplete="off" aria-describedby="member-demo-help member-message"></label>
+        <button id="member-save" type="button">Add</button><button id="member-cancel" type="button">Cancel</button>
+      </div>
+      <p id="member-demo-help" class="member-demo-help">Demo member list only · Calendars and Sync stay unchanged. <button id="member-reset" type="button" hidden>Reset members</button></p>
+      <p id="member-message" class="small" role="status" hidden></p>
+      <div class="availability-confirmation">
+        <div class="availability-dates" role="group" aria-label="Selected dates for Activities and initial calendar display" aria-describedby="availability-date-help">
+          <label for="availability-start">Start date<input id="availability-start" type="date" min="2000-01-01" max="2100-12-31" value="2026-10-09" required autocomplete="off"></label>
+          <label for="availability-end">End date<input id="availability-end" type="date" min="2000-01-01" max="2100-12-31" value="2026-10-11" required autocomplete="off"></label>
+        </div>
+        <p id="availability-date-error" role="status" hidden></p>
+        <button id="availability-supported-dates" hidden>Choose 9–15 October 2026</button>
+      </div>
+      <button id="availability-refresh" hidden disabled aria-describedby="availability-targets availability-load-scope"><span aria-hidden="true">↻</span> Update</button>
+      <button id="availability-saved" hidden disabled aria-describedby="availability-targets availability-load-scope availability-saved-help child-retention">View saved only</button>
+      <p id="availability-status" role="status" tabindex="-1" hidden>Schedules not loaded.</p>
+      <p id="availability-recovery" hidden><a href="/">Reload page</a></p>
+      <p id="child-status" role="status" tabindex="-1" hidden>Kimi · Saved view not loaded. No Outlook request.</p>
+      <div id="availability-context" aria-live="polite" hidden></div>
+      <div id="availability-surface" class="week-surface" data-loaded="false">
+        <div class="button-row availability-actions"><button id="availability-load" type="button" disabled aria-describedby="availability-targets availability-load-scope availability-saved-help child-retention"><span aria-hidden="true"><span class="sync-calendar-icon"></span></span><span id="availability-sync-label">Sync</span></button><button id="availability-clear" type="button"><span aria-hidden="true">×</span> Clear</button></div>
+        <div id="availability-empty" class="week-empty" role="region" aria-labelledby="availability-empty-title">
+          <h2 id="availability-empty-title">Your week, at a glance</h2>
+          <p id="availability-empty-description">Choose your dates, then select Sync.</p>
+        </div>
+      </div>
+      <div id="availability-legend" class="week-key" hidden><ul class="week-legend" aria-label="Calendar status legend">
+        <li data-status="free_or_elsewhere">No busy time*</li><li data-status="tentative">Tentative</li><li data-status="busy">Busy</li><li data-status="oof">Away</li><li data-status="unknown">Unknown</li>
+      </ul>
+      <p id="week-help" class="small">*May include working elsewhere. Opens at 6:00 AM; scroll up for earlier hours.</p></div>
+      <div id="availability-grid" role="region" tabindex="0" aria-label="Weekly calendar, 9–11 October 2026, Mike and Debby, Asia/Taipei" aria-describedby="week-help" hidden></div>
+      <details class="availability-details"><summary>Details</summary>
+        <div class="display-navigation" role="group" aria-label="Calendar display only">
+          <button id="availability-display-previous" type="button" aria-label="Previous days" aria-describedby="availability-display-help" disabled>Earlier days</button>
+          <button id="availability-display-next" type="button" aria-label="Next days" aria-describedby="availability-display-help" disabled>Later days</button>
+        </div>
+        <p id="availability-targets">Mike + Debby · Default calendars · Busy-only</p>
+        <p id="availability-date-help">Choose 1–7 days for Activities and the starting calendar view. The calendar shows at most three days at a time. Dates within 9–15 October use the full calendar load scope below; this is not a three-day query.</p>
+        <p id="availability-date-sharing" class="small">Activities selected dates: 2026-10-09 through 2026-10-11, inclusive. Only dates are remembered in this tab. No calendar access is needed to find games.</p>
+        <p id="availability-range-support" class="small"></p>
+        <p id="availability-load-scope">Calendar load scope: 9–15 October 2026 inclusive · Taipei (UTC+8), ending 16 October 00:00 exclusive · 336 half-hours per parent. Confirm / Update / View saved only cover this entire scope, not just the displayed days. Kimi is saved-view only; Update refreshes parents only.</p>
+        <p id="availability-saved-help" class="small">Confirm loads Mike + Debby busy times and any matching Kimi saved view. Update refreshes parents only; Kimi stays saved-only. View saved only never queries Outlook, even on a miss. Clear deletes both saved views.</p>
+        <p id="availability-status-details" role="status">Schedules not loaded.</p>
+        <p id="availability-source" class="small">Outlook · Default calendars only</p>
+        <p id="child-week-status" class="small" role="status">Kimi · Not loaded. Saved view only; missing time is unknown.</p>
+        <p id="child-status-details" role="status">Kimi · Saved view not loaded. No Outlook request.</p>
+        <p id="availability-display-label" role="status">Display: 9–11 October 2026 · Three days · Taipei (UTC+8).</p>
+        <p id="availability-display-help" class="small">Previous/Next only move the calendar view within its load scope. They do not load calendars, change consent or change the selected dates for Activities above. Days without loaded context remain unknown.</p>
+        <div id="availability-parent-details"></div>
+        <p id="child-retention" class="small">Kimi saved viewing needs a current backend. Nothing loads automatically.</p>
+        <p id="child-imported-access" hidden></p>
+        <p id="child-event-help">Our week shows consented event names, times and reported status. Private and Busy-only events stay unnamed. Events are not verified Busy slots; gaps are unknown. No live Kimi refresh or new source import is available here.</p>
+        <p id="owner-source-notice">Calendar source not verified. Do not treat this page as real availability.</p>
+        <p>Only you can use this local calendar view. Keep it private; do not share it with other people or an assistant. Family Copilot cannot change your calendar events.</p>
+        <p id="availability-grid-source">Calendar source not verified. No availability established.</p>
+        <p id="availability-freshness">Freshness unknown · No snapshot loaded.</p>
+        <p id="availability-cleanup" class="small" role="status" hidden></p>
+        <p>For help, share only the status message, not calendar contents. If updating is paused, ask the person who set up this page to check it. Restarting does not resolve an unconfirmed update.</p>
+        <p>Scroll sideways, or focus the calendar and use arrow keys. Block descriptions include exact times; 24:00 ends that day. No busy block reported is not guaranteed availability. Missing data is never free. Other calendars, personal plans and travel are not checked.</p>
+        <p id="availability-identity">Display labels: Mike = Mike Lee; Debby = Debby. Labels do not establish identity, parent relationships or guardian authority.</p>
+        <p id="availability-window">Calendar load window: 2026-10-09 00:00 through 2026-10-16 00:00 (end exclusive) · Asia/Taipei (UTC+8). All 336 half-hour slots per parent, 672 total across the two parent calendars only. Nothing checked until Confirm. Kimi is saved-view only.</p>
+        <p>Uses your existing Outlook connection, not a visitor's account. The two parent calendars cannot be changed here. Busy-status information stays with this local owner, not in an assistant or Activities.</p>
+        <p id="availability-retention">Confirm uses a matching local snapshot if present, otherwise queries once. Update always queries. Cached use does not recheck provider permissions.</p>
+        <p>Outlook may send event titles, locations and privacy labels to Azure. These details are removed there before parent busy times reach this page. Azure retains protected processing history; Clear does not erase it.</p>
+        <p>No calendar changes, mail, booking, background refresh or automatic retries. View saved only never queries, even on a miss. Failed updates hide results without showing older data instead. Changing the calendar load dates hides results and cancels pending work but keeps a completed saved view. Moving between displayed days keeps results and consent. Clear deletes the saved view and prevents pending results from restoring it. If deletion or finishing an update cannot be confirmed, further use stays blocked. Other open pages may still show previously loaded results.</p>
+        <p id="availability-storage">Snapshot storage depends on this local server's mode.</p>
+        <p>Saved views have no expiry timer. After five minutes they are marked stale, not deleted or automatically refreshed. Saved views do not recheck Outlook permissions; known access changes prevent reuse.</p>
+        <p>This page expires after 30 minutes. Reload to review access again; nothing loads automatically. Reload hides this page's results and cancels pending work, but keeps a completed saved view. It cannot resolve an unconfirmed update. Confirm is the explicit access action.</p>
+        <button id="availability-check">Check status</button>
+      </details>
+    </section>
+    <div id="synthetic-controls" hidden><label for="fixture">Synthetic review scenario</label><select id="fixture"><option value="listed">Listed</option><option value="empty">Empty</option><option value="partial">Availability: second person unavailable</option><option value="unavailable">Unavailable</option><option value="revoked">Revoked</option><option value="slow">Slow / cancel</option><option value="cleanup_failed">Cleanup failure (blocks this test server)</option></select></div>
+    <!-- Retained backend capability and shared cleanup handlers, not an initial UI step. -->
+    <section id="owner-calendar-section" class="shell-card" aria-labelledby="owner-title" hidden inert>
+      <p class="eyebrow">1 · Load &nbsp; 2 · Select &nbsp; 3 · Local summary</p>
+      <h2 id="owner-title">Choose available calendars</h2>
+      <p>An explicit Load requests up to 100 available calendars once through the developer's existing authorized Outlook connection, only after backend contract checks pass. The list may include shared calendars; ownership and completeness are unverified. No time range or schedule availability is checked.</p>
+      <p id="owner-deployment" class="small">The owner-label workflow update was deployed and verified Disabled on 15 September 2026. Every explicit Load checks the current contract and access policy again; this page does not inspect Azure on startup.</p>
+      <details><summary>Account, access and retention</summary>
+        <p>This uses the developer's previously authorized account, not the account of a person visiting this page. No new Microsoft permission is requested. The existing connector grant is broader than this names-only operation.</p>
+        <p>The local backend holds credentials in process memory only; Azure CLI maintains its existing credential cache. Provider IDs and owner fields never reach this page. Calendar names and selections stay in this tab, are not sent to an assistant, and are cleared on reset, page exit or reload. No local file, browser storage or database saves them. Azure retains service-managed protected run history; this is not zero persistence or cloud deletion.</p>
+        <p>The workflow is temporarily enabled only for your explicit load request and disabled before results are shown. Cancellation fences late results and attempts cleanup; it cannot undo a request already accepted by Azure. Force-kill or network loss can prevent verified cleanup.</p>
+      </details>
+      <label class="owner-ack"><input id="owner-ack" type="checkbox" autocomplete="off"> I am the local developer/owner. I understand Load uses my previously authorized Outlook account, not visitor sign-in.</label>
+      <div class="button-row"><button id="owner-load" disabled>Load available calendars</button><button id="owner-clear">Clear / cancel</button><button id="owner-check">Check local cleanup status</button></div>
+      <p id="owner-status" class="status" role="status" tabindex="-1">Idle · Nothing loaded. No calendar request has been made by this page.</p>
+      <p id="owner-cleanup" class="small" role="status">Cleanup not requested. Current cloud state has not been checked by this page.</p>
+      <div id="owner-picker" hidden>
+        <fieldset><legend>Available calendars · all off until selected</legend><div id="owner-list"></div></fieldset>
+        <p id="owner-selection" class="small" aria-live="polite"></p>
+        <button id="owner-review" disabled>Review local selection</button>
+      </div>
+      <section id="owner-summary" class="result-card" hidden aria-labelledby="owner-summary-title">
+        <h3 id="owner-summary-title" tabindex="-1">Local selection summary</h3>
+        <ul id="owner-summary-list"></ul>
+        <p>Local selection only. No access granted, no events imported, no sharing, no invitation, and no schedule comparison. Nothing has been connected to the fictional activity demo.</p>
+        <button id="owner-back">Change selection</button>
+      </section>
+      <p class="small">One load per page, with no polling or automatic retries. <a href="/">Start a fresh owner page</a> to make another deliberate request. Clear does not disconnect or reset the authorized Outlook connector.</p>
+      <noscript>JavaScript is required for the local owner controls. No calendars have been requested.</noscript>
+    </section>
+    <details class="shell-card activity-detour"><summary><span aria-hidden="true">🌱</span> A little activity inspiration</summary><p>Find public Taiwan basketball listings or explore separate sample ideas. Calendar access is not required; no availability or calendar selections are used.</p><a href="/activities">Explore activities →</a></details>
+  </main>
+  <footer>Family Copilot · Your private calendar view</footer>
+</body>
+</html>

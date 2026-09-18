@@ -1,0 +1,24 @@
+:root { color-scheme:light; font:16px/1.6 system-ui,sans-serif; color:#192c41; background:#f3f6fa; }
+* { box-sizing:border-box; }
+body { margin:0; }
+main { max-width:860px; margin:auto; padding:2rem 1rem; }
+h1 { font-size:clamp(1.8rem,5vw,2.8rem); line-height:1.2; letter-spacing:-.04em; }
+h2 { font-size:1.2rem; }
+.eyebrow { color:#075c93; font-weight:700; }
+.notice,.card { border:1px solid #cbd8e6; border-radius:1rem; padding:1.3rem; margin:1rem 0; background:white; }
+.notice { background:#eaf1f8; }
+p,li,label { overflow-wrap:anywhere; }
+fieldset { min-inline-size:0; border:1px solid #cbd8e6; border-radius:.7rem; margin:1rem 0; padding:.7rem; }
+label { display:flex; align-items:center; gap:.7rem; min-height:44px; padding:.5rem; }
+input[type=checkbox] { flex:0 0 22px; width:22px; height:22px; accent-color:#075c93; }
+button,summary { font:inherit; min-height:44px; cursor:pointer; }
+button { background:#075c93; color:white; border:1px solid #075c93; border-radius:.5rem; padding:.55rem .9rem; margin:.3rem .4rem .3rem 0; }
+button:disabled { background:#e0e5ed; border-color:#738297; color:#455467; cursor:not-allowed; }
+button:focus-visible,summary:focus-visible,input:focus-visible,[tabindex]:focus-visible { outline:3px solid #a34800; outline-offset:3px; }
+.actions { display:flex; flex-wrap:wrap; gap:.3rem; margin-top:1rem; }
+#picker-status { border-left:4px solid #075c93; padding:.8rem; background:#f3f6fa; font-weight:600; }
+#picker-error { color:#883600; font-weight:600; }
+#picker-error:empty { display:none; }
+footer { color:#52657c; font-size:.9rem; }
+[hidden] { display:none !important; }
+@media(max-width:420px) { main { padding:.8rem; } .card,.notice { padding:.85rem; } button { width:100%; margin-right:0; } }

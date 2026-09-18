@@ -1,0 +1,209 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflowName": { "type": "string", "defaultValue": "familycopilot-invitations-dev", "minLength": 1, "maxLength": 80 },
+    "connectionName": { "type": "string", "defaultValue": "familycopilot-office365-dev", "minLength": 1, "maxLength": 80 },
+    "location": { "type": "string", "defaultValue": "[resourceGroup().location]" },
+    "createConnection": { "type": "bool", "defaultValue": true },
+    "callerObjectId": { "type": "string", "minLength": 36, "maxLength": 36 },
+    "callerApplicationId": {
+      "type": "string",
+      "defaultValue": "04b07795-8ddb-461a-bbee-02f9e1bf7b46",
+      "metadata": { "description": "Azure CLI operator bootstrap only. Replace with the approved backend identity before application use." }
+    },
+    "callerAudience": { "type": "string", "defaultValue": "https://management.azure.com/" },
+    "deliveryEnabled": { "type": "bool", "defaultValue": false },
+    "approvedRecipient": { "type": "securestring", "defaultValue": "" },
+    "applicationOrigin": { "type": "string", "defaultValue": "https://example.invalid" }
+  },
+  "variables": {
+    "office365ApiId": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', parameters('location'), '/managedApis/office365')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/connections",
+      "condition": "[parameters('createConnection')]",
+      "apiVersion": "2016-06-01",
+      "name": "[parameters('connectionName')]",
+      "location": "[parameters('location')]",
+      "kind": "V1",
+      "tags": { "application": "FamilyCopilot", "purpose": "invitation-email", "environment": "development" },
+      "properties": {
+        "displayName": "Family Copilot invitation sender (authorization required)",
+        "api": { "id": "[variables('office365ApiId')]" }
+      }
+    },
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2019-05-01",
+      "name": "[parameters('workflowName')]",
+      "location": "[parameters('location')]",
+      "tags": { "application": "FamilyCopilot", "purpose": "invitation-email", "environment": "development" },
+      "dependsOn": [ "[resourceId('Microsoft.Web/connections', parameters('connectionName'))]" ],
+      "properties": {
+        "state": "Disabled",
+        "accessControl": {
+          "triggers": {
+            "sasAuthenticationPolicy": { "state": "Disabled" },
+            "openAuthenticationPolicies": {
+              "policies": {
+                "ApprovedCaller": {
+                  "type": "AAD",
+                  "claims": [
+                    { "name": "iss", "value": "[concat('https://sts.windows.net/', subscription().tenantId, '/')]" },
+                    { "name": "aud", "value": "[parameters('callerAudience')]" },
+                    { "name": "oid", "value": "[parameters('callerObjectId')]" },
+                    { "name": "appid", "value": "[parameters('callerApplicationId')]" }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "$connections": { "type": "Object", "defaultValue": {} },
+            "deliveryEnabled": { "type": "Bool", "defaultValue": false },
+            "approvedRecipient": { "type": "SecureString" },
+            "applicationOrigin": { "type": "String", "defaultValue": "https://example.invalid" }
+          },
+          "triggers": {
+            "manual": {
+              "type": "Request",
+              "kind": "Http",
+              "operationOptions": "EnableSchemaValidation",
+              "inputs": {
+                "method": "POST",
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [ "invitationToken" ],
+                  "properties": {
+                    "invitationToken": { "type": "string", "minLength": 43, "maxLength": 43 }
+                  }
+                }
+              },
+              "runtimeConfiguration": {
+                "secureData": { "properties": [ "outputs" ] }
+              }
+            }
+          },
+          "actions": {
+            "Delivery_gate": {
+              "type": "If",
+              "expression": "@and(equals(parameters('deliveryEnabled'), true), not(empty(parameters('approvedRecipient'))), not(equals(parameters('applicationOrigin'), 'https://example.invalid')))",
+              "runAfter": {},
+              "actions": {
+                "Validate_delivery": {
+                  "type": "ParseJson",
+                  "inputs": {
+                    "content": {
+                      "recipient": "@parameters('approvedRecipient')",
+                      "origin": "@parameters('applicationOrigin')",
+                      "invitationToken": "@triggerBody()?['invitationToken']"
+                    },
+                    "schema": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [ "recipient", "origin", "invitationToken" ],
+                      "properties": {
+                        "recipient": { "type": "string", "maxLength": 254, "pattern": "^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9-]+(?:\\.[A-Za-z0-9-]+)+(?![\\s\\S])" },
+                        "origin": { "type": "string", "maxLength": 253, "pattern": "^https://[a-z0-9]+(?:[a-z0-9-]*[a-z0-9])?(?:\\.[a-z0-9]+(?:[a-z0-9-]*[a-z0-9])?)+(?![\\s\\S])" },
+                        "invitationToken": { "type": "string", "minLength": 43, "maxLength": 43, "pattern": "^[A-Za-z0-9_-]{43}$" }
+                      }
+                    }
+                  },
+                  "runAfter": {},
+                  "runtimeConfiguration": { "secureData": { "properties": [ "inputs" ] } }
+                },
+                "Send_invitation_email": {
+                  "type": "ApiConnection",
+                  "inputs": {
+                    "host": { "connection": { "name": "@parameters('$connections')['office365']['connectionId']" } },
+                    "method": "post",
+                    "path": "/v2/Mail",
+                    "body": {
+                      "To": "@body('Validate_delivery')['recipient']",
+                      "Subject": "You're invited to Family Copilot",
+                      "Body": "<p>You have been invited to connect your own Microsoft calendar to Family Copilot.</p><p><a href=\"@{body('Validate_delivery')['origin']}/invite#token=@{body('Validate_delivery')['invitationToken']}\">Review invitation</a></p><p>Opening this link does not grant calendar access. You must sign in with Microsoft, choose calendars, and confirm who can see your busy times before anything is shared. Personal and work event details are not shared with another parent.</p><p>If you were not expecting this invitation, ignore this email. Do not forward the link or send anyone your password.</p>",
+                      "Importance": "Normal"
+                    },
+                    "retryPolicy": { "type": "none" }
+                  },
+                  "runAfter": { "Validate_delivery": [ "Succeeded" ] },
+                  "runtimeConfiguration": { "secureData": { "properties": [ "inputs", "outputs" ] } }
+                },
+                "Accepted": {
+                  "type": "Response",
+                  "kind": "Http",
+                  "inputs": {
+                    "statusCode": 200,
+                    "headers": { "Content-Type": "application/json", "Cache-Control": "no-store" },
+                    "body": { "status": "provider_accepted", "calendarAccessGranted": false }
+                  },
+                  "runAfter": { "Send_invitation_email": [ "Succeeded" ] }
+                },
+                "Delivery_unknown": {
+                  "type": "Response",
+                  "kind": "Http",
+                  "inputs": {
+                    "statusCode": 502,
+                    "headers": { "Content-Type": "application/json", "Cache-Control": "no-store" },
+                    "body": { "status": "delivery_unknown", "retryAutomatically": false }
+                  },
+                  "runAfter": { "Send_invitation_email": [ "Failed", "TimedOut" ] }
+                },
+                "Invalid_delivery": {
+                  "type": "Response",
+                  "kind": "Http",
+                  "inputs": {
+                    "statusCode": 400,
+                    "headers": { "Content-Type": "application/json", "Cache-Control": "no-store" },
+                    "body": { "status": "invalid_delivery_configuration" }
+                  },
+                  "runAfter": { "Validate_delivery": [ "Failed", "TimedOut" ] }
+                }
+              },
+              "else": {
+                "actions": {
+                  "Not_ready": {
+                    "type": "Response",
+                    "kind": "Http",
+                    "inputs": {
+                      "statusCode": 503,
+                      "headers": { "Content-Type": "application/json", "Cache-Control": "no-store" },
+                      "body": { "status": "delivery_not_configured", "calendarAccessGranted": false }
+                    },
+                    "runAfter": {}
+                  }
+                }
+              }
+            }
+          },
+          "outputs": {}
+        },
+        "parameters": {
+          "$connections": {
+            "value": {
+              "office365": {
+                "id": "[variables('office365ApiId')]",
+                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('connectionName'))]",
+                "connectionName": "[parameters('connectionName')]"
+              }
+            }
+          },
+          "deliveryEnabled": { "value": "[parameters('deliveryEnabled')]" },
+          "approvedRecipient": { "value": "[parameters('approvedRecipient')]" },
+          "applicationOrigin": { "value": "[parameters('applicationOrigin')]" }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "workflowId": { "type": "string", "value": "[resourceId('Microsoft.Logic/workflows', parameters('workflowName'))]" },
+    "connectionId": { "type": "string", "value": "[resourceId('Microsoft.Web/connections', parameters('connectionName'))]" }
+  }
+}

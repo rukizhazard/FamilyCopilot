@@ -1,0 +1,31 @@
+"use strict";
+const test=require('node:test'), assert=require('node:assert/strict');
+const {allowedRequest}=require('../scripts/record-real-calendar-demo');
+const url=p=>new URL('http://127.0.0.1:8002'+p);
+test('recording allows exact cache-only scope and never provider sync or clear deletion',()=>{
+  const body={cacheOnly:true,refresh:false,acknowledged:true,startDate:'2026-10-09',endDate:'2026-10-15'};
+  assert(allowedRequest(url('/api/availability'),'POST',body));
+  for(const patch of [{cacheOnly:false},{refresh:true},{acknowledged:false},{endDate:'2026-10-11'}]) assert(!allowedRequest(url('/api/availability'),'POST',{...body,...patch}));
+  assert(allowedRequest(url('/api/child/saved'),'POST',body));
+  for(const p of ['/api/child/sync','/api/child/import','/api/child/find','/api/activities/basketball']) assert(!allowedRequest(url(p),'POST',body));
+  assert(!allowedRequest(url('/api/clear'),'POST',{}));
+  assert(!allowedRequest(url('/api/child/clear'),'POST',{reason:'clear'}));
+  assert(allowedRequest(url('/api/clear'),'POST',{reason:'leave'}));
+  assert(!allowedRequest(new URL('https://example.com/'),'GET'));
+  assert(!allowedRequest(url('/api/status'),'GET'));
+  assert(allowedRequest(url('/'),'GET'));
+});
+test('complete story bridges intro, excludes old calendar and delays basketball reveal',()=>{
+  const {plan}=require('../scripts/render-complete-demo');
+  const {transitionNarration}=require('../scripts/finish-real-calendar-demo');
+  assert.match(transitionNarration[0],/^Let's meet Family Copilot\./);
+  assert.doesNotMatch(transitionNarration.join(' '),/basketball|everyone is free|automatically/i);
+  const story=Array.from({length:8},(_,i)=>({start:40+i*4,end:60+i*4,text:'Test'}));
+  story[7]={start:0,end:14.532,text:'Official page'};
+  const result=plan({captureStart:1,captureEnd:31},[{seconds:12},{seconds:12}],story,Array.from({length:8},()=>({seconds:12})));
+  assert(result.calendarVoiceStart<15.2);
+  assert.equal(result.scenes[2].sourceStart,43.5);
+  assert.equal(result.scenes[3].delay,6);
+  assert.equal(result.scenes.at(-1).kind,'official');
+  result.scenes.forEach((s,i)=>{if(i)assert(Math.abs(s.start-result.scenes[i-1].start-result.scenes[i-1].duration)<1e-8);});
+});
