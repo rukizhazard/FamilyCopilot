@@ -73,24 +73,51 @@
   async function post(path, body, signal, keepalive = false) {
     const loading = ["/api/child/saved", "/api/child/sync"].includes(path);
     const invalid = () => new Error(loading ? "child_cache_invalid" : "unavailable");
-    const response = await fetch(path, { method: "POST", credentials: "omit", cache: "no-store", redirect: "error", keepalive,
-      headers: { "Content-Type": "application/json", "X-Owner-CSRF": csrf }, body: JSON.stringify(body),
-      signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(245000)]) : AbortSignal.timeout(245000) });
-    if (+response.headers.get("content-length") > C.maxBytes) throw invalid();
-    const reader = response.body.getReader(); let size = 0, chunks = [];
+    const startedAt = Date.now();
+    let phase = "browser_request";
     try {
-      while (true) { const { done, value } = await reader.read(); if (done) break; size += value.byteLength; if (size > C.maxBytes) throw invalid(); chunks.push(value); }
-    } finally { await reader.cancel().catch(() => {}); }
-    const bytes = new Uint8Array(size); let at = 0; for (const c of chunks) { bytes.set(c, at); at += c.length; }
-    let data;
-    try { data = JSON.parse(new TextDecoder().decode(bytes)); } catch { throw invalid(); }
-    if (!data || typeof data !== "object" || Array.isArray(data)) throw invalid();
-    if (loading && response.ok && response.status !== 200) throw invalid();
-    if (data.status === "cleanup_failed" || data.cleanup === "cleanup_failed") throw new Error("cleanup_failed");
-    const storageError = [data.childCacheStatus, data.childSourceStatus, data.status].find(value => storageErrors.includes(value));
-    if (storageError) throw new Error(storageError);
-    if (!response.ok) throw new Error(data.reason === "session_unavailable" ? "expired" : ["revoked", "expired", "blocked", "contract_drift", "busy", "child_not_ready"].includes(data.status) ? data.status : "unavailable");
-    return data;
+      const response = await fetch(path, { method: "POST", credentials: "omit", cache: "no-store", redirect: "error", keepalive,
+        headers: { "Content-Type": "application/json", "X-Owner-CSRF": csrf }, body: JSON.stringify(body),
+        signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(245000)]) : AbortSignal.timeout(245000) });
+      phase = "browser_response";
+      if (+response.headers.get("content-length") > C.maxBytes) throw invalid();
+      const reader = response.body.getReader(); let size = 0, chunks = [];
+      try {
+        while (true) { const { done, value } = await reader.read(); if (done) break; size += value.byteLength; if (size > C.maxBytes) throw invalid(); chunks.push(value); }
+      } finally { await reader.cancel().catch(() => {}); }
+      const bytes = new Uint8Array(size); let at = 0; for (const c of chunks) { bytes.set(c, at); at += c.length; }
+      let data;
+      try { data = JSON.parse(new TextDecoder().decode(bytes)); } catch { throw invalid(); }
+      if (!data || typeof data !== "object" || Array.isArray(data)) throw invalid();
+      if (loading && response.ok && response.status !== 200) throw invalid();
+      const failure = code => {
+        const error = new Error(code);
+        if (path === "/api/child/sync" && !response.ok) {
+          try { error.diagnostic = C.syncDiagnostic(data.diagnostic); } catch { /* Older or invalid diagnostics are never displayed verbatim. */ }
+          error.diagnostic ||= C.syncDiagnostic({ stage: "browser_response",
+            code: response.status >= 400 && response.status <= 599 ? `http_${response.status}` : "invalid_response",
+            elapsedMs: C.diagnosticElapsed(startedAt) });
+        }
+        return error;
+      };
+      if (data.status === "cleanup_failed" || data.cleanup === "cleanup_failed") throw failure("cleanup_failed");
+      const storageError = [data.childCacheStatus, data.childSourceStatus, data.status].find(value => storageErrors.includes(value));
+      if (storageError) throw failure(storageError);
+      if (!response.ok) throw failure(data.reason === "session_unavailable" ? "expired" : ["revoked", "expired", "blocked", "contract_drift", "busy", "child_not_ready"].includes(data.status) ? data.status : "unavailable");
+      return data;
+    } catch (error) {
+      if (path === "/api/child/sync") {
+        let diagnostic;
+        try { diagnostic = C.syncDiagnostic(error.diagnostic); } catch { /* Do not copy arbitrary transport errors. */ }
+        // These stages explicitly describe browser evidence, not a guessed
+        // Outlook/native cause when an old backend supplies no diagnostic.
+        const safe = new Error(["cleanup_failed", "expired", "revoked", "blocked", "contract_drift", "busy", "child_not_ready", ...storageErrors].includes(error?.message) ? error.message : "unavailable");
+        safe.diagnostic = diagnostic || C.syncDiagnostic({ stage: phase,
+          code: phase === "browser_request" ? "request_failed" : "invalid_response", elapsedMs: C.diagnosticElapsed(startedAt) });
+        throw safe;
+      }
+      throw error;
+    }
   }
   function cancel(kind = "cancel", leaving = false) {
     if (!used || !available || released) return clearing;
@@ -179,6 +206,13 @@
         : messages[e.message] || (lostAccess ? "Kimi access is unconfirmed. Saved results hidden; reuse blocked." : useSync
           ? "Kimi Sync unavailable. Schedule unknown; the Outlook request outcome is unconfirmed. No saved fallback."
           : "Kimi saved view unavailable. Schedule unknown; no Outlook request."), true);
+      if (useSync) {
+        try {
+          const diagnostic = C.syncDiagnostic(e.diagnostic);
+          $("child-status-details").textContent = `Sync diagnostic · stage: ${diagnostic.stage} · code: ${diagnostic.code} · elapsed: ${diagnostic.elapsedMs} ms. Duration covers the reporting layer, including any completed cleanup. No automatic retry.`;
+          $("child-status-details").hidden = false;
+        } catch { /* No diagnostic is better than exposing unvalidated data. */ }
+      }
       if (lostAccess) await cancel("clear");
       else if (!blocked) await cancel(expired ? "leave" : "cancel");
       return blocked || expired ? "cancel" : "skip";

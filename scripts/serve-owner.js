@@ -267,6 +267,7 @@ function createServer({ port = 8002, synthetic = false, perform = synthetic ? re
         if (!synthetic && !childApproved) { send(res, 503, { status: "child_not_ready" }); return; }
         if (active) { send(res, 409, { status: "busy" }); return; }
         const syncing = req.url === "/api/child/sync";
+        const syncStartedAt = Date.now();
         let sourceRecord;
         if (syncing) {
           if (!C.exact(body, ["acknowledged", "startDate", "endDate", "refresh"]) || body.acknowledged !== true ||
@@ -373,7 +374,18 @@ function createServer({ port = 8002, synthetic = false, perform = synthetic ? re
             if (invoked && ["revoked", "contract_drift", "blocked", "invalid_provider_response"].includes(code)) invalidateChild();
             if (error instanceof ChildSourceFailure || error instanceof ChildCacheFailure && !syncing) invalidateChild();
             if (code === "cleanup_failed") childRecord("cleanup_failed");
-            send(res, 503, { status: cleanupFailed ? "cleanup_failed" : childCache.failure?.code || childSource.failure?.code || code, ...childCacheFlags() });
+            let diagnostic;
+            if (syncing) {
+              // Revalidate at HTTP egress; never serialize the exception, native
+              // frame, provider body, source reference or arbitrary properties.
+              try { if (error instanceof OwnerFailure && error.diagnostic) diagnostic = C.syncDiagnostic(error.diagnostic); } catch { /* Fixed fallback below. */ }
+              if (cleanupFailed) diagnostic = undefined;
+              diagnostic ||= C.syncDiagnostic({ stage: cleanupFailed ? "cleanup" : "backend",
+                code: cleanupFailed ? "cleanup_failed" : C.diagnosticCodes.includes(code) ? code : "unavailable",
+                elapsedMs: C.diagnosticElapsed(syncStartedAt) });
+            }
+            send(res, 503, { status: cleanupFailed ? "cleanup_failed" : childCache.failure?.code || childSource.failure?.code || code, ...childCacheFlags(),
+              ...(diagnostic ? { diagnostic } : {}) });
           } finally { res.off("close", disconnect); active = null; }
         })();
         await operation.done; return;

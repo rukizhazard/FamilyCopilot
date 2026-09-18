@@ -16,6 +16,63 @@ const noSetup = h => {
   for (const id of ["calendar-access", "child-calendar-section", "child-source-select", "child-guardian", "child-person", "child-clear"]) assert.equal(h.get(id), null);
 };
 
+test("safe Sync diagnostics appear only in Details and disappear on retry/success/date edit", async t => {
+  let failing = true;
+  const h = harness(t, { meta, savedChild: saved(), override: path => failing && path === "/api/child/sync"
+    ? json({ status: "unavailable", diagnostic: { stage: "event_request", code: "http_500", elapsedMs: 4200 } }, 503) : null });
+  const storage = [...h.storage.values];
+  assert.deepEqual(h.calls, []);
+  await h.fire("availability-load");
+  const details = h.get("child-status-details");
+  assert.match(details.textContent, /stage: event_request · code: http_500 · elapsed: 4200 ms/);
+  assert.equal(details.hidden, false); assert.equal(h.visible(details), false); // Closed Details stays closed.
+  assert.doesNotMatch(h.get("child-status").textContent, /http_500|4200/);
+  assert.equal(h.focus, h.get("availability-load"));
+  assert.deepEqual([...h.storage.values], storage);
+  assert.doesNotMatch(JSON.stringify(h.events), /diagnostic|http_500|4200/);
+  assert.doesNotMatch(JSON.stringify(h.calls.map(c => c.body)), /diagnostic|http_500|4200/);
+  failing = false; await h.fire("availability-load");
+  assert.doesNotMatch(details.textContent, /Sync diagnostic|http_500/);
+  failing = true; await h.fire("availability-load");
+  await h.range("2026-10-08", "2026-10-14");
+  assert.doesNotMatch(details.textContent, /Sync diagnostic|http_500/);
+});
+
+test("invalid or old backend diagnostics never expose arbitrary text or invent native evidence", async t => {
+  const values = [undefined, null, { stage: "PRIVATE", code: "http_500", elapsedMs: 1 },
+    { stage: "event_request", code: "PRIVATE", elapsedMs: 1 },
+    { stage: "event_request", code: "http_500", elapsedMs: 600001 },
+    { stage: "event_request", code: "http_500", elapsedMs: 1, token: "PRIVATE" }];
+  for (const diagnostic of values) {
+    const h = harness(t, { meta, override: path => path === "/api/child/sync" ? json({ status: "unavailable", diagnostic }, 503) : null });
+    await h.fire("availability-load");
+    assert.match(h.get("child-status-details").textContent, /stage: browser_response · code: http_503/);
+    assert.doesNotMatch(h.all(), /PRIVATE|stage: event_request/);
+    assert.equal(h.calls.filter(c => c.path === "/api/child/sync").length, 1);
+  }
+});
+
+test("transport failures have browser-only diagnostics and remain generic, bounded and nonpersistent", async t => {
+  const h = harness(t, { meta, override: path => { if (path === "/api/child/sync") throw Error("PRIVATE url token"); } });
+  await h.fire("availability-load");
+  assert.match(h.get("child-status-details").textContent, /stage: browser_request · code: request_failed · elapsed: \d+ ms/);
+  assert.doesNotMatch(h.all(), /PRIVATE url token/);
+});
+
+test("diagnostic cannot weaken cleanup blocking and a late failure cannot revive Details", async t => {
+  const diagnostic = { stage: "cleanup", code: "cleanup_failed", elapsedMs: 600000 };
+  const blocked = harness(t, { meta, override: path => path === "/api/child/sync" ? json({ status: "cleanup_failed", diagnostic }, 503) : null });
+  await blocked.fire("availability-load");
+  assert.equal(blocked.get("availability-load").disabled, true);
+  assert.match(blocked.get("child-status-details").textContent, /stage: cleanup/);
+  assert.equal(blocked.calls.some(c => c.path === "/api/availability"), false);
+  const wait = deferred(), h = harness(t, { meta, override: path => path === "/api/child/sync" ? wait.promise : null });
+  const loading = h.fire("availability-load"); await settle();
+  await h.range("2026-10-08", "2026-10-14");
+  wait.resolve(json({ status: "cleanup_failed", diagnostic }, 503)); await loading;
+  assert.doesNotMatch(h.get("child-status-details").textContent, /Sync diagnostic/);
+});
+
 test("new marker is doublequoted and startup, focus and freshness timers never sync", async t => {
   assert.match(fs.readFileSync(require.resolve("../owner/index.html"), "utf8"), /<meta name="child-sync" content="CHILD_SYNC">/);
   const h = harness(t, { meta, savedChild: saved() });

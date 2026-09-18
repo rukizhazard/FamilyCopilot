@@ -1,5 +1,105 @@
 # Kimi shared Outlook calendar import
 
+## Diagnostics backend activated, 18 September 2026
+
+The user separately approved the shared 8002 safe restart after reviewing the
+offline diagnostic result. Reviewed `activate-windows-owner.js
+--approved-local-restart-with-child` performed locked native parent/child metadata
+preflight, exact process/mode/idle guards and the existing Windows-auth task
+handoff. Final reported PID **54854** is a historical observation: re-identify
+before any later operation. Activation and independent local inspection both
+confirmed live/disk safe idle, `cleanup: not_requested`, all date/October/saved/
+child Sync markers, and no remaining 18002 lock listener. The activation handshake
+also verified native execution, `tpbl-teams-v2` and static Activities assets.
+
+Initial activation returned `activation_unconfirmed`; independent inspection
+found both ports absent, then the reviewed helper explicitly returned
+`ECONNREFUSED`. The same approved restart was continued through the helper's
+already-stopped branch with fresh locked metadata checks, no additional stop or
+force kill. The original stop-confirmation failure remains undiagnosed.
+
+The activation/status test files `test/activate-windows-owner.test.js`,
+`test/activity-activation.test.js` and `test/owner-local-status.test.js` passed
+**18/18**. The first test invocation used a nonexistent filename, ran no tests,
+and was corrected before activation. No activation code or task settings changed.
+Concurrent `activity-preview/poc-storyboard/` work was left untouched.
+
+**Zero calendar queries, private snapshot reads/deletions, cloud mutations or
+enrollment repeats.** Native checks read only metadata; no loaded browser tab
+was inspected or reloaded. Existing saved records were not migrated or cleared.
+This completes the restart authorization and supersedes activation-pending text
+below. Reload Our week to get a fresh page session and the Details presentation.
+An actual user-run Sync can now expose safe failure evidence, but real Sync
+success/root cause is still unverified. Agent-run Sync needs separate approval;
+this restart does not authorize it. No commit or push.
+
+## Sync failure diagnostics verified offline, activation pending, 18 September 2026
+
+The reported second-Sync failure is **not yet attributed or fixed**. Existing
+cached-first versus fresh-refresh behavior is unchanged. Real worker/backend/
+find/import code succeeds through synthetic enrollment and two subsequent Syncs;
+missing sources, callback errors and invalid projections can reproduce the same
+previously generic message. No additional real source listing/import was run.
+
+Approved offline diagnostics now carry only `{ stage, code, elapsedMs }` on Sync
+errors. Stages/codes are fixed allowlists (plus numeric HTTP 400–599 codes), elapsed
+is an integer clamped to 0–600000 ms. Worker failures distinguish source matching,
+source-list requests, event requests/validation and authentication. Completed
+cleanup cannot overwrite the original observed failure; uncertain cleanup still
+dominates and remains sticky. Timing covers the reporting layer through cleanup,
+not solely the Outlook request. A callback HTTP code describes that endpoint,
+not an inferred underlying Graph error. Generic errors stay generic where no
+more precise evidence exists. No exception text, response bodies, URLs, credentials,
+source IDs/references, names or events are diagnostic fields.
+
+The native protocol validates the optional error-only projection, the adapter and
+HTTP boundary validate again, and the browser shows it using textContent in the
+existing closed **Details** section. The primary message, cancellation/revocation,
+no-fallback policy, storage and parent continuation remain unchanged. Diagnostics
+are not saved, logged, added to success/snapshot payloads, shared through the week
+bridge, or sent to Activities. Old backend/transport failures are explicitly
+labelled browser observations, not guessed native stages.
+
+**Rolling compatibility:** only the new native controller sets the internal Sync
+`diagnostics: true` flag. The new worker accepts legacy input and omits diagnostics
+for old controllers, which may stage new code before a service restart. Browser
+inputs cannot opt into native flags. Existing success shapes and protocol name
+remain unchanged. Full native diagnostics require an approved backend restart;
+a static reload alone cannot activate the new running controller/server modules.
+
+Verification: baseline seven-file suite **264/264**; final thirteen-file suite
+**462/462 each** under UTC, Asia/Taipei and America/Los_Angeles. Executed with
+`node --test` against:
+
+- `test/child-sync-diagnostics.test.js`, `test/child-sync-ui.test.js`, `test/child-sync-server.test.js`
+- `test/windows-child.test.js`, `test/windows-child-sync.test.js`, `test/windows-child-server.test.js`
+- `test/child-calendar-adapter.test.js`, `test/availability-ui.test.js`, `test/child-calendar.test.js`
+- `test/child-calendar-cache.test.js`, `test/child-source-store.test.js`, `test/our-week.test.js`, `test/week-display.test.js`
+
+New actual-chain fixtures replace only credential/HTTP I/O, exercise both
+disclosures, malformed/leaking IPC rejection, no retries, independent cleanup,
+sticky recovery, elapsed bounds, legacy negotiation and late-response fencing.
+Editor diagnostics and whitespace checks passed. Full suite was not rerun because
+of the previously observed unrelated full-suite hangs.
+
+Isolated RAM-only synthetic browser review on explicitly assigned **8037**, PID
+**53788**, from the current worktree: zero startup API calls, real keyboard date
+selection/Sync/Details, injected `event_request / http_500 / 4200 ms` shown in
+Details, no overflow at observed desktop 1778px or mobile 375px. Only synthetic
+child Sync/edit and parent availability endpoints were requested. Pointer click
+stability timed out, so physical pointer behavior was not newly verified. The
+owned process was stopped; page-close returned page-not-found, so tab closure is
+not independently confirmed. No real browser tab, shared 8002 service, private
+snapshot, cloud API, public source, permission or deployment was touched.
+
+Changes: child core/UI, native protocol/worker/controller, the child-error branch
+of the shared owner server, focused tests and this checkpoint. No markup, CSS,
+Activities route, provider contract, native bundle manifest, cache schema or task
+configuration changed. Next gate is separately coordinated/approved safe restart;
+then one deliberate failure can supply safe diagnostic evidence. Agent-run live
+Sync/list/import requires separate approval. Do not repeat enrollment or clear
+saved data merely to obtain diagnostics. No commit or push.
+
 ## Kimi enrollment completed, 18 September 2026
 
 With later explicit agent listing/event-read approval, the one-shot enrollment

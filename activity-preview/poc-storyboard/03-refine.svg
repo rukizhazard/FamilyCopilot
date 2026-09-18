@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="600" viewBox="0 0 960 600">
+  <rect width="960" height="600" rx="28" fill="#f7f5fb"/>
+  <g font-family="Segoe UI, Arial, sans-serif" fill="#302944">
+    <text x="48" y="55" font-size="17" font-weight="700" fill="#7155ac">FAMILY COPILOT</text>
+    <text x="912" y="55" text-anchor="end" font-size="13" fill="#766d85">CONCEPT · SCRIPTED REFINEMENT</text>
+    <text x="48" y="115" font-size="35" font-weight="700">03  Want a change? Just say it.</text>
+    <text x="48" y="152" font-size="18" fill="#766d85">Optional conversation, right below the suggestions.</text>
+    <rect x="48" y="185" width="864" height="79" rx="20" fill="white" stroke="#d8cde8"/>
+    <text x="72" y="212" font-size="12" font-weight="700" fill="#766d85">REFINE SUGGESTIONS</text>
+    <text x="72" y="242" font-size="21">Something closer, and preferably Sunday afternoon.</text>
+    <rect x="807" y="204" width="82" height="42" rx="13" fill="#7155ac"/>
+    <text x="848" y="231" text-anchor="middle" font-size="16" fill="white">Send ↑</text>
+    <circle cx="72" cy="307" r="23" fill="#eee6fb"/>
+    <text x="72" y="314" text-anchor="middle" font-size="21" fill="#7155ac">✦</text>
+    <text x="110" y="304" font-size="20" font-weight="600">Here is a closer Sunday screening.</text>
+    <text x="110" y="333" font-size="16" fill="#766d85">Same age criteria. No conflicts in the checked sample calendars.</text>
+    <rect x="110" y="356" width="802" height="156" rx="22" fill="white" stroke="#e3dced"/>
+    <text x="135" y="393" font-size="24" font-weight="700">Skybound · Another nearby cinema</text>
+    <text x="135" y="423" font-size="17">Sun, Oct 11 · 15:00 · ~8 min walk</text>
+    <text x="135" y="449" font-size="14" fill="#766d85">Fictional screening and travel estimate · No booking made</text>
+    <rect x="135" y="466" width="134" height="32" rx="11" fill="#eee6fb"/>
+    <text x="202" y="487" text-anchor="middle" font-size="14" fill="#61428f">View details →</text>
+    <text x="48" y="560" font-size="19" font-weight="600">Say the preference, not the search steps.</text>
+    <text x="912" y="560" text-anchor="end" font-size="14" fill="#766d85">Optional demo ending</text>
+  </g>
+</svg>

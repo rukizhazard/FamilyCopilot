@@ -57,6 +57,12 @@ function validateInput(mode, value, now = Date.now()) {
   requireMode(mode);
   if (!dataMode(mode)) { if (!exact(value, [])) fail(); return value; }
   const keys = ["sessionId", "expires", "key", "action"];
+  // An old running controller stages current worker code. It must continue to
+  // receive the legacy error shape until a new controller explicitly opts in.
+  if (mode === "sync" && Object.hasOwn(value || {}, "diagnostics")) {
+    if (value.diagnostics !== true) fail();
+    keys.push("diagnostics");
+  }
   if (mode !== "find") keys.push(mode === "sync" ? "reference" : "calendarId", "disclosure", "person", "guardian", "confirmed");
   if (!exact(value, keys) || value.action !== mode) fail();
   validateSession(value, now);
@@ -113,6 +119,10 @@ function validateReport(report, mode) {
 function validateResult(result, mode, disclosure) {
   requireMode(mode);
   const keys = ["ok", "cleanup", "stage", "extensionsRemoved", ...(result?.ok ? [dataMode(mode) ? "data" : "report"] : ["code"])];
+  if (mode === "sync" && result?.ok === false && Object.hasOwn(result, "diagnostic")) {
+    keys.push("diagnostic");
+    try { C.syncDiagnostic(result.diagnostic); } catch { fail(); }
+  }
   if (!exact(result, keys) || typeof result.ok !== "boolean" || !stages.includes(result.stage) || typeof result.extensionsRemoved !== "boolean" ||
     !["not_requested", "workflow_disabled", "cleanup_failed"].includes(result.cleanup) || Buffer.byteLength(JSON.stringify(result)) > maxBytes - 4096) fail();
   if (!result.ok) {

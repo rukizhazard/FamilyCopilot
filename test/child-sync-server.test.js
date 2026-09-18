@@ -79,6 +79,32 @@ async function enroll(h, disclosure = "details") {
 }
 const parentBody = { acknowledged: true, requestId: "11111111-1111-4111-8111-111111111111", startDate: dates.startDate, endDate: dates.endDate, cacheOnly: true, refresh: false };
 
+test("Sync error diagnostic is validated at HTTP egress and never stored or retained in status", async t => {
+  for (const malformed of [false, true]) {
+    const diagnostic = { stage: "event_request", code: "http_500", elapsedMs: 1234 };
+    const memory = stores({ source: sourceRecord(), saved: { status: "saved", access, data: await sample() } });
+    const before = memory.value();
+    const h = await harness(t, { memory, handler: args => {
+      args.record("workflow_disabled");
+      const error = new OwnerFailure("unavailable");
+      error.diagnostic = malformed ? { ...diagnostic, body: "PRIVATE provider payload" } : diagnostic;
+      error.secret = "PRIVATE credential"; throw error;
+    } });
+    assert.equal(h.calls.length, 0);
+    const result = await h.post("/api/child/sync", syncBody(true));
+    assert.equal(result.status, 503); assert.equal(result.data.status, "unavailable");
+    C.syncDiagnostic(result.data.diagnostic);
+    if (malformed) { assert.equal(result.data.diagnostic.stage, "backend"); assert.equal(result.data.diagnostic.code, "unavailable"); }
+    else assert.deepEqual(result.data.diagnostic, diagnostic);
+    assert.doesNotMatch(result.text, /PRIVATE|reference|sourceName|events|token/);
+    assert.deepEqual(memory.value(), before); assert.equal(h.calls.length, 1);
+    const status = await h.post("/api/status"); assert.equal(Object.hasOwn(status.data, "diagnostic"), false);
+    const saved = await h.post("/api/child/saved", dates);
+    assert.equal(saved.data.status, "saved"); assert.equal(Object.hasOwn(saved.data, "diagnostic"), false);
+    assert.equal(h.calls.length, 1);
+  }
+});
+
 test("construction/pages/status are inert; exact Sync marker only for native-approved or synthetic", async t => {
   const promises = require("node:fs/promises"), filename = require.resolve("../scripts/serve-owner"), previous = require.cache[filename];
   t.mock.method(promises, "readFile", async () => '<meta name="owner-csrf" content="OWNER_CSRF"><meta name="child-sync" content="CHILD_SYNC">');

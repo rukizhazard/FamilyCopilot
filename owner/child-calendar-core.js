@@ -12,6 +12,26 @@
   const fail = () => { throw new Error("invalid_child_response"); };
   const text = (s, max) => typeof s === "string" && s.length <= max && !/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/.test(s);
   const handle = s => typeof s === "string" && /^[a-f0-9]{64}$/.test(s);
+  // Error-only, page-local diagnostics. Never include IDs, names, URLs, bodies or
+  // arbitrary exception text. This is not part of an event or saved-view schema.
+  const diagnosticStages = Object.freeze(["native_runtime", "extensions", "account", "signed_in_user", "credential",
+    "find", "source_list_request", "source_match", "import", "event_request", "event_validation",
+    "cleanup", "extension_cleanup", "backend", "browser_request", "browser_response"]);
+  const diagnosticCodes = Object.freeze(["blocked", "busy", "unavailable", "expired", "revoked", "contract_drift",
+    "cancelled", "cleanup_failed", "invalid_provider_response", "update_conflict", "update_required",
+    "source_not_found", "request_failed", "invalid_response"]);
+  const diagnosticElapsed = (start, now = Date.now()) => Math.min(600000, Math.max(0, Math.floor(now - start)));
+  function syncDiagnostic(value) {
+    const keys = ["stage", "code", "elapsedMs"];
+    if (!value || typeof value !== "object" || Array.isArray(value) || Reflect.ownKeys(value).length !== keys.length) fail();
+    const fields = keys.map(key => Object.getOwnPropertyDescriptor(value, key));
+    if (fields.some(field => !field || !Object.hasOwn(field, "value"))) fail();
+    const [stage, code, elapsedMs] = fields.map(field => field.value);
+    if (!diagnosticStages.includes(stage) || typeof code !== "string" ||
+      !(diagnosticCodes.includes(code) || /^http_[45]\d\d$/.test(code)) ||
+      !Number.isSafeInteger(elapsedMs) || elapsedMs < 0 || elapsedMs > 600000) fail();
+    return { stage, code, elapsedMs };
+  }
   function timestamp(s) {
     if (typeof s !== "string" || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d{1,7})?(?:Z|[+-]\d\d:\d\d)$/.test(s) || !Number.isFinite(Date.parse(s))) fail();
     const parts = /^(\d{4}-\d\d-\d\d)T(\d\d):(\d\d):(\d\d)/.exec(s);
@@ -70,5 +90,6 @@
       : `${retention === "disk" ? "Permitted names/times and reviewed access saved privately on this device until Clear, including after restart." : "Permitted names/times and reviewed access kept in process memory until Clear or server restart; no child saved file."} Source/privacy changes delete the saved view. No automatic refresh; offline permission revocation is unknown. Saved settings authorize saved viewing only; a new session must find, select and review a fresh source for Update.`;
     return `Kimi · ${name} · Existing authorized Outlook connection · Guardian authority acknowledged · ${disclosure === "details" ? "Normal titles and times" : "Busy-only"}. Private, personal, confidential and unknown sensitivity: Busy-only. 9–15 October 2026, Asia/Taipei; ends 16 October 00:00 exclusive. Current local parent only; no assistant or cross-parent sharing. ${storage} Azure protected processing/history is not zero retention.`;
   }
-  return { contract, window, maxBytes, maxEvents, exact, text, handle, timestamp, project, list, datesAllowed, escapeHtml, summary, savedAccess, saved };
+  return { contract, window, maxBytes, maxEvents, exact, text, handle, timestamp, project, list, datesAllowed, escapeHtml, summary, savedAccess, saved,
+    diagnosticStages, diagnosticCodes, diagnosticElapsed, syncDiagnostic };
 });

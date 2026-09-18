@@ -1,4 +1,218 @@
-# Activity search from an available time slot
+# Chat-first family demo: design and three-conversation plan
+
+## Current design handoff, 18 September 2026
+
+**Read this section first.** It captures the parent's latest design discussion
+so Builder, Calendar and Activities do not need the originating chat history.
+The new direction is a single cute conversation: show the existing calendar,
+let AI proactively suggest outings, then refine them conversationally.
+The three agents own **three demo conversation stages**, not three separate apps
+or merely frontend/backend technical layers.
+
+Status: design direction and requested planning handoff, not an implemented
+chat/AI integration. This document does not change active agent permissions,
+provider consent, storage, live-query or service-operation authorization.
+The older form-first plans below remain historical context. This section
+supersedes their UX direction for the proposed demo, not the running product's
+contracts or the [product/privacy plan](parent-schedule-activity-discovery.md).
+Builder must reconcile conflicting product rules explicitly before implementation.
+
+### Visual reference and reading order
+
+| Stage | Current reference | Intended demonstration |
+| --- | --- | --- |
+| 1. See the calendar | [04: Calendar in chat](../activity-preview/poc-storyboard/04-calendar-chat.svg) | Keep and expand Our week; demonstrate actual authorized Sync results and freshness. |
+| 2. AI brings ideas | [05: Proactive illustrated picks](../activity-preview/poc-storyboard/05-ai-picks.svg) | AI speaks first with basketball and movie alternatives, without a Find form. |
+| 3. Ask for sooner | [06: Conversational refinement](../activity-preview/poc-storyboard/06-sooner.svg) | The parent changes the proposed dates in ordinary language; recommendations update in the same conversation. |
+
+Images 01–03 are superseded design iterations, retained for comparison. Images
+04–06 are static SVG concepts, not functional UI, real schedules, real listings,
+provider logos, a working AI model or proof of background discovery. Their
+fictional names, dates, guidance, transport estimates and artwork are placeholders.
+The sample calendar is a placement sketch: reuse the existing calendar UI rather
+than replacing it with the drawing's simplified grid or generic person labels.
+
+### Parent-confirmed design requirements
+
+1. **Do not abandon Calendar.** Start the demo by proving that the existing UI
+	 loads real authorized data. Show actual source, covered dates and last update;
+	 distinguish a saved view from a fresh provider load. Preserve current Sync,
+	 consent, disclosure, errors and actual identities. No fake successful load.
+2. **One chat-first surface, not Calendar/Activities tabs.** Keep the current
+	 cute cream/lilac/peach palette, rounded cards, friendly sun and short English
+	 UI copy. Calendar remains available as an expandable/collapsible panel within
+	 the experience. Use structured cards and a visible message composer, not walls
+	 of chat prose or a separate chat application.
+3. **One child, age 8.** Do not retain the first sketch's second child or age 12.
+	 This demo preference does not rename, infer or authorize any calendar identity.
+4. **No Look ahead setup.** AI proposes useful dates. The parent can say the
+	 dates are too far away and ask for nearer dates as part of the demo. An
+	 internal bounded discovery window is still required, but is not a mandatory
+	 parent-facing horizon setting or permission for unlimited searches.
+5. **Interests are broad.** Include more than basketball and movies: sports,
+	 science, arts/making, nature, music and exhibitions are example categories,
+	 not an exhaustive set or confirmed preferences for every category. Basketball
+	 and movie are the AI's two demo suggestions, not required user-selected filters.
+	 Preferences can be prepared before the demo; persistence is not yet decided.
+6. **Starting area: office in Xinyi District, Taipei City.** Show distance or
+	 travel time and support relevant ordering. An exact public landmark/nearby MRT,
+	 travel mode and any travel limit remain to be confirmed; do not assume a full
+	 address, City Hall MRT, transit or 45 minutes from earlier sample copy.
+7. **Use thumbnails.** Basketball cards should have corresponding team logos
+	 and movie cards a corresponding poster when permitted assets are available.
+	 Preserve source identity/attribution and provide a graceful unavailable-image
+	 fallback. Current original badges/poster are fictional, not production assets.
+8. **Proactive first, conversational second.** The main activity demo must not
+	 require selecting dates/categories or pressing Find to obtain the first
+	 suggestions. The optional refinement composer follows those suggestions.
+	 A precise opt-in trigger and execution model still need agreement; merely
+	 showing hardcoded cards is not proof of proactive AI or background monitoring.
+
+### Three demo conversations and acceptance
+
+**Conversation 1 — Calendar (formerly Auth), existing calendar proof**
+
+- Entry: a request such as “Let's take a look at our week.”
+- Present the existing Our week UI in the shared experience. Parent-operated
+	Sync retains its current access controls. Calendar stays accessible after
+	collapse; collapsing/reopening must not trigger another query or lose data.
+- Acceptance: actual source, coverage, freshness and partial/missing states stay
+	truthful. No private content is transferred to chat/AI just because the UI is
+	embedded. First implementation review uses synthetic data; real demonstration
+	uses only the separately authorized existing calendar path.
+
+**Conversation 2 — Activities, AI-initiated outing suggestions**
+
+- Entry: an explicitly agreed demo/product trigger, not another parent search
+	form. AI introduces two possible outings with a short explanation.
+- Show basketball and movie cards as alternatives, not an automatically combined
+	itinerary. Include thumbnail, exact occurrence date/time/zone, venue/area,
+	evidence-based travel/distance, age guidance, rationale and source/freshness.
+	Keep secondary evidence in details; essential uncertainty remains visible.
+- Acceptance: age 8 and the Xinyi context are preserved; broader interests remain
+	possible. Filter known hard constraints before ranking/truncation. Order using
+	comparable evidenced travel values where available; unknown travel is not zero.
+	Do not fabricate a second match, silently relax constraints, or claim calendar
+	compatibility when it has not been checked. Export reusable card/search seams
+	for conversation 3, not a second standalone chat shell.
+
+**Conversation 3 — Builder, refinement and shared integration**
+
+- Entry: “October feels too far away. How about this weekend?”
+- Resolve the date request against an explicit reference date and Taipei time,
+	show the interpreted dates naturally, and preserve age, origin and other
+	preferences. Ask for clarification only if materially ambiguous.
+- Reuse conversation 2's search/card components and update the same conversation.
+	Cancel/fence outdated requests. No reset-and-refill form or duplicated adapter.
+- Acceptance: actual dates change, rather than relabeling old events. A date
+	outside loaded calendar coverage has unknown fit, never inferred free time.
+	In the drawing, September 20 is outside the October 9–15 sample window; those
+	dates illustrate the gap, not a new live calendar authorization. A lack of a
+	nearer verified game does not justify inventing one.
+
+### Ownership and proposed shared contracts
+
+Calendar owns stage 1's calendar internals. Activities owns stage 2's activity
+components and public discovery. Builder owns stage 3, the shared chat shell,
+conversation orchestration and final integration. Stage ownership does not
+authorize cross-module writes: agree one writer for each shared path first.
+In particular, Calendar owns existing owner markup/controllers/styles; Builder
+coordinates any embedding changes rather than editing those files concurrently.
+Activities does not add calendar comparison, operate port 8002 or receive raw
+calendar data under this plan.
+
+Builder should publish a versioned integration contract before parallel coding.
+The following is a checklist to finalize, **not an existing API**:
+
+| Contract | Minimum design decisions | Responsible parties |
+| --- | --- | --- |
+| Demo context | One age, broad interests, origin precision, explicit reference date/time zone; page-local fixture vs approved retained preferences | Builder coordinates; all consume |
+| Calendar presentation | Mount/expand/collapse ownership; covered range, per-source freshness and partial/unknown status; no raw event payload by default | Calendar produces; Builder embeds |
+| Activity request | Context revision, bounded proposed dates, explicit constraints, cancellation, synthetic/live mode; no private calendar data to public sources | Activities proposes; Builder consumes |
+| Activity result/card | Exact source/occurrence identity, timing, thumbnail attribution/permission, age evidence, travel evidence, unknowns and error/partial/empty states | Activities produces; Builder reuses |
+| Conversation lifecycle | Initiation trigger, typed messages/card references, request generation, refinement/reset, stale-result fencing and no duplicate provider calls | Builder owns |
+| Future calendar assessment | Separately approved minimal comparison inputs/output, exact checked coverage/freshness and unknown/conflict states; no automatic model disclosure | Calendar and Builder; separate privacy review |
+
+Separate conversations do not isolate files or services and do not automatically
+share decisions. Each handoff must name the exact files, contract version, tests,
+remaining limitations and any operation still requiring approval. Use agreed
+independent worktrees only if requested; do not switch the shared branch, copy
+worktrees or overwrite unrelated edits as part of this handoff.
+
+### Delivery sequence
+
+1. **Builder reads this design and 04–06, then updates the three agent definitions
+	 only.** Map the stages above, retain operational/privacy limits, and flag
+	 conflicts requiring a scoped decision. Inspect existing changes/ownership first.
+	 Agent files are [Builder](../.github/agents/familycopilot-builder.agent.md),
+	 [Calendar](../.github/agents/familycopilot-auth.agent.md) (filename retains Auth),
+	 and [Activities](../.github/agents/familycopilot-activities.agent.md).
+	 Do not run services or implement the product during that instructions-only step.
+2. **Agents reread and acknowledge the plan.** Verify that each session actually
+	 has the intended role instructions; if still stale, start a new conversation
+	 with the relevant agent and a concise handoff. Reading a file does not itself
+	 override stronger active instructions.
+3. **Builder publishes contracts, exact file ownership and bounded milestones.**
+	 Other agents review their seams before implementation. Resolve where shared
+	 fixtures and styles live and who writes each one. This document remains the
+	 design baseline; Builder's integration contract must link back to it.
+4. **Implement the offline vertical slices in parallel where ownership permits.**
+	 Calendar exposes the existing presentation seam, Activities implements reusable
+	 illustrated cards/results, Builder implements the shell and refinement flow.
+	 Fixtures are visibly synthetic; scripted language handling is labeled scripted.
+5. **Builder integrates; parent reviews the entire 1 → 2 → 3 flow.** Test desktop,
+	 mobile, actual keyboard/focus, failure/partial/unknown states, context retention,
+	 cancellation and zero unintended startup/provider calls. Use focused offline
+	 suites; do not substitute the known-hanging full suite. This milestone proves
+	 interaction, not real AI, live movie discovery or schedule compatibility.
+6. **Complete separately agreed real capability increments.** Select the model,
+	 safe tool orchestration, movie/image/routing sources, authorized calendar-fit
+	 path and proactive trigger. Then validate bounded live behavior only with fresh
+	 applicable approvals. Final demo distinguishes the real calendar proof from
+	 any still-synthetic recommendation capability.
+
+### Open decisions and unchanged safety boundaries
+
+- **Proactive model:** an opt-in in-session opportunity, a staged demo trigger,
+	scheduled monitoring and external notifications are different scopes. The parent
+	wants proactive suggestions; frequency, pause behavior, deduplication, search
+	bounds and background execution are not yet specified or authorized here.
+- **Real AI:** choose runtime/provider, cost, allowed tools, input minimization,
+	outbound data and retention. No secret/model setup is implied by the SVGs.
+- **Additional sources:** TPBL is the existing bounded public adapter. Movie
+	showtimes/posters, wider categories, licensed images and routing need source
+	decisions; a broad interests UI is not evidence of broad live source coverage.
+- **Dates:** no horizon setting does not remove existing backend limits. Current
+	dates-only storage and calendar coverage remain unchanged until an explicit
+	integration milestone handles the new contract. Never silently broaden reads.
+- **Privacy/storage:** preconfigured preferences do not imply persistent child
+	profiles or model access to calendar details. Existing dates-only sessionStorage
+	remains the browser storage boundary. No names, birth dates, school/home address,
+	analytics or new retained chat/profile data are added by this plan.
+- **Operations:** no bookings, purchases, registration or calendar writes. No
+	agent-run live query, service restart, provider/permission/cloud change, new
+	dependency or deployment is authorized by a design or instruction update.
+	Preserve Host/Origin, URL/SSRF, escaping, bounded requests and late-response
+	safeguards. Commit and push require separate exact-diff approvals.
+
+### Planning handoff record
+
+This increment edits only this document; other chats' calendar changes, the
+existing UX record and all six SVGs are preserved. Agent definitions and central
+README/product plan are read-only here. No runtime/API contract changed, process
+started/stopped/revalidated, real browser/calendar inspected or live source queried.
+No restart is needed for this documentation change.
+
+Validation: `node scripts/test-activity-discovery.js` before and after: 206 total,
+205 passed, one existing shared-calendar shell timezone assertion failure, exit 1.
+Relative Markdown file targets exist; scoped `git diff --check` and editor
+diagnostics passed. No UI/browser, actual AI or live capability validation is
+claimed for this documentation-only increment.
+
+## Historical available-slot and form-first plan
+
+The sections below preserve previous proposals and dated implementation records.
+They are not the new chat-first demo specification or current runtime evidence.
 
 ## Current approved category/team increment, 17 September 2026
 
