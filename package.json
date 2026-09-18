@@ -1,0 +1,17 @@
+{
+  "name": "familycopilot-browser-picker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build:picker": "node scripts/build-picker.js",
+    "serve:picker": "node scripts/serve-picker.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@azure/msal-browser": "5.21.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  },
+  "engines": { "node": ">=18.17" }
+}

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; form-action 'none'; base-uri 'none'">
+  <meta name="activity-week" content="ACTIVITY_WEEK">
+  <meta name="referrer" content="no-referrer">
+  <title>Family Copilot · A little more fun</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/activity-preview/preview.css">
+  <link rel="stylesheet" href="/shell.css">
+  <link rel="stylesheet" href="/activity-preview/basketball.css">
+  <script src="/activity-preview/core.js" defer></script>
+  <script src="/activity-preview/ui.js" defer></script>
+  <script src="/availability-core.js" defer></script>
+  <script src="/shared/date-selection.js" defer></script>
+  <script src="/shared/basketball-teams.js" defer></script>
+  <script src="/activity-preview/basketball-ui.js" defer></script>
+</head>
+<body class="activity-page">
+  <a class="shell-skip" href="#main">Skip to content</a>
+  <header class="family-shell">
+    <div class="shell-heading">
+      <div class="shell-brand"><span class="shell-mark" aria-hidden="true">✿</span><div><strong class="shell-name">Family Copilot</strong><p class="shell-tagline">A little more room for happy days.</p></div></div>
+      <nav class="shell-nav" aria-label="Family Copilot"><a href="/">Our week</a><a href="/activities" aria-current="page">Activities</a></nav>
+    </div>
+    <div class="shell-source-row"><span class="shell-source" id="activity-source">Activity discovery</span></div>
+  </header>
+  <main id="main" class="shell-main shell-activities" tabindex="-1">
+    <section class="shell-card planner" aria-labelledby="page-title">
+      <div class="shell-intro">
+        <div><h1 id="page-title" class="shell-title"><span>A little more <span class="fun-word">fun.</span></span> <span class="shell-date">9–11 October 2026</span></h1><p class="shell-zone">Taipei (UTC+8)</p></div>
+        <span class="shell-decoration hero-art" aria-hidden="true"><span class="sky"><span class="sun"><span class="sun-eyes"></span><span class="sun-smile"></span></span><span class="cloud"></span><span class="sparkle">✧</span><span class="sparkle small">✦</span></span></span>
+      </div>
+      <form id="activity-form" autocomplete="off" novalidate>
+        <fieldset class="interests">
+          <legend>What sounds fun? <span class="optional">Choose a few, or leave it open.</span></legend>
+          <div class="interest-grid">
+            <label class="interest peach"><input type="checkbox" name="interest" value="sports"><span class="interest-face"><span class="interest-emoji" aria-hidden="true">🏅</span><span>Sports</span><span class="selection-mark" aria-hidden="true">✓</span></span></label>
+            <label class="interest lilac"><input type="checkbox" name="interest" value="music"><span class="interest-face"><span class="interest-emoji" aria-hidden="true">🎵</span><span>Music</span><span class="selection-mark" aria-hidden="true">✓</span></span></label>
+            <label class="interest pink"><input type="checkbox" name="interest" value="art"><span class="interest-face"><span class="interest-emoji" aria-hidden="true">🎨</span><span>Art</span><span class="selection-mark" aria-hidden="true">✓</span></span></label>
+            <label class="interest blue"><input type="checkbox" name="interest" value="science"><span class="interest-face"><span class="interest-emoji" aria-hidden="true">🔬</span><span>Science</span><span class="selection-mark" aria-hidden="true">✓</span></span></label>
+            <label class="interest mint"><input type="checkbox" name="interest" value="outdoors"><span class="interest-face"><span class="interest-emoji" aria-hidden="true">🌿</span><span>Outdoors</span><span class="selection-mark" aria-hidden="true">✓</span></span></label>
+            <label class="interest butter"><input type="checkbox" name="interest" value="exhibition"><span class="interest-face"><span class="interest-emoji" aria-hidden="true">🏛️</span><span>Exhibitions</span><span class="selection-mark" aria-hidden="true">✓</span></span></label>
+          </div>
+          <button type="button" class="text-button" id="surprise" aria-pressed="true">✧ Anything <span class="optional">All six categories</span></button>
+        </fieldset>
+
+        <fieldset id="sport-choices" class="basketball-choices" tabindex="-1" hidden>
+          <legend>Which sports? <span class="optional">Choose a few, or leave all open.</span></legend>
+          <div class="intent-choices sport-icons">
+            <label title="Basketball"><input type="checkbox" name="sport" value="basketball" aria-label="Basketball"><span aria-hidden="true">🏀</span></label>
+            <label title="Ping-pong"><input type="checkbox" name="sport" value="pingpong" aria-label="Ping-pong"><span aria-hidden="true">🏓</span></label>
+            <label title="Baseball"><input type="checkbox" name="sport" value="baseball" aria-label="Baseball"><span aria-hidden="true">⚾</span></label>
+            <label title="Football"><input type="checkbox" name="sport" value="football" aria-label="Football"><span aria-hidden="true">⚽</span></label>
+            <label title="Badminton"><input type="checkbox" name="sport" value="badminton" aria-label="Badminton"><span aria-hidden="true">🏸</span></label>
+            <label title="Swimming"><input type="checkbox" name="sport" value="swimming" aria-label="Swimming"><span aria-hidden="true">🏊</span></label>
+          </div>
+          <p class="hint">None selected means any sport.</p>
+        </fieldset>
+        <fieldset id="basketball-choices" class="basketball-choices" tabindex="-1" hidden>
+          <legend>Basketball</legend>
+          <div id="team-controls">
+            <label for="team-name" id="preferred-teams-label">Preferred teams</label>
+            <div class="team-entry"><input type="text" id="team-name" maxlength="120" autocomplete="off" list="team-suggestions" placeholder="Team name" aria-describedby="team-status"><button type="button" id="add-team">Add</button></div>
+            <datalist id="team-suggestions"></datalist>
+            <p id="team-status" role="status" aria-live="polite" aria-atomic="true"></p>
+            <ul id="preferred-teams" class="preferred-teams" aria-labelledby="preferred-teams-label"></ul>
+            <label class="only-teams"><input type="checkbox" id="only-teams" checked> Only preferred teams</label>
+          </div>
+        </fieldset>
+        <div class="discovery-dates" role="group" aria-label="Activity dates">
+          <label for="activity-start">Start date<input type="date" id="activity-start" min="2000-01-01" max="2100-12-31" aria-describedby="basketball-dates"></label>
+          <label for="activity-end">End date<input type="date" id="activity-end" min="2000-01-01" max="2100-12-31" aria-describedby="basketball-dates"></label>
+          <button type="button" class="text-button" id="reset-dates">Reset dates</button>
+        </div>
+        <p class="hint" id="basketball-dates" aria-live="polite">Taipei (UTC+8) · Choose 1–7 days.</p>
+        <details class="date-help">
+          <summary>About these dates</summary>
+          <p class="hint">Only dates are remembered in this same-origin tab, also used by Our week. Start over keeps dates; Reset dates forgets them. Neither loads calendars.</p>
+        </details>
+        <fieldset class="party">
+          <legend>Who's coming? <span class="optional" id="age-note">Ages (optional)</span></legend>
+          <div class="age-controls"><div id="age-rows"></div><button type="button" class="age-icon" id="add-age" aria-label="Add an age" title="Add an age"><span aria-hidden="true">+</span></button></div>
+        </fieldset>
+        <details class="preferences" id="preferences">
+          <summary><span aria-hidden="true">＋</span> More options <span class="optional">optional</span></summary>
+          <p class="hint">Ages and these options filter invented ideas only, never public games, and are not sent. Fixed dates: 20–26 September 2026.</p>
+          <div class="preference-fields">
+            <label for="date">Day
+              <select name="date" id="date"><option value="any">Any day · Sep 20–26</option><option value="2026-09-20">Sun, Sep 20</option><option value="2026-09-21">Mon, Sep 21</option><option value="2026-09-22">Tue, Sep 22</option><option value="2026-09-23">Wed, Sep 23</option><option value="2026-09-24">Thu, Sep 24</option><option value="2026-09-25">Fri, Sep 25</option><option value="2026-09-26">Sat, Sep 26</option></select>
+            </label>
+            <label for="period">Time of day
+              <select name="period" id="period"><option value="any">Any time</option><option value="morning">Morning · before noon</option><option value="afternoon">Afternoon · noon–6 pm</option></select>
+            </label>
+            <label for="format">Idea format
+              <select name="format" id="format"><option value="any">Any format</option><option value="try">Hands-on</option><option value="class">Class / workshop</option><option value="watch">Performance / exhibition</option></select>
+            </label>
+            <label for="budget">Price per child
+              <select name="budget" id="budget"><option value="any">Any price</option><option value="0">Free</option><option value="15">Up to $15 USD</option><option value="30">Up to $30 USD</option></select>
+            </label>
+            <label for="setting">Indoors or outdoors?
+              <select name="setting" id="setting"><option value="any">Either sounds good</option><option value="indoor">Indoors only</option><option value="outdoor">Outdoors only</option></select>
+            </label>
+          </div>
+        </details>
+        <p id="form-error" class="error" role="alert"></p>
+        <div class="find-row"><button class="primary" type="submit" id="find"><span aria-hidden="true">✦</span> Find activities <span aria-hidden="true">↗</span></button><button type="button" id="cancel-games" hidden>Cancel public search</button></div>
+      </form>
+      <section id="basketball-panel" aria-labelledby="basketball-title">
+        <h2 id="basketball-title" tabindex="-1" hidden>Public listings · Basketball</h2>
+        <p id="basketball-status" role="status" aria-live="polite" aria-atomic="true"></p>
+        <div id="team-recovery" class="game-actions" hidden><button type="button" id="show-all-teams">Show all teams on next search</button><button type="button" id="change-activity-dates">Change dates</button><button type="button" id="edit-preferred-teams">Edit preferred teams</button></div>
+        <details id="basketball-source-details" hidden><summary>Sources &amp; coverage · Partial Taiwan search</summary><div id="basketball-sources"></div></details>
+        <div id="basketball-games" class="cards" aria-label="Basketball listings"></div>
+      </section>
+      <noscript><p>Enable JavaScript to search public games or filter ideas. Nothing loads automatically.</p></noscript>
+    </section>
+
+    <p id="status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+  </main>
+  <footer>
+    <p>A little more room for happy days. <span aria-hidden="true">✿</span></p>
+    <div class="footer-actions"><details><summary>About these ideas</summary><p>For parents. Six invented Taipei activities and venues, not web listings or real places. USD prices are invented, not converted or family totals. No accounts, calendars, booking or saved profiles. Only explicit Find activities can request public listings, separately from these ideas. Ages and interests stay in this page and clear on reset, reload or page exit. No external fonts or images. Age guidance is not verified admission eligibility. Our week is a separate page; nothing from its calendars is used here.</p></details><button type="button" id="reset" class="text-button">Start over</button></div>
+  </footer>
+</body>
+</html>

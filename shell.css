@@ -1,0 +1,44 @@
+/* Shared page structure. Feature styles own controls, not outer geometry. */
+html { scrollbar-gutter: stable; }
+body { margin: 0; border: 0; min-height: 100vh; background: #fcf9f5; color: #352e49; font: 16px/1.5 ui-rounded, "Segoe UI", system-ui, sans-serif; }
+.family-shell, main.shell-main { box-sizing: border-box; width: 100%; max-width: 1280px; margin: 0 auto; padding: 16px; }
+main.shell-main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.shell-card { min-width: 0; margin: 0; padding: 16px; border: 1px solid #ded5e7; border-radius: 24px; background: #fff; box-shadow: 0 6px 24px #53317306; }
+.shell-intro { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 8px; }
+.shell-intro > div:first-child { flex: 1; min-width: 0; }
+.shell-title { display: grid; grid-template-columns: 240px minmax(0, 1fr); align-items: baseline; gap: 12px; margin: 0; font-size: 25.6px; font-weight: 700; line-height: 1.2; letter-spacing: -.04em; }
+.shell-date { font-size: 16px; font-weight: 600; letter-spacing: -.02em; }
+.shell-zone { margin: 7.2px 0 0; color: #625a70; font-size: 16px; line-height: 24px; }
+.shell-decoration { flex: 0 0 48px; width: 48px; height: 48px; display: grid; place-items: center; border-radius: 18px; background: #fff1d4; font-size: 28.8px; transform: rotate(7deg); }
+.family-shell { color: #352e49; font: 16px/1.5 ui-rounded, "Segoe UI", system-ui, sans-serif; }
+.shell-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.shell-brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.shell-brand > div { min-width: 0; }
+.shell-mark { flex-shrink: 0; color: #624199; font-size: 48px; line-height: 1; }
+.shell-name { display: block; font-size: 32px; font-weight: 750; letter-spacing: -.03em; line-height: 1.2; }
+.shell-tagline { margin: 4px 0 0; color: #625a70; font-size: 15px; line-height: 1.5; }
+.family-shell .shell-nav { display: flex; flex-wrap: nowrap; gap: 8px; margin: 0; }
+.family-shell .shell-nav a { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; min-height: 44px; padding: 8px 14px; border: 1px solid #ded5e7; border-radius: 12px; background: #fff; color: #352e49; font: 600 14px/20px ui-rounded, "Segoe UI", system-ui, sans-serif; text-decoration: none; white-space: nowrap; }
+.family-shell .shell-nav a[aria-current="page"] { background: #624199; border-color: #624199; color: #fff; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
+.family-shell .shell-nav a:focus-visible { outline: 3px solid #874015; outline-offset: 3px; }
+.shell-source-row { display: flex; justify-content: flex-end; margin-top: 8px; }
+.family-shell .shell-source { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: 160px; height: 28px; padding: 0 8px; border: 1px solid #ded5e7; border-radius: 20px; background: #eee8f4; color: #625a70; font-size: 12px; line-height: 18px; white-space: nowrap; }
+.shell-skip { position: absolute; top: -100px; left: 16px; padding: 10px 16px; z-index: 2; background: #fff; color: #352e49; }
+.shell-skip:focus { top: 16px; outline: 3px solid #874015; }
+@media (max-width: 600px) {
+  .family-shell, main.shell-main { padding: 12px; }
+  .shell-heading { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .shell-mark { font-size: 44px; }
+  .shell-name { font-size: 28px; }
+  .shell-tagline { font-size: 14px; }
+  .shell-source-row { justify-content: flex-start; }
+  .shell-title { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+}
+@media (max-width: 500px) {
+  .shell-card { border-radius: 18px; padding: 14.4px; }
+  .shell-intro { gap: 8px; }
+  .shell-decoration { flex-basis: 42px; width: 42px; height: 42px; border-radius: 14px; font-size: 24px; }
+}
+@media (forced-colors: active) {
+  .family-shell .shell-nav a[aria-current="page"] { border: 2px solid Highlight; padding: 7px 13px; }
+}

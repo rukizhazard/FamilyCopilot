@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Family Copilot · My Microsoft calendars</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="picker.css">
+  <script src="main.js" defer></script>
+</head>
+<body>
+  <main>
+    <header><p class="eyebrow">Family Copilot · Limited live milestone</p><h1>My Microsoft calendars</h1>
+      <p>Sign in. Choose your own calendars. Review what you selected.</p></header>
+    <aside class="notice"><strong>No event import. No sharing. No background sync.</strong>
+      <p>This separate page contacts Microsoft only when you request sign-in and calendar listing. The fictional prototype is unchanged.</p>
+      <p>Initial audience: the owner's corporate Microsoft tenant only. Personal, guest, child and other-organization accounts are not enabled. Tenant permission and mailbox support still require verification.</p></aside>
+    <section class="card" aria-labelledby="connection-title">
+      <h2 id="connection-title">1 · Connect only your account</h2>
+      <p>Microsoft consent requests <strong>Calendars.ReadBasic</strong>, the least-privileged calendar-list scope. This provider permission also permits basic event reading, but this application never calls event endpoints. Selecting a calendar does not narrow the Microsoft permission itself.</p>
+      <details><summary>Authentication and privacy details</summary>
+        <p>MSAL handles authorization code + PKCE in a popup. Its standard OpenID scopes are openid, profile and offline_access. Tokens stay in the page's memory, never local storage, session storage or application cookies. MSAL may use session storage for temporary request metadata, not tokens. No silent token acquisition or refresh is called.</p>
+        <p>Calendar IDs, names and owner metadata are processed only in this browser. No backend, assistant, other parent or family receives them. Other owners' calendar labels are discarded before rendering. This page cannot send invitations or emails.</p>
+        <p>Disconnect removes local access and cancels pending work. It does not sign out of Microsoft or revoke provider consent. To remove consent, use your organization's My Apps portal or contact its administrator. No tenant restrictions are bypassed.</p>
+      </details>
+      <div class="actions"><button id="sign-in" type="button" disabled>Sign in with Microsoft</button><button id="disconnect" type="button" hidden>Disconnect and clear</button></div>
+      <p id="picker-status" role="status" tabindex="-1">Loading local application. Sign-in remains disabled if the bundle or configuration is unavailable.</p>
+      <div id="picker-content"></div>
+      <p id="picker-error" role="alert"></p>
+    </section>
+    <footer>Read-only calendar selection, not a family connection. No time range checked; availability is unknown.</footer>
+    <noscript>JavaScript is required for Microsoft sign-in. No calendar access has occurred.</noscript>
+  </main>
+</body>
+</html>

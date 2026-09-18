@@ -1,0 +1,35 @@
+<!doctype html>
+<!-- Synthetic test-only mount for the retained legacy school controller. No real files. -->
+<html lang="en"><head><title>Legacy school synthetic fixture</title>
+<script src="/availability-ui.js" defer></script>
+<script src="/school-calendar-core.js" defer></script>
+<script src="/school-calendar-ui.js" defer></script>
+<script src="/owner-ui.js" defer></script>
+</head><body>
+<input id="availability-start" value="2026-09-20"><input id="availability-end" value="2026-09-26">
+<button id="availability-supported-dates">Choose supported dates</button>
+<div id="availability-grid"></div>
+<section id="school-calendar-section" class="shell-card school-calendar" aria-labelledby="school-calendar-title">
+  <h2 id="school-calendar-title">School calendar</h2>
+  <p>Local PDF-derived dates, separate from the default calendars and busy statuses. Times are unknown; these dates do not establish attendance, conflicts or availability.</p>
+  <p id="school-calendar-file-help" class="small">Choose local-calendars/school-family.json from your device, or another local JSON file in the same school calendar format (maximum 64 KiB). Nothing loads automatically. The optional local ICS file is for other calendar apps; it is not imported here.</p>
+  <label class="school-file-label" for="school-calendar-file">Choose file</label>
+  <input id="school-calendar-file" type="file" accept=".json,application/json" aria-describedby="school-calendar-file-help" autocomplete="off">
+  <div id="school-calendar-preview" class="school-preview" hidden aria-labelledby="school-calendar-preview-title">
+    <h3 id="school-calendar-preview-title">File preview · Details not loaded</h3>
+    <div id="school-calendar-metadata"></div>
+  </div>
+  <div class="school-controls">
+    <label for="school-calendar-view">School calendar view<select id="school-calendar-view" aria-describedby="school-calendar-view-help"><option value="selected">Selected dates</option><option value="term">Whole term</option></select></label>
+    <button id="school-calendar-load" disabled aria-describedby="school-calendar-consent">Load local school calendar</button>
+    <button id="school-calendar-clear">Clear school</button>
+  </div>
+  <p id="school-calendar-view-help" class="small">Selected dates uses Start date and End date in Our week (1–7 inclusive days). Whole term shows every event in the file. Editing dates hides school details until you press Load again.</p>
+  <p id="school-calendar-consent" class="small">Load confirms read-only event details in this tab only, not permission to share with anyone else. The file is read only in your browser, with no upload, network request or browser storage by this school calendar.</p>
+  <p class="small">Clear school, owner session clear and page exit remove the school page copy only. Original JSON and ICS files remain on your device until you delete them. Clear school does not change the owner saved week.</p>
+  <p id="school-calendar-status" role="status" aria-live="polite" tabindex="-1">Not loaded · Choose a local school calendar file to preview.</p>
+  <ul id="school-calendar-events" class="school-events" aria-label="Loaded school events" hidden></ul>
+  <noscript>JavaScript is required to preview and load a local school calendar. No file has been read.</noscript>
+</section>
+<div id="synthetic-controls"></div>
+</body></html>

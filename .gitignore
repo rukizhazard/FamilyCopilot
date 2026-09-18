@@ -1,0 +1,65 @@
+# Dependencies and generated browser bundles.
+node_modules/
+dist-picker/
+dist-picker-synthetic/
+
+# Local environment/credential files. Templates must contain placeholders only.
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+.npmrc
+.azure/
+.msal/
+.ssh/
+secrets/
+credentials/
+local.settings.json
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+
+# Owner-provided school documents and converted calendars stay local.
+/國小行事曆.pdf
+/local-calendars/
+# Other private inputs should be kept here, not beside publishable source files.
+/private-data/
+*.ics
+*.ical
+# Normally outside the repository; also protect accidental snapshot copies.
+owner-availability.json
+owner-availability.json.*
+.owner-availability-*.tmp
+child-calendar.json
+child-calendar.json.*
+.child-calendar-*.tmp
+child-source.json
+child-source.json.*
+.child-source-*.tmp
+
+# Local environments, caches and diagnostic/browser captures may contain data.
+/.venv/
+__pycache__/
+*.py[cod]
+.cache/
+/coverage/
+/.nyc_output/
+/debug-logs/
+/browser-artifacts/
+/playwright-report/
+/test-results/
+/tmp/
+/temp/
+*.log
+*.har
+*.tmp
+
+# Machine/editor leftovers; shared VS Code tasks remain publishable.
+.DS_Store
+Thumbs.db
+*.swp
+*.swo

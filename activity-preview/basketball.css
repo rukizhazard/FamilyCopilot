@@ -1,0 +1,62 @@
+/* Activity-only presentation. Shared calendar shell and runtime remain untouched.
+	Keep legacy heading nodes for controller/shared-shell compatibility, but the
+	date inputs below are the single visible date surface. display:none also
+	excludes duplicate text and the non-link standalone placeholder from a11y. */
+.activity-page .shell-source-row,
+.activity-page .shell-nav > [aria-disabled="true"],
+.activity-page .shell-intro .shell-date,
+.activity-page .shell-intro .shell-zone { display: none; }
+.activity-page .shell-title { grid-template-columns: minmax(0, 1fr); }
+.activity-page .shell-nav { flex-wrap: wrap; }
+.activity-page .shell-intro { min-height: 72px; }
+.activity-page .date-help { margin: 0 0 16px; }
+.activity-page .date-help > summary { width: fit-content; color: var(--muted); }
+.activity-page .date-help > p { max-width: 65ch; }
+.discovery-dates > label { min-width: 0; }
+.game-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0; }
+.game-actions button, .game-card button, #cancel-games { min-height: 44px; border: 1px solid #7b6352; border-radius: 14px; padding: 10px 16px; cursor: pointer; font: inherit; color: #493b32; background: #fffaf2; overflow-wrap: anywhere; }
+.game-actions [aria-pressed="true"], .game-card [aria-pressed="true"] { background: #ffe2b9; border: 2px solid #754719; font-weight: 700; }
+.game-actions button.primary { color: #fff; background: #543280; border-color: #543280; }
+.game-actions button.primary:hover { color: #fff; background: #442667; }
+.game-actions [aria-pressed="true"]::before, .game-card [aria-pressed="true"]::before { content: "✓ "; }
+#basketball-panel { margin-top: 24px; border-top: 1px solid #d8cde5; padding-top: 18px; }
+.basketball-choices { background: #fffaf2; border: 1px solid #d3bda5; padding: 16px; border-radius: 18px; }
+.intent-choices { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.intent-choices label, label.only-teams { display: flex !important; align-items: center; gap: 10px; min-height: 44px; padding: 8px; cursor: pointer; overflow-wrap: anywhere; min-width: 0; }
+.intent-choices label { border: 1px solid #998da9; border-radius: 12px; background: white; }
+.sport-icons label { position: relative; justify-content: center; gap: 8px; width: 84px; min-height: 64px; box-sizing: border-box; }
+.sport-icons span { font-size: 32px; line-height: 1.2; }
+.sport-icons label:has(input:checked) { background: #eee5fb; border-color: #624199; }
+.sport-icons input:checked + span::after { content: "✓"; position: absolute; top: 3px; right: 5px; font-size: 14px; font-weight: 700; color: #49306f; }
+.intent-choices input[type=checkbox], .only-teams input[type=checkbox] { width: 20px; height: 20px; min-height: 20px; flex: 0 0 20px; margin: 0; padding: 0; accent-color: #624199; }
+.sport-icons input[type=checkbox] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; z-index: 1; cursor: pointer; }
+.intent-choices label:focus-within { outline: 3px solid #874015; outline-offset: 1px; }
+.team-entry { display: flex; gap: 8px; align-items: stretch; }
+.team-entry input { min-width: 0; flex: 1; }
+.team-entry button, .preferred-team button { min-height: 44px; min-width: 44px; border: 1px solid #998da9; border-radius: 12px; font: inherit; color: #49306f; background: #eee5fb; cursor: pointer; }
+.team-entry button { padding: 8px 18px; }
+.preferred-teams { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0; list-style: none; }
+.preferred-teams:not(:empty) { margin-top: 12px; }
+.preferred-team { display: flex; align-items: center; gap: 4px; max-width: 100%; min-width: 0; padding-left: 12px; border: 1px solid #998da9; border-radius: 14px; background: #eee5fb; }
+.preferred-team > span { min-width: 0; overflow-wrap: anywhere; }
+.preferred-team button { flex: 0 0 44px; border: 0; background: transparent; font-size: 1.4rem; }
+#team-status { font-size: .85rem; overflow-wrap: anywhere; }
+#team-status:empty { margin: 0; }
+#team-controls :focus-visible { outline: 3px solid #874015; outline-offset: 2px; }
+.discovery-dates { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; align-items: end; gap: 12px; margin-top: 20px; }
+@media (max-width: 500px) { .discovery-dates { grid-template-columns: minmax(0, 1fr); } .basketball-choices { padding: 12px; } }
+@media (forced-colors: active) { .intent-choices label, .preferred-team { border-color: ButtonText; } }
+#basketball-panel h2 { font-size: 1.35rem; margin-bottom: 8px; }
+#basketball-sources p, #basketball-status { overflow-wrap: anywhere; }
+#basketball-sources { font-size: .9rem; line-height: 1.5; }
+#basketball-sources p { margin: 6px 0; }
+#basketball-source-details > summary { cursor: pointer; padding: 12px 0; min-height: 44px; box-sizing: border-box; }
+#basketball-games { margin-top: 18px; }
+.game-card { background: #fffaf2; border: 1px solid #d3bda5; border-radius: 20px; padding: 20px; min-width: 0; overflow-wrap: anywhere; }
+.game-card h3 { font-size: 1.2rem; }
+.game-card details { margin: 14px 0; }
+.game-card summary, .game-card a, #basketball-sources a { display: inline-block; padding: 10px 0; min-height: 44px; box-sizing: border-box; color: #754719; }
+.game-card summary { cursor: pointer; }
+#basketball-panel :focus-visible { outline: 3px solid #694a95; outline-offset: 3px; }
+#basketball-panel button:disabled { cursor: wait; opacity: .65; }
+[hidden] { display: none !important; }

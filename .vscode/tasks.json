@@ -1,0 +1,51 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "FamilyCopilot: local owner calendars",
+      "type": "shell",
+      "command": "node scripts/serve-owner.js",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "FamilyCopilot: synthetic owner browser review",
+      "type": "shell",
+      "command": "node scripts/serve-owner.js --synthetic",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "FamilyCopilot: local owner calendars (Windows auth, review before start)",
+      "type": "shell",
+      "command": "node scripts/serve-owner.js",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "FAMILYCOPILOT_OWNER_EXECUTION": "windows-native",
+          "FAMILYCOPILOT_CHILD_ENABLED": "kimi-calendar-v1"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "FamilyCopilot: live Microsoft picker",
+      "type": "shell",
+      "command": "npm run build:picker && npm run serve:picker",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "FamilyCopilot: synthetic picker browser review",
+      "type": "shell",
+      "command": "node scripts/build-picker.js --synthetic && node scripts/serve-picker.js --synthetic",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}
