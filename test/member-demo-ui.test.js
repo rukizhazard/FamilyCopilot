@@ -18,7 +18,7 @@ test("demo members add, remove, restore and reset without calendar requests or s
   await add(h, "kimi"); assert.equal(h.visible("calendar-person-2"), true);
   await h.fire("member-reset");
   for (const i of [0, 1, 2]) assert.equal(h.visible("calendar-person-" + i), true);
-  assert.deepEqual(h.calls, []); assert.equal(h.storage.values.size, 0);
+  assert.deepEqual(h.calls, []); assert.equal(h.storage.values.size, 1); // Explicit dates-only fixture selection.
 });
 test("member input validates blank, duplicate, long, control names and capacity; treats markup as text", async t => {
   const h = harness(t);

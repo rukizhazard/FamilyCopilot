@@ -40,15 +40,16 @@ function activityDOM(reply, { preview = false, ideasSurface = true, contextWeek 
   form.reset = () => {
     options.forEach(id => { get(id).value = "any"; }); interests.forEach(field => { field.checked = false; });
     sports.forEach(field => { field.checked = false; });
-    for (const id of ["activity-start", "activity-end", "team-name"]) get(id).value = "";
+    get("team-name").value = "";
     get("only-teams").checked = true;
   };
   form.querySelectorAll = selector => selector === '[name="ages"]' ? ages : selector === '[name="interest"]' ? interests :
     selector === '[name="sport"]' ? sports : [...nodes.values()].filter(field => Object.hasOwn(field.attributes, "aria-invalid"));
   form.querySelector = () => interests.find(field => field.checked);
   get("basketball-status").dataset.preview = String(preview);
-  const lookup = id => !ideasSurface && ["results", "cards", "result-summary", "results-title", "edit"].includes(id) ? null : get(id);
-  const document = { getElementById: get, createElement: tag => new Element(tag),
+  const lookup = id => ["activity-start", "activity-end", "reset-dates"].includes(id) ||
+    !ideasSurface && ["results", "cards", "result-summary", "results-title", "edit"].includes(id) ? null : get(id);
+  const document = { getElementById: lookup, createElement: tag => new Element(tag),
     querySelector: selector => selector === ".shell-date" ? get("date-label") : selector.startsWith("meta") ? { content: JSON.stringify(contextWeek) } : lookup(selector.slice(1)),
     querySelectorAll: () => [get("preferences"), get("about")], addEventListener: (name, fn) => { (lifecycle.get(name) || lifecycle.set(name, []).get(name)).push(fn); } };
   class FormData {

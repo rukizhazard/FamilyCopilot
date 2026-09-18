@@ -346,7 +346,12 @@ test("compact age chips keep one optional caption and accessible icons without p
   assert.doesNotMatch(party, /<p|Skip ages|skip-ages|Child ages|birthdays|eight/);
   assert.match(css, /\.age-controls \{[^}]*display: flex; flex-wrap: wrap/);
   assert.match(css, /#age-rows \{ display: contents; \}/);
-  assert.match(css, /\.age-row select \{ width: 62px; min-height: 44px/);
+  const ageSelect = css.match(/\.age-row select \{([^}]+)\}/)[1];
+  assert.match(ageSelect, /width: 6em;/);
+  assert.match(ageSelect, /flex: 0 0 auto;/);
+  assert.match(ageSelect, /padding-inline-end: 2em;/);
+  assert.match(ageSelect, /min-height: 44px;/);
+  assert.doesNotMatch(ageSelect, /appearance: none/);
   assert.match(css, /\.age-icon \{[^}]*width: 44px; min-width: 44px; height: 44px/);
   assert.doesNotMatch(css, /#age-rows \{[^}]*grid-template-columns/);
 });

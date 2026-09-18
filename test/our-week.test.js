@@ -178,7 +178,7 @@ test("fresh combined default resolves the fixed load scope, preserves unknown sc
   assert.equal(h.get("availability-refresh").disabled, true); await h.fire("availability-refresh");
   await h.emit("focus"); await h.emit("pageshow", { persisted: false });
   await h.document.dispatchEvent({ type: "visibilitychange" }); await settle();
-  assert.equal(h.calls.length, 0); assert.equal(h.storage.values.size, 0);
+  assert.equal(h.calls.length, 0); assert.equal(h.storage.values.size, 1); // Explicit dates-only fixture selection.
   assert.equal(h.parentBlocks().length, 0); assert.equal(h.childBlocks().length, 0);
   assert.match(h.get("child-week-status").textContent, /unknown|Not loaded/i);
   assert.equal(C.datesAllowed("2026-10-09", "2026-10-11"), false);

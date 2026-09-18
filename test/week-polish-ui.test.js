@@ -35,7 +35,7 @@ test("one calendar Sync action replaces decorative icon; timezone and day paging
     assert.doesNotMatch(h.get("calendar-person-" + i).textContent, /Loaded|Not loaded/);
     assert.match(h.get("calendar-person-" + i).attributes["aria-label"], /Not loaded/);
   }
-  assert.deepEqual(h.calls, []); assert.equal(h.storage.values.size, 0);
+  assert.deepEqual(h.calls, []); assert.equal(h.storage.values.size, 1); // Explicit dates-only fixture selection.
   await h.fire("availability-load");
   assert.equal(h.get("availability-surface").dataset.loaded, "true");
   assert.equal(h.visible("availability-empty"), false);

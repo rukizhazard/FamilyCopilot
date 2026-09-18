@@ -155,26 +155,28 @@ test("raw private errors and diagnostic fields never reach any availability DOM 
   }
 });
 
-test("fresh default displays October 9–11 with no startup writes/API and exact full-week Confirm", async () => {
+test("fresh owner dates are empty without startup writes/API; explicit selection retains full-week scope", async () => {
   for (const mode of ["live", "synthetic"]) {
     const storage = dateStorage(), writes = [], set = storage.setItem;
     storage.setItem = (...args) => { writes.push(args); return set(...args); };
     const h = harness(() => snapshot(A.liveWindow, mode === "synthetic"), mode, "memory", "configurable-v1", storage);
-    assert.equal(h.get("availability-start").value, "2026-10-09");
-    assert.equal(h.get("availability-end").value, "2026-10-11");
-    assert.match(h.get("availability-display-label").textContent, /9–11 October 2026/); assert.ok(noWeekView(h, 7));
-    assert.match(h.get("availability-window").textContent, /2026-10-16 00:00 \(end exclusive\).*All 336.*672 total/);
+    assert.equal(h.get("availability-start").value, "");
+    assert.equal(h.get("availability-end").value, "");
+    assert.equal(h.get("availability-date-error").hidden, true);
+    assert.equal(h.get("availability-start-label").textContent, "Choose date");
     h.documentHandlers.visibilitychange(); h.handlers.pageshow({ persisted: false });
     await h.get("availability-refresh").handlers.click();
     assert.deepEqual(h.calls, []); assert.deepEqual(writes, []); assert.equal(storage.getItem(D.key), null);
-    assert.equal(h.get("availability-empty").dataset.state, "idle");
+    assert.equal(h.get("availability-empty").dataset.state, "invalid");
     assert.equal(h.get("availability-supported-dates").hidden, true);
-    for (const id of ["availability-load", "availability-saved"]) assert.equal(h.get(id).disabled, false);
+    for (const id of ["availability-load", "availability-saved"]) assert.equal(h.get(id).disabled, true);
+    await h.load(); assert.deepEqual(h.calls, []);
+    await h.range("2026-10-09", "2026-10-11");
     await h.load();
     assert.deepEqual(h.calls, ["/api/availability"]);
     assert.equal(h.bodies[0].endDate, "2026-10-15");
     assert.equal(h.get("availability-grid").children[0].children.length - 1, 3);
-    assert.deepEqual(writes, []); assert.equal(blocks(h).length, 6);
+    assert.equal(writes.length, 1); assert.equal(blocks(h).length, 6);
   }
 });
 
@@ -188,6 +190,7 @@ test("fresh shorter display leaves a mocked saved full week untouched until expl
   }, "live", "disk", "configurable-v1", dates);
   h.documentHandlers.visibilitychange();
   assert.deepEqual(h.calls, []); assert.equal(JSON.stringify(data), original);
+  await h.range("2026-10-09", "2026-10-11");
   await h.get("availability-saved").handlers.click();
   const summary = h.get("availability-status").textContent;
   assert.equal(h.bodies[0].startDate, "2026-10-09"); assert.equal(h.bodies[0].endDate, "2026-10-15");
@@ -642,7 +645,9 @@ test("calendar scroll region is keyboard reachable, technical details closed, bl
   assert.match(html,/<details class="availability-details"><summary>/);
   assert.doesNotMatch(html,/id="availability-deployment"|<details[^>]* open/);
   assert.match(html,/Mike \+ Debby · Default calendars · Busy-only/);
-  assert.doesNotMatch(ui,/innerHTML|outerHTML|insertAdjacentHTML|\.tabIndex/);
+  assert.doesNotMatch(ui,/innerHTML|outerHTML|insertAdjacentHTML/);
+  // Only the date-picker day buttons rove; schedule blocks do not gain tab stops.
+  assert.deepEqual(ui.match(/\w+\.tabIndex\s*=.*;/g), ["button.tabIndex = value === dateCursor ? 0 : -1;"]);
   assert.match(css,/overflow-x:auto/);assert.match(css,/repeat\(3,minmax\(264px,1fr\)\)/);
   assert.match(css,/position:sticky; left:0/);assert.match(css,/repeating-linear-gradient/);
 });
@@ -1253,7 +1258,7 @@ test("external shared clear and page exit abort pending work without late rows o
 test("missing, old or unresolved October contract marker blocks every API despite current static assets", async () => {
   for (const contract of [null, "OWNER_CONTRACT", "bounded-availability-v4"]) {
     const h = harness(() => { throw Error("No API permitted"); }, "live", "disk", "configurable-v1", dateStorage(), "preserve-v1", contract);
-    assert.match(h.get("availability-display-label").textContent, /9–11 October 2026/);
+    assert.equal(h.get("availability-display-label").textContent, "No valid display dates.");
     assert.equal(h.get("availability-load").disabled, true);
     for (const id of ["availability-load", "availability-refresh", "availability-saved", "availability-clear", "availability-check"]) await h.get(id).handlers.click();
     assert.deepEqual(h.calls, []); assert.match(h.get("availability-range-support").textContent, /Calendar access needs an update.*help, then reload.*Nothing will load here yet/);

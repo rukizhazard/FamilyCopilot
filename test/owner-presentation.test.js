@@ -55,7 +55,10 @@ test("visible date selection precedes Load, with access summary in Details and n
   assert.doesNotMatch(access, /id="availability-targets"/);
   assert.match(details, /<p id="availability-targets">Mike \+ Debby · Default calendars · Busy-only<\/p>/);
   assert.match(access, /role="group" aria-label="Selected dates for Activities and initial calendar display" aria-describedby="availability-date-help"/);
-  for (const [id, label, value] of [["availability-start", "Start date", "2026-10-09"], ["availability-end", "End date", "2026-10-11"]]) {
+  assert.match(access, /id="availability-date-toggle" type="button" aria-haspopup="dialog"/);
+  assert.match(access, /id="availability-date-picker"[^>]*role="dialog"[^>]* hidden/);
+  assert.match(access, /<div hidden>\s*<label for="availability-start">/);
+  for (const [id, label, value] of [["availability-start", "Start date", ""], ["availability-end", "End date", ""]]) {
     assert.match(access, new RegExp(`<label for="${id}">${label}<input`));
     const input = access.match(new RegExp(`<input id="${id}"[^>]*>`))[0];
     for (const attribute of ['type="date"', 'min="2000-01-01"', 'max="2100-12-31"', `value="${value}"`, "required", 'autocomplete="off"'])
@@ -111,13 +114,17 @@ test("owner decorative icons do not replace action names or uncertainty semantic
     assert.match(button, /<span aria-hidden="true">/);
   }
   assert.match(html, /week-decoration" aria-hidden="true"/);
-  for (const text of ["No busy time*", "Tentative", "Unknown", "*May include working elsewhere.", "not guaranteed availability", "Missing data is never free", "24:00 ends that day"])
+  const legend = html.slice(html.indexOf('id="availability-legend"'), html.indexOf('id="availability-grid"'));
+  assert.doesNotMatch(legend, /data-status="unknown"|>Unknown</);
+  for (const text of ["No busy time*", "Tentative", "*May include working elsewhere.", "not guaranteed availability", "Missing data is never free", "24:00 ends that day"])
     assert.ok(html.includes(text), text);
   for (const id of ["availability-status", "availability-cleanup", "availability-source", "availability-context", "availability-freshness", "availability-recovery"])
     assert.ok(html.includes(`id="${id}"`));
 });
 
 test("owner polish scopes new rules without changing all-day weekly geometry", () => {
+  assert.match(css, /\.owner-page \.week-run \{ border-radius:5px; \}/);
+  assert.match(css, /\.owner-page \.child-event, \.owner-page \.child-all-day \{ border-radius:5px; \}/);
   const theme = css.slice(css.indexOf("/* Presentation-only owner theme."));
   // Every added selector is scoped; @media clauses are not selectors.
   const selectors = [...theme.matchAll(/(?:^|\})\s*([^{}]+)\{/g)].map(x => x[1].trim()).filter(x => !x.startsWith("@") && !x.startsWith("/*"));

@@ -18,7 +18,7 @@ test("three-day opening is supported but inert; every explicit parent action sti
     assert.equal(h.get(action).disabled, false);
     assert.equal(h.get("availability-supported-dates").hidden, true);
     assert.match(h.get("availability-load-scope").textContent, /9–15 October 2026.*336/);
-    assert.equal(h.calls.length, 0); assert.equal(h.storage.values.size, 0);
+    assert.equal(h.calls.length, 0); assert.equal(h.storage.values.size, 1); // Explicit dates-only fixture selection.
     await h.fire("availability-refresh"); assert.equal(h.calls.length, 0);
     await h.fire(action); await h.fire("availability-refresh");
     assert.equal(h.calls.length, 2);

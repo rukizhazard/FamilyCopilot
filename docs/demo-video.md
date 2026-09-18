@@ -1,5 +1,132 @@
 # Demo video
 
+## Immediate, shorter official-page transition, 18 September 2026
+
+[Latest MP4](../browser-artifacts/demo/updated-ux-EiJBEK/quick-loading-svpizx/familycopilot-updated-ux.mp4)
+and [English SRT](../browser-artifacts/demo/updated-ux-EiJBEK/quick-loading-svpizx/familycopilot-updated-ux.en.srt)
+supersede the longer loading transition below. The white viewport begins on the
+recorded click-release frame at **1:50.88**, lasts **one second (25 frames)**,
+and reveals the official page at **1:51.88**, without the previous post-click delay.
+
+[Offline transition editor](../scripts/shorten-demo-loading.js) holds a verified
+previously recorded official-site frame across the superseded wait, then rejoins
+the existing footage at 1:56.92. This remains an edited, simulated loading
+transition. Current calendar-picker edit, approved title, smooth scrolling,
+intro, narration, caption timing and overall duration are preserved.
+
+Validation: **18 focused tests passed**, complete decode passed, decoded audio
+matched, SRT copied unchanged, all 25 white frames and non-white boundary frames
+checked. The restored official-site frame was visually reviewed. No new network
+requests, calendar refresh, Speech calls or service changes.
+
+## Final calendar-picker edit, 18 September 2026
+
+[Final MP4](../browser-artifacts/demo/updated-ux-EiJBEK/date-selection-woBuhu/familycopilot-updated-ux.mp4)
+and [English SRT](../browser-artifacts/demo/updated-ux-EiJBEK/date-selection-woBuhu/familycopilot-updated-ux.en.srt)
+include the current date picker, visible selection of **9–11 October 2026**, Apply
+and Sync clicks, and Activities navigation. **Sync is simulated**: the calendar
+is a previously recorded real-calendar image, not newly refreshed data. One
+explicitly approved event title is restored as an editing overlay; other event
+title masks remain. This is a disclosed composite, not an end-to-end live capture.
+
+[Offline calendar editor](../scripts/record-demo-date-selection.js) accepts that
+single title through a local environment variable rather than tracked calendar
+data. All requests are intercepted locally; no calendar, website or Speech
+queries, service restarts or application changes were performed for this edit.
+The smooth activity scrolling and simulated three-second official-page loading
+transition below are retained, as are the intro, narration and corrected captions.
+
+Validation: **27 focused tests passed**; full decode passed; decoded audio is
+identical and SRT timing unchanged. The rendered calendar frame was visually
+reviewed. Both files were copied to a new Windows Videos folder with matching
+SHA256 hashes, and an Explorer launch was requested. Human audition is not claimed.
+
+## Official-page loading transition, 18 September 2026
+
+[Updated MP4](../browser-artifacts/demo/updated-ux-EiJBEK/official-loading-CWwJ4x/familycopilot-updated-ux.mp4)
+and [English SRT](../browser-artifacts/demo/updated-ux-EiJBEK/official-loading-CWwJ4x/familycopilot-updated-ux.en.srt)
+retain the smooth-scroll edit below and add a **simulated three-second white
+browser viewport**, from **1:53.92 to 1:56.92**, after View official game.
+The previously recorded official website then appears. The loading duration is
+an editing choice requested by the owner, not a newly measured website response.
+
+[Offline loading editor](../scripts/add-demo-loading.js) preserves the audio
+stream and caption band, copies the SRT unchanged, and leaves the overall timing
+unchanged. No website, calendar or Speech requests. **15 focused tests passed**;
+full decode and identical decoded audio verified. Click, white-loading and
+revealed-site frames reviewed. Earlier edits are retained separately.
+
+## Smooth activity scrolling, 18 September 2026
+
+[Updated MP4](../browser-artifacts/demo/updated-ux-EiJBEK/smooth-scroll-tDfRil/familycopilot-updated-ux.mp4)
+and [English SRT](../browser-artifacts/demo/updated-ux-EiJBEK/smooth-scroll-tDfRil/familycopilot-updated-ux.en.srt)
+replace the abrupt post-team jump with visible Add → pause → smooth scroll →
+pause → Find activities, followed by smooth scrolling to results.
+
+Only the activity viewport from **57.80–94.48 seconds** is replaced. Intro,
+calendar footage, narration and corrected caption timing remain unchanged.
+[Offline retake script](../scripts/smooth-demo-transition.js) loads hash-matched
+original assets (without changing current application files) and replays the
+previously captured public response. This is an edited offline retake, not a new
+live search. No calendar access, service change or Speech request occurred.
+
+Validation: **13/13 focused tests passed**; complete decode passed; decoded audio
+matches exactly; the SRT is copied unchanged. Browser scroll measurements recorded
+76 and 75 intermediate positions, maximum steps of 16px and 9px. Sequential
+rendered frames were reviewed across both scrolls. No human audition claimed.
+
+## Subtitle timing correction, 18 September 2026
+
+[Corrected-caption MP4](../browser-artifacts/demo/updated-ux-EiJBEK/caption-timed/familycopilot-updated-ux.mp4)
+and [English SRT](../browser-artifacts/demo/updated-ux-EiJBEK/caption-timed/familycopilot-updated-ux.en.srt)
+supersede the caption timing of the edit below. Duration remains **132.92 seconds**;
+the intro, app footage, navigation and spoken script are unchanged.
+
+- Previous captions grouped up to 94 characters, timed proportionally across
+  an entire narration clip. That exposed later sentences before they were spoken.
+- All eight clips now produce **26 sentence captions**, matched to measured
+  one-second sentence pauses in the existing audio. Captions never combine
+  successive sentences. Longer sentences use balanced two-line layouts.
+- Closing “Family Copilot.” appears at **2:05.641–2:06.884**, followed separately
+  by “Less time piecing plans together, more to look forward to.” at
+  **2:07.870–2:11.075**. Neither appears with the preceding sentence.
+- [Caption helper](../scripts/demo-captions.js) fails on mismatched sentence/pause
+  counts, rather than falling back to estimated character timing. This is
+  sentence-level audio-pause alignment, not word recognition or word highlighting.
+- [Renderer](../scripts/record-updated-demo.js), `--render-aligned-offline`, verifies
+  the original media hashes and voice offsets and writes a separate exclusive
+  output directory. No new recording, calendar/public query or Speech request.
+- **11/11 focused tests passed**, complete video decode passed, decoded audio
+  hashes match the earlier video exactly. Closing pre-brand, brand and tagline
+  frames were reviewed. Human audition has not been established.
+
+## Latest UX recording with visible Activities navigation, 18 September 2026
+
+[Updated UX MP4](../browser-artifacts/demo/updated-ux-EiJBEK/finished/familycopilot-updated-ux.mp4)
+and [English SRT](../browser-artifacts/demo/updated-ux-EiJBEK/finished/familycopilot-updated-ux.en.srt)
+are the latest private local deliverables: **132.92 seconds**, 1080p H.264/AAC.
+This replaces the older app footage below, not the application itself.
+
+- Original animated family intro, then “Let's meet Family Copilot.” Existing
+  English Jenny Neural friendly -3% clips are reused; zero Speech requests.
+- Fresh isolated browser capture of the updated UI, with all three saved calendar
+  statuses loaded. Child event names are masked; actual times/statuses remain.
+  One parent cache-only read and one child saved-view read; zero provider Syncs.
+- **No calendar scrolling during the take.** The pointer visibly moves to and
+  clicks Activities, then the same recording continues through interests, team
+  selection, results and the official-game link. No cut at the calendar handoff.
+- Exactly one public TPBL search returned two CTBC DEA games. The actual official
+  game link opens the separate ending tab. Two external resources were blocked;
+  app requests were not blocked. No service, existing tab or app source changed.
+- [Recorder and offline renderer](../scripts/record-updated-demo.js) hash app
+  sources before/after capture, guard requests, assert zero calendar scroll events,
+  and verify media hashes. Eight focused production tests passed. Full video
+  decoding passed; final click, Activities, Basketball and results frames reviewed.
+  Caption timing is approximate, not word-aligned; human audition is not asserted.
+- Earlier setup attempts stopped before any public search. The recorder now waits
+  for all three independent loaded flags before starting the take. A busy-service
+  attempt stopped at metadata preflight, without calendar access or restart.
+
 ## Complete real-calendar story, revised transitions, 18 September 2026
 
 [Complete story MP4](../browser-artifacts/demo/real-calendar-LHXjcP/complete-story/familycopilot-complete-story.mp4)

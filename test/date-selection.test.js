@@ -41,8 +41,8 @@ test("describeWeek default remains the exact live full-week compatibility marker
   const owner = activityMarkup(readFileSync(require.resolve("../owner/index.html"), "utf8"));
   // The compact Our week heading no longer duplicates the editable dates.
   assert.match(owner, /id="availability-title" class="shell-title">Our week<\/h1>/);
-  assert.match(owner, /id="availability-start"[^>]*value="2026-10-09"/);
-  assert.match(owner, /id="availability-end"[^>]*value="2026-10-11"/);
+  assert.match(owner, /id="availability-start"[^>]*value=""/);
+  assert.match(owner, /id="availability-end"[^>]*value=""/);
 });
 test("shared date contract uses Our week validation: 1–7 inclusive Taipei days, not host timezone", () => {
   const body = { startDate: "2026-10-09", endDate: "2026-10-15" };

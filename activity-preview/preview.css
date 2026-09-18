@@ -24,7 +24,7 @@ a { color: inherit; }
 .age-row { display: flex; flex: 0 0 auto; align-items: center; min-width: 0; border: 1px solid #998da9; border-radius: 16px; background: #fff0e1; }
 .age-row:nth-child(3n + 2) { background: #eee7fa; }
 .age-row:nth-child(3n) { background: #e8f2e8; }
-.age-row select { width: 62px; min-height: 44px; padding: 8px; border: 0; border-radius: 15px; background: transparent; }
+.age-row select { width: 6em; flex: 0 0 auto; min-height: 44px; padding: 8px; padding-inline-end: 2em; border: 0; border-radius: 15px; background: transparent; }
 .age-icon { display: grid; place-items: center; flex: 0 0 44px; width: 44px; min-width: 44px; height: 44px; padding: 0; border-radius: 14px; background: transparent; color: var(--purple); font-size: 1.4rem; line-height: 1; }
 .age-icon:hover { background: #eee7fa; }
 #add-age { border: 1px dashed #998da9; background: #faf2d9; }

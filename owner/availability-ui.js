@@ -69,12 +69,14 @@
   const rangeMessage = "This calendar demo supports 9–15 October 2026 only. Nothing loaded; other dates still work for Activities. Earlier saved dates are kept, never shifted into October.";
   const dates = globalThis.FamilyDates.createStore();
   const restoredDates = dates.read();
-  dateSelection = restoredDates.window;
+  // Our week starts unselected; Activities keeps its own existing default.
+  // Explicit remembered choices still survive navigation/reload.
+  dateSelection = restoredDates.status === "default" ? null : restoredDates.window;
   selectedWindow = A.calendarWindow(dateSelection);
   visibleWindow = A.displayWindow(dateSelection);
   $("availability-start").value = dateSelection ? A.slotTime(0, dateSelection).date : "";
   $("availability-end").value = dateSelection ? A.slotTime(dateSelection.slots - 1, dateSelection).date : "";
-  if (!selectedWindow) {
+  if (!selectedWindow && restoredDates.status !== "default") {
     $("availability-date-error").hidden = false;
     $("availability-date-error").textContent = "Remembered dates are invalid or unavailable. Choose valid dates again; nothing has loaded.";
     for (const id of ["availability-start", "availability-end"]) $(id).setAttribute("aria-invalid", "true");
@@ -526,6 +528,7 @@
     let selection;
     try { selection = A.dateRange($("availability-start").value, $("availability-end").value); }
     catch { selection = null; }
+    updateDateLabel();
     const nextWindow = A.calendarWindow(selection);
     const sameScope = selectedWindow && nextWindow && selectedWindow.start === nextWindow.start && selectedWindow.end === nextWindow.end;
     dateSelection = selection; visibleWindow = A.displayWindow(selection);
@@ -570,6 +573,184 @@
     }
   }
   for (const id of ["availability-start", "availability-end"]) $(id).addEventListener("input", changeRange);
+  // One calendar edits a page-local draft. Apply writes both backing inputs
+  // together, then enters the existing date/safety path exactly once. Browsing
+  // or cancelling never changes consent, storage, results or request generations.
+  const dateFormat = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+  const fullDateFormat = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+  const monthFormat = new Intl.DateTimeFormat("en-GB", { month: "long", timeZone: "UTC" });
+  const weekdayFormat = new Intl.DateTimeFormat("en-GB", { weekday: "long", timeZone: "UTC" });
+  const dateValue = value => Date.parse(value + "T00:00:00Z");
+  const isoDate = value => new Date(value).toISOString().slice(0, 10);
+  const firstDate = dateValue("2000-01-01"), lastDate = dateValue("2100-12-31"), dayMs = 86400000;
+  const clampDate = value => Math.max(firstDate, Math.min(lastDate, value));
+  let draftStart, draftEnd, dateCursor, dateMonth;
+  const dateButtons = new Map();
+  function rangeLabel(start, end) {
+    const a = dateValue(start), b = dateValue(end);
+    return a === b ? dateFormat.format(a) : dateFormat.formatRange(a, b);
+  }
+  function updateDateLabel() {
+    const start = $("availability-start").value, end = $("availability-end").value;
+    let valid = false;
+    try { A.dateRange(start, end); valid = true; } catch { /* Invalid remembered dates remain invalid. */ }
+    const label = valid ? rangeLabel(start, end) : "Choose dates";
+    $("availability-date-label").textContent = label;
+    $("availability-reset-dates").hidden = !valid;
+    for (const [part, value] of [["start", start], ["end", end]]) {
+      $("availability-" + part + "-label").textContent = valid ? dateFormat.format(dateValue(value)) : "Choose date";
+      $("availability-" + part + "-weekday").textContent = valid ? weekdayFormat.format(dateValue(value)) : "";
+    }
+    $("availability-date-toggle").setAttribute("aria-label", `Choose date range: ${label}`);
+    $("availability-date-toggle").setAttribute("aria-invalid", String(!valid));
+  }
+  function closeDatePicker(restoreFocus = true) {
+    $("availability-date-picker").hidden = true;
+    $("availability-date-toggle").setAttribute("aria-expanded", "false");
+    if (restoreFocus) $("availability-date-toggle").focus();
+  }
+  function moveDateMonth(offset) {
+    const current = new Date(dateCursor);
+    const target = new Date(Date.UTC(current.getUTCFullYear(), current.getUTCMonth() + offset, 1));
+    const maxDay = new Date(Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0)).getUTCDate();
+    dateCursor = clampDate(Date.UTC(target.getUTCFullYear(), target.getUTCMonth(), Math.min(current.getUTCDate(), maxDay)));
+    dateMonth = new Date(dateCursor).setUTCDate(1);
+  }
+  function paintDateRange(candidate, message) {
+    let start = draftStart, end = draftEnd || draftStart, preview = false;
+    if (candidate && draftStart && !draftEnd) {
+      const a = candidate < draftStart ? candidate : draftStart, b = candidate < draftStart ? draftStart : candidate;
+      try { A.dateRange(a, b); start = a; end = b; preview = candidate !== draftStart; }
+      catch { message = "Choose 1–7 days, including the start and end dates."; }
+    }
+    // Preview is paint only: no draft commit, aria-selection, storage or requests.
+    for (const [date, button] of dateButtons) {
+      const cell = button.parentNode, inRange = !!start && date >= start && date <= end;
+      cell.dataset.inRange = String(inRange);
+      cell.dataset.rangePosition = !inRange ? "none" : date === start
+        ? (start === end ? "single" : "start") : date === end ? "end" : "middle";
+      cell.dataset.preview = String(preview);
+    }
+    $("availability-date-hint").textContent = message || (preview
+      ? `${rangeLabel(start, end)} · Select to finish.`
+      : draftStart && !draftEnd ? `${dateFormat.format(dateValue(draftStart))} · Choose an end date (1–7 days).`
+        : draftStart ? `${rangeLabel(draftStart, draftEnd)} · Click a day to start a new range.`
+          : "Choose a start date, then an end date. Up to 7 days.");
+  }
+  function drawDatePicker(focusDay = false, message) {
+    const current = new Date(dateMonth), year = current.getUTCFullYear(), month = current.getUTCMonth();
+    $("availability-date-month").value = String(month);
+    $("availability-date-year").value = String(year);
+    $("availability-date-month-label").textContent = `${monthFormat.format(dateMonth)} ${year}`;
+    $("availability-date-previous").disabled = dateMonth <= firstDate;
+    $("availability-date-next").disabled = year === 2100 && month === 11;
+    $("availability-date-apply").disabled = !draftStart || !draftEnd;
+    const grid = $("availability-date-grid"); grid.replaceChildren(); dateButtons.clear();
+    const header = node("div", "date-week-row"); header.setAttribute("role", "row");
+    for (const name of ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]) {
+      const heading = node("span", "date-weekday", name); heading.setAttribute("role", "columnheader"); header.append(heading);
+    }
+    grid.append(header);
+    const first = dateMonth - current.getUTCDay() * dayMs;
+    for (let week = 0; week < 6; week++) {
+      const row = node("div", "date-week-row"); row.setAttribute("role", "row");
+      for (let d = 0; d < 7; d++) {
+        const value = first + (week * 7 + d) * dayMs, date = isoDate(value);
+        const selected = !!draftStart && date >= draftStart && date <= (draftEnd || draftStart);
+        const edge = date === draftStart || date === draftEnd;
+        const cell = node("div", "date-cell"); cell.setAttribute("role", "gridcell");
+        cell.setAttribute("aria-selected", String(selected)); cell.dataset.selected = String(selected); cell.dataset.edge = String(edge);
+        const button = node("button", "date-day", String(new Date(value).getUTCDate()));
+        button.type = "button"; button.dataset.date = date;
+        button.dataset.outside = String(new Date(value).getUTCMonth() !== month);
+        button.disabled = value < firstDate || value > lastDate;
+        button.tabIndex = value === dateCursor ? 0 : -1;
+        button.setAttribute("aria-label", fullDateFormat.format(value) + (date === draftStart ? ", Start date" : "") + (date === draftEnd ? ", End date" : ""));
+        button.addEventListener("pointerenter", () => { if (!button.disabled) paintDateRange(date); });
+        button.addEventListener("click", () => {
+          if (button.disabled) return;
+          dateCursor = value; dateMonth = new Date(value).setUTCDate(1);
+          let error;
+          if (!draftStart || draftEnd) { draftStart = date; draftEnd = null; }
+          else {
+            const start = date < draftStart ? date : draftStart, end = date < draftStart ? draftStart : date;
+            try { A.dateRange(start, end); draftStart = start; draftEnd = end; }
+            catch { error = "Choose 1–7 days, including the start and end dates."; }
+          }
+          drawDatePicker(true, error);
+        });
+        button.addEventListener("keydown", event => {
+          const offsets = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7,
+            Home: -new Date(value).getUTCDay(), End: 6 - new Date(value).getUTCDay() };
+          if (Object.hasOwn(offsets, event.key)) dateCursor = clampDate(value + offsets[event.key] * dayMs);
+          else if (["PageUp", "PageDown"].includes(event.key)) {
+            dateCursor = value; moveDateMonth((event.key === "PageUp" ? -1 : 1) * (event.shiftKey ? 12 : 1));
+          } else return;
+          event.preventDefault(); dateMonth = new Date(dateCursor).setUTCDate(1); drawDatePicker(true);
+          paintDateRange(isoDate(dateCursor));
+        });
+        dateButtons.set(date, button); cell.append(button); row.append(cell);
+      }
+      grid.append(row);
+    }
+    paintDateRange(undefined, message);
+    if (focusDay) dateButtons.get(isoDate(dateCursor))?.focus();
+  }
+  $("availability-date-grid").addEventListener("pointerleave", () => paintDateRange());
+  for (let month = 0; month < 12; month++) {
+    const option = node("option", "", monthFormat.format(Date.UTC(2026, month, 1))); option.value = String(month);
+    $("availability-date-month").append(option);
+  }
+  for (let year = 2000; year <= 2100; year++) {
+    const option = node("option", "", String(year)); option.value = String(year); $("availability-date-year").append(option);
+  }
+  $("availability-date-toggle").addEventListener("click", () => {
+    if (!$("availability-date-picker").hidden) { closeDatePicker(); return; }
+    draftStart = null; draftEnd = null;
+    try {
+      A.dateRange($("availability-start").value, $("availability-end").value);
+      draftStart = $("availability-start").value; draftEnd = $("availability-end").value;
+    } catch { /* Do not repair invalid storage implicitly. */ }
+    dateCursor = dateValue(draftStart || A.slotTime(0, A.liveWindow).date);
+    dateMonth = new Date(dateCursor).setUTCDate(1);
+    $("availability-date-picker").hidden = false;
+    $("availability-date-toggle").setAttribute("aria-expanded", "true"); drawDatePicker(true);
+  });
+  for (const [id, offset] of [["availability-date-previous", -1], ["availability-date-next", 1]]) {
+    $(id).addEventListener("click", () => { if (!$(id).disabled) { moveDateMonth(offset); drawDatePicker(); if ($(id).disabled) dateButtons.get(isoDate(dateCursor))?.focus(); } });
+  }
+  for (const id of ["availability-date-month", "availability-date-year"]) $(id).addEventListener("change", () => {
+    const year = Number($("availability-date-year").value), month = Number($("availability-date-month").value);
+    if (!Number.isInteger(year) || year < 2000 || year > 2100 || !Number.isInteger(month) || month < 0 || month > 11) return;
+    dateCursor = dateMonth = Date.UTC(year, month, 1); drawDatePicker();
+  });
+  $("availability-date-cancel").addEventListener("click", () => closeDatePicker());
+  $("availability-reset-dates").addEventListener("click", async () => {
+    $("availability-start").value = ""; $("availability-end").value = "";
+    closeDatePicker();
+    // Use normal fencing and the dates-only tombstone; never delete snapshots.
+    await changeRange();
+    $("availability-date-error").hidden = true;
+    $("availability-date-toggle").setAttribute("aria-invalid", "false");
+  });
+  $("availability-date-apply").addEventListener("click", async () => {
+    if ($("availability-date-apply").disabled || !draftStart || !draftEnd) return;
+    try { A.dateRange(draftStart, draftEnd); } catch { return; }
+    $("availability-start").value = draftStart; $("availability-end").value = draftEnd;
+    closeDatePicker(); await changeRange();
+  });
+  $("availability-date-picker").addEventListener("keydown", event => {
+    if (event.key === "Escape") { event.preventDefault(); closeDatePicker(); }
+  });
+  // Non-modal popover: Tab may leave freely; leaving discards only the draft.
+  $("availability-date-control").addEventListener("focusout", event => {
+    if (event.relatedTarget && !$("availability-date-control").contains(event.relatedTarget)) closeDatePicker(false);
+  });
+  document.addEventListener("pointerdown", event => {
+    if (!$("availability-date-picker").hidden && !event.target.closest?.("#availability-date-control")) closeDatePicker(false);
+  });
+  updateDateLabel();
+  if (restoredDates.status === "default") $("availability-date-toggle").setAttribute("aria-invalid", "false");
   function pageDisplay(direction) {
     const id = direction < 0 ? "availability-display-previous" : "availability-display-next";
     if ($(id).disabled || !visibleWindow || !selectedWindow) return;

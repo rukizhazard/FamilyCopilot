@@ -10,6 +10,34 @@ function harness(reply = async (_path, options) => ({ ok: true, json: async () =
   return activityDOM(reply, options);
 }
 const counts = h => h.get("basketball-games").children.length;
+// Simulate Calendar updating the existing dates-only store, then returning.
+async function calendarDates(h, startDate, endDate) {
+  D.createStore(() => h.storage).write(startDate, endDate);
+  await h.lifecycle("focus");
+}
+async function calendarReset(h) {
+  D.createStore(() => h.storage).reset();
+  await h.lifecycle("focus");
+}
+test("activity dates are read-only and search inherits calendar dates without writing storage", async () => {
+  const fs = require("node:fs"), html = fs.readFileSync(require.resolve("../activity-preview/index.html"), "utf8");
+  const js = fs.readFileSync(require.resolve("../activity-preview/basketball-ui.js"), "utf8");
+  assert.doesNotMatch(html, /id="(?:activity-start|activity-end|reset-dates)"/);
+  assert.match(html, /<a id="calendar-dates-link" class="text-button" href="\/">Change dates<\/a>/);
+  assert.match(html, /<a id="change-activity-dates" class="text-button" href="\/">Change dates<\/a>/);
+  assert.doesNotMatch(js, /dates\.(?:write|reset)\(/);
+  const storage = dateStorage(); D.createStore(() => storage).write("2026-10-10", "2026-10-11");
+  const before = storage.getItem(D.key);
+  storage.setItem = storage.removeItem = () => { throw Error("Activity must not write dates"); };
+  const h = harness(undefined, { storage, ideasSurface: false });
+  assert.equal(h.get("basketball-dates").textContent, "10–11 October 2026 · Taipei (UTC+8)");
+  assert.equal(h.requests.length, 0); assert.equal(h.get("find").disabled, false);
+  await h.click("find");
+  assert.equal(JSON.parse(h.requests[0].options.body).startDate, "2026-10-10");
+  assert.equal(JSON.parse(h.requests[0].options.body).endDate, "2026-10-11");
+  await h.click("reset"); await h.lifecycle("pagehide"); await h.lifecycle("pageshow", { persisted: true });
+  assert.equal(storage.getItem(D.key), before); assert.equal(h.requests.length, 1);
+});
 test("successful game summaries are concise without hiding truncation or fuzzy resolution", async () => {
   for (const total of [1, 2, 45]) {
     const rows = Array.from({ length: total }, (_, i) => row(i + 1, undefined, { home_team: { name: "新北中信特攻" } }));
@@ -36,7 +64,7 @@ test("public listings heading appears only after Find and hides when choices are
   await h.click("find");
   assert.equal(h.get("basketball-title").hidden, false); assert.ok(counts(h) > 0);
   assert.equal(h.focus.id, "basketball-title");
-  await h.input("activity-end", "2026-09-25");
+  await calendarDates(h, "2026-09-20", "2026-09-25");
   assert.equal(h.get("basketball-title").hidden, true);
   await h.click("find"); assert.equal(h.get("basketball-title").hidden, false);
   await h.click("reset"); assert.equal(h.get("basketball-title").hidden, true);
@@ -87,29 +115,28 @@ test("removed ideas surface never renders or announces counts while public searc
     await h.lifecycle("pagehide"); await h.lifecycle("pageshow", { persisted: true }); noIdeas();
   }
 });
-test("activity layout keeps one visible date editor and hides technical header chrome with scoped styles", () => {
+test("activity layout keeps one read-only date summary and hides technical header chrome with scoped styles", () => {
   const fs = require("node:fs");
   const html = fs.readFileSync(require.resolve("../activity-preview/index.html"), "utf8");
   const css = fs.readFileSync(require.resolve("../activity-preview/basketball.css"), "utf8");
   assert.match(html, /<body class="activity-page">/);
   assert.match(css, /\.activity-page \.shell-source-row,[\s\S]*?\.activity-page \.shell-nav > \[aria-disabled="true"\],[\s\S]*?\.activity-page \.shell-intro \.shell-date,[\s\S]*?\.activity-page \.shell-intro \.shell-zone\s*\{\s*display: none;/);
-  assert.match(html, /<details class="date-help">\s*<summary>About these dates<\/summary>\s*<p class="hint">Only dates are remembered/);
-  assert.equal((html.match(/id="activity-start"/g) || []).length, 1);
-  assert.equal((html.match(/id="activity-end"/g) || []).length, 1);
+  assert.match(html, /<details class="date-help">\s*<summary>About these dates<\/summary>\s*<p class="hint">Dates follow Our week/);
+  assert.equal((html.match(/id="basketball-dates"/g) || []).length, 1);
+  assert.doesNotMatch(html, /id="activity-start"|id="activity-end"|id="reset-dates"/);
   assert.match(css, /\.activity-page \.shell-nav\s*\{[^}]*flex-wrap: wrap/);
-  assert.match(css, /\.discovery-dates > label\s*\{[^}]*min-width: 0/);
+  assert.match(css, /\.discovery-dates > p\s*\{[^}]*min-width: 0/);
 });
-test("date hint never repeats selected dates; invalid input stays visible and reset preserves no-query behavior", async () => {
+test("read-only dates follow calendar edits and invalid dates block search without querying", async () => {
   const h = harness(undefined, { storage: dateStorage() });
-  assert.equal(h.get("basketball-dates").textContent, "Taipei (UTC+8) · Default dates · Choose 1–7 days.");
-  await h.input("activity-start", "2026-10-10");
-  assert.equal(h.get("basketball-dates").textContent, "Taipei (UTC+8) · Choose 1–7 days.");
-  assert.doesNotMatch(h.get("basketball-dates").textContent, /October|2026|Our week/);
-  await h.input("activity-end", "2026-10-09");
-  assert.match(h.get("basketball-dates").textContent, /Dates are invalid/);
+  assert.equal(h.get("basketball-dates").textContent, "9–11 October 2026 · Taipei (UTC+8) · Default dates");
+  await calendarDates(h, "2026-10-10", "2026-10-11");
+  assert.equal(h.get("basketball-dates").textContent, "10–11 October 2026 · Taipei (UTC+8)");
+  await calendarDates(h, "2026-10-10", "2026-10-09");
+  assert.match(h.get("basketball-dates").textContent, /Dates unavailable.*Our week/);
   assert.equal(h.get("find").disabled, true);
-  await h.click("reset-dates");
-  assert.equal(h.get("find").disabled, false); assert.equal(h.focus.id, "activity-start");
+  await calendarReset(h);
+  assert.equal(h.get("find").disabled, false);
   assert.match(h.get("basketball-dates").textContent, /Default dates/);
   assert.equal(h.requests.length, 0);
 });
@@ -174,7 +201,7 @@ test("fuzzy source names stay literal and date edits fence candidate controls", 
   const h = harness(async (_path, options) => ({ ok: true, json: async () => response({ ...JSON.parse(options.body), rows }) }));
   await h.category("sports"); await h.sport("basketball"); await h.addTeam("Falcons"); await h.click("find");
   const control = h.get("basketball-sources").querySelectorAll("button")[0];
-  assert.ok(control); await h.input("activity-end", "2026-09-25"); await control.fire("click");
+  assert.ok(control); await calendarDates(h, "2026-09-20", "2026-09-25"); await control.fire("click");
   assert.equal(h.get("preferred-teams").children.length, 1); assert.equal(h.requests.length, 1);
   assert.doesNotMatch(h.storage.getItem(D.key), /Falcons|team/);
 });
@@ -349,8 +376,8 @@ test("current-page preferred chips survive date/category changes but never stora
   const snapshot = h.storage.getItem(D.key);
   await h.category("music"); assert.equal(h.get("team-controls").hidden, true); assert.match(text(h.get("preferred-teams")), /Synthetic Keep/);
   await h.category("sports"); assert.equal(h.get("team-controls").hidden, false);
-  await h.input("activity-end", "2026-09-25"); assert.match(text(h.get("preferred-teams")), /Synthetic Keep/);
-  await h.click("reset-dates"); assert.match(text(h.get("preferred-teams")), /Synthetic Keep/); assert.equal(h.get("team-suggestions").children.length, 0);
+  await calendarDates(h, "2026-09-20", "2026-09-25"); assert.match(text(h.get("preferred-teams")), /Synthetic Keep/);
+  await calendarReset(h); assert.match(text(h.get("preferred-teams")), /Synthetic Keep/); assert.equal(h.get("team-suggestions").children.length, 0);
   const restored = harness(undefined, { storage: h.storage }); assert.equal(restored.get("preferred-teams").children.length, 0);
   assert.doesNotMatch(snapshot, /Synthetic|team/);
   for (const action of [() => h.click("reset"), () => h.lifecycle("pagehide"), () => h.lifecycle("pageshow", { persisted: true })]) {
@@ -555,7 +582,7 @@ test("no favorite matches offers explicit all/date/name-edit recovery, never aut
   const h = harness(); await h.category("sports"); await h.sport("basketball"); await h.addTeam("Formosa Dreamers"); await h.click("find"); assert.equal(counts(h), 0);
   assert.match(h.get("basketball-status").textContent, /No matching favorite-team games/); assert.equal(h.get("team-recovery").hidden, false);
   await h.click("edit-preferred-teams"); assert.match(text(h.get("preferred-teams")), /福爾摩沙夢想家/); assert.equal(h.focus.id, "team-name"); assert.equal(h.requests.length, 1);
-  await h.click("find"); await h.click("change-activity-dates"); assert.equal(h.focus.id, "activity-start"); assert.equal(h.requests.length, 2);
+  await h.click("find"); await h.click("change-activity-dates"); assert.equal(h.requests.length, 2);
   await h.click("find"); await h.click("show-all-teams"); assert.equal(h.focus.id, "find"); assert.equal(counts(h), 0);
   await h.click("find"); assert.equal(counts(h), 1); assert.deepEqual(JSON.parse(h.requests.at(-1).options.body).teamIds, []);
   const empty = harness(async (_path, options) => ({ ok: true, json: async () => response({ ...JSON.parse(options.body), rows: [] }) }));
@@ -597,24 +624,24 @@ test("shared date changes at focus/history/visibility/storage/response/decode fe
     if (!["response", "decode"].includes(event)) await h.lifecycle(event, { key: D.key });
     finish({ ok: true, json: async () => { if (event === "decode") change(); return response(); } }); await pending;
     assert.equal(counts(h), 0); assert.equal(h.get("date-label").textContent, "9–15 October 2026"); assert.equal(h.requests.length, 1); assert.equal(h.get("cards").innerHTML, "");
-    assert.equal(h.get("activity-start").value, "2026-10-09"); assert.equal(h.get("activity-end").value, "2026-10-15");
+    assert.equal(h.get("basketball-dates").textContent, "9–15 October 2026 · Taipei (UTC+8)");
   }
 });
-test("direct dates use existing key only, preserve fixed sample dates, and Start over keeps dates", async () => {
+test("inherited dates use existing key only, preserve fixed sample dates, and Start over keeps dates", async () => {
   const storage = dateStorage(); storage.setItem("unrelated", "keep");
   const h = harness(async (_path, options) => ({ ok: true, json: async () => response({ ...JSON.parse(options.body), rows: [row(1, "2026-10-09")] }) }), { storage });
-  assert.equal(h.get("activity-start").value, "2026-10-09"); await h.input("activity-end", "2026-10-09"); await h.click("find"); assert.equal(counts(h), 1);
+  await calendarDates(h, "2026-10-09", "2026-10-09"); await h.click("find"); assert.equal(counts(h), 1);
   assert.match(h.get("result-summary").textContent, /Sep 20–Sat, Sep 26/); assert.equal(JSON.parse(h.requests[0].options.body).endDate, "2026-10-09");
-  await h.addTeam("Formosa Dreamers"); await h.click("reset"); assert.equal(h.get("activity-end").value, "2026-10-09"); assert.equal(h.get("preferred-teams").children.length, 0); assert.equal(h.get("team-summary").textContent, "");
+  await h.addTeam("Formosa Dreamers"); await h.click("reset"); assert.equal(h.get("basketball-dates").textContent, "9 October 2026 · Taipei (UTC+8)"); assert.equal(h.get("preferred-teams").children.length, 0); assert.equal(h.get("team-summary").textContent, "");
   assert.deepEqual(JSON.parse(storage.getItem(D.key)), { version: 1, state: "selected", startDate: "2026-10-09", endDate: "2026-10-09" });
-  await h.click("reset-dates"); assert.equal(storage.getItem(D.key), null); assert.equal(storage.getItem("unrelated"), "keep"); assert.equal(h.requests.length, 1);
+  await calendarReset(h); assert.equal(storage.getItem(D.key), null); assert.equal(storage.getItem("unrelated"), "keep"); assert.equal(h.requests.length, 1);
 });
-test("invalid dates block requests, direct edits immediately clear selected games and sample results", async () => {
+test("invalid calendar dates block requests and clear selected games and sample results", async () => {
   const h = harness(); await h.click("find"); await h.get("basketball-games").querySelectorAll("button")[0].fire("click");
-  await h.input("activity-start", "2026-10-09"); assert.equal(counts(h), 0); assert.equal(h.get("cards").innerHTML, ""); assert.equal(h.get("find").disabled, true); await h.click("find"); assert.equal(h.requests.length, 1);
-  await h.input("activity-end", "2026-10-15"); assert.equal(h.get("find").disabled, false);
+  await calendarDates(h, "2026-10-09", "2026-09-26"); assert.equal(counts(h), 0); assert.equal(h.get("cards").innerHTML, ""); assert.equal(h.get("find").disabled, true); await h.click("find"); assert.equal(h.requests.length, 1);
+  await calendarDates(h, "2026-10-09", "2026-10-15"); assert.equal(h.get("find").disabled, false);
   for (const raw of ['{"version":1,"state":"invalid"}', "bad"]) {
-    const storage = dateStorage(); storage.setItem(D.key, raw); const invalid = harness(undefined, { storage }); await invalid.click("find"); assert.equal(invalid.requests.length, 0); assert.equal(invalid.get("date-label").textContent, "Choose dates"); await invalid.click("reset-dates"); assert.equal(invalid.get("find").disabled, false);
+    const storage = dateStorage(); storage.setItem(D.key, raw); const invalid = harness(undefined, { storage }); await invalid.click("find"); assert.equal(invalid.requests.length, 0); assert.equal(invalid.get("date-label").textContent, "Choose dates"); await calendarReset(invalid); assert.equal(invalid.get("find").disabled, false);
   }
 });
 test("offline preview explains basketball limits after Find without changing preferences", async () => {
@@ -655,23 +682,23 @@ test("empty three-day October selection works with the unchanged full-week serve
   storage.setItem = (...args) => { writes.push(args); return set(...args); };
   const h = harness(async (_path, options) => { const data = response({ ...JSON.parse(options.body), rows: [row(1, "2026-10-09")] }); data.week.label = "9 – 11 October 2026"; return { ok: true, json: async () => data }; }, { storage, contextWeek: { ...D.describeWeek(), label: "9 – 15 October 2026" } });
   assert.equal(h.get("date-label").textContent, "9–11 October 2026");
-  assert.equal(h.get("activity-start").value, "2026-10-09"); assert.equal(h.get("activity-end").value, "2026-10-11");
+  assert.equal(h.get("basketball-dates").textContent, "9–11 October 2026 · Taipei (UTC+8) · Default dates");
   for (const event of ["focus", "pageshow", "visibilitychange"]) await h.lifecycle(event, { persisted: false });
   assert.equal(h.requests.length, 0); assert.deepEqual(writes, []);
   await h.click("find"); assert.equal(counts(h), 1); assert.equal(storage.getItem(D.key), null); assert.deepEqual(writes, []);
   assert.deepEqual(JSON.parse(h.requests[0].options.body), { startDate: "2026-10-09", endDate: "2026-10-11", teamIds: [], teamMode: "prefer" });
-  await h.input("activity-end", "2026-10-15"); await h.click("reset-dates");
-  assert.equal(h.get("activity-end").value, "2026-10-11"); assert.equal(h.get("date-label").textContent, "9–11 October 2026");
+  await calendarDates(h, "2026-10-09", "2026-10-15"); await calendarReset(h);
+  assert.equal(h.get("basketball-dates").textContent, "9–11 October 2026 · Taipei (UTC+8) · Default dates"); assert.equal(h.get("date-label").textContent, "9–11 October 2026");
   assert.equal(h.requests.length, 1); assert.equal(storage.getItem(D.key), null); assert.equal(counts(h), 0);
 });
-test("denied date storage fails closed, invalid edit retains no earlier result, reset cannot claim recovery", async () => {
+test("denied date storage fails closed and Start over cannot claim recovery", async () => {
   const storage = { getItem() { throw Error("denied"); }, setItem() { throw Error("denied"); }, removeItem() { throw Error("denied"); } };
   const h = harness(undefined, { storage }); assert.equal(h.get("find").disabled, true);
-  await h.input("activity-start", "2026-10-09"); await h.input("activity-end", "2026-10-15"); await h.click("find"); await h.click("reset-dates");
+  await h.lifecycle("focus"); await h.click("find"); await h.click("reset");
   assert.equal(h.requests.length, 0); assert.equal(h.get("find").disabled, true); assert.equal(h.get("date-label").textContent, "Choose dates");
 });
-test("late team response decoding and direct date/reset edits cannot resurrect old data or selected games", async () => {
-  for (const action of [h => h.click("show-all-teams"), h => h.click("surprise"), h => h.input("activity-end", "2026-09-25"), h => h.click("reset-dates")]) {
+test("late team response decoding and calendar date changes cannot resurrect old data or selected games", async () => {
+  for (const action of [h => h.click("show-all-teams"), h => h.click("surprise"), h => calendarDates(h, "2026-09-20", "2026-09-25"), calendarReset]) {
     let decode, decoding; const ready = new Promise(resolve => { decoding = resolve; });
     const h = harness(async () => ({ ok: true, json: () => new Promise(resolve => { decode = resolve; decoding(); }) }));
     const pending = h.click("find"); await ready;

@@ -41,6 +41,8 @@ test("standalone page and every referenced asset work with zero startup/source c
     assert.equal(page.status, 200); assert.match(page.text, /Independent activity search/);
     assert.doesNotMatch(page.text, /data-preview="true"|ACTIVITY_WEEK|href="\/">Our week|8002|owner-csrf/);
     assert.match(page.text, /Dates stay in this activity tab/);
+    assert.doesNotMatch(page.text, /id="(?:activity-start|activity-end|reset-dates|calendar-dates-link|change-activity-dates)"/);
+    assert.match(page.text, /does not receive Calendar changes/);
     assert.match(page.headers["content-security-policy"], /connect-src 'self'/);
     assert.equal(page.headers["cache-control"], "no-store"); assert.equal(page.headers["set-cookie"], undefined);
     for (const [, asset] of page.text.matchAll(/(?:src|href)="(\/[^"#]+\.(?:js|css))"/g)) {

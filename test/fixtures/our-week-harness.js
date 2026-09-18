@@ -9,7 +9,7 @@ const settle = async () => { for (let i = 0; i < 15; i++) await new Promise(setI
 const deferred = () => { let resolve, reject; const promise = new Promise((a, b) => { resolve = a; reject = b; }); return { promise, resolve, reject }; };
 const descendants = n => [n, ...n.children.flatMap(descendants)];
 const text = n => [n.textContent, ...n.children.map(text)].join("\n");
-function harness(t, { override, meta: overrides = {}, childData, initialDates, sharedActions = true, savedChild, cloneResponses = true } = {}) {
+function harness(t, { override, meta: overrides = {}, childData, initialDates = ["2026-10-09", "2026-10-11"], sharedActions = true, savedChild, cloneResponses = true } = {}) {
   const nodes = new Map(), calls = [], packets = [], metadata = [], events = [], timers = new Map(), storage = dateStorage();
   let renderer, rendererInterface, childActions, actionInterface;
   let clock = Date.parse("2026-09-17T01:00:00Z"), timer = 0, focus;
@@ -72,6 +72,7 @@ function harness(t, { override, meta: overrides = {}, childData, initialDates, s
   Object.defineProperty(document, "activeElement", { get: () => focus });
   window.addEventListener("child-week-changed", e => packets.push(structuredClone(e.detail)));
   window.addEventListener("week-safety-changed", e => metadata.push(structuredClone(e.detail)));
+  // Loaded-week tests explicitly select dates; null exercises fresh empty startup.
   if (initialDates) D.createStore(() => storage).write(...initialDates);
   const parentData = () => ({ window: A.liveWindow, checkedAt: "2026-09-17T00:59:00Z", synthetic: meta["owner-mode"] === "synthetic", cleanup: "workflow_disabled",
     people: [0, 1].map(person => ({ person, status: "checked", slots: Array(336).fill("busy") })) });

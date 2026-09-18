@@ -1,6 +1,6 @@
 /* Activity-only presentation. Shared calendar shell and runtime remain untouched.
 	Keep legacy heading nodes for controller/shared-shell compatibility, but the
-	date inputs below are the single visible date surface. display:none also
+	read-only dates below are the single visible date surface. display:none also
 	excludes duplicate text and the non-link standalone placeholder from a11y. */
 .activity-page .shell-source-row,
 .activity-page .shell-nav > [aria-disabled="true"],
@@ -12,7 +12,8 @@
 .activity-page .date-help { margin: 0 0 16px; }
 .activity-page .date-help > summary { width: fit-content; color: var(--muted); }
 .activity-page .date-help > p { max-width: 65ch; }
-.discovery-dates > label { min-width: 0; }
+.discovery-dates > p { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.discovery-dates > a, .game-actions > a { display: inline-flex; align-items: center; min-height: 44px; }
 .game-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0; }
 .game-actions button, .game-card button, #cancel-games { min-height: 44px; border: 1px solid #7b6352; border-radius: 14px; padding: 10px 16px; cursor: pointer; font: inherit; color: #493b32; background: #fffaf2; overflow-wrap: anywhere; }
 .game-actions [aria-pressed="true"], .game-card [aria-pressed="true"] { background: #ffe2b9; border: 2px solid #754719; font-weight: 700; }
@@ -43,8 +44,8 @@
 #team-status { font-size: .85rem; overflow-wrap: anywhere; }
 #team-status:empty { margin: 0; }
 #team-controls :focus-visible { outline: 3px solid #874015; outline-offset: 2px; }
-.discovery-dates { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; align-items: end; gap: 12px; margin-top: 20px; }
-@media (max-width: 500px) { .discovery-dates { grid-template-columns: minmax(0, 1fr); } .basketball-choices { padding: 12px; } }
+.discovery-dates { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 20px; }
+@media (max-width: 500px) { .basketball-choices { padding: 12px; } }
 @media (forced-colors: active) { .intent-choices label, .preferred-team { border-color: ButtonText; } }
 #basketball-panel h2 { font-size: 1.35rem; margin-bottom: 8px; }
 #basketball-sources p, #basketball-status { overflow-wrap: anywhere; }

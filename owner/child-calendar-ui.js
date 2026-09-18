@@ -135,7 +135,7 @@
     hide(); const version = ++generation;
     const [startDate, endDate] = dates();
     pending = true; publish("loading"); controls();
-    status(useSync ? refresh ? "Syncing Kimi's remembered source…" : "Opening Kimi's saved view or syncing its remembered source…" : "Opening Kimi's saved view only… No Outlook request.");
+    status(useSync ? "" : "Opening Kimi's saved view only… No Outlook request.", false, useSync);
     await clearing;
     if (version !== generation) return "cancel";
     if (Date.now() >= expires) { expire(); return "cancel"; }

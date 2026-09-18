@@ -90,10 +90,58 @@ body.owner-page { --ink:#352e49; --muted:#625a70; --paper:#fcf9f5; --card:#fff; 
 .owner-page #availability-targets { margin:0 0 .25rem; font-weight:600; overflow-wrap:anywhere; }
 .owner-page .availability-confirmation .owner-ack { align-items:center; min-height:44px; margin:0; padding:.35rem 0; background:transparent; line-height:1.45; cursor:pointer; }
 .owner-page .availability-confirmation .owner-ack span { min-width:0; overflow-wrap:anywhere; }
-.owner-page .availability-dates { display:flex; flex-wrap:wrap; gap:.6rem 1rem; margin:.7rem 0 .4rem; }
-.owner-page .availability-dates label { display:flex; flex-direction:column; gap:.25rem; min-width:0; flex:1 1 180px; max-width:260px; font-weight:600; }
-.owner-page .availability-dates input { width:100%; min-width:0; min-height:44px; box-sizing:border-box; padding:.5rem .65rem; border:1px solid #b9a3d1; border-radius:10px; font:inherit; color:var(--ink); background:#fff; }
-.owner-page .availability-dates input:focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
+.owner-page .availability-dates { position:relative; margin:.7rem 0 .4rem; max-width:560px; }
+.owner-page #availability-date-toggle { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; min-height:48px; padding:.6rem 0; border:1px solid #b9a3d1; border-radius:13px; font:inherit; font-weight:600; color:var(--ink); background:#fff; text-align:left; }
+.owner-page #availability-date-toggle .sync-calendar-icon { flex-shrink:0; width:21px; height:21px; }
+.owner-page .date-endpoint { display:flex; align-items:center; gap:.75rem; min-width:0; padding:.2rem 1rem; }
+.owner-page .date-endpoint + .date-endpoint { border-left:1px solid var(--border); }
+.owner-page .date-endpoint-text { display:flex; flex-direction:column; gap:.15rem; min-width:0; }
+.owner-page .date-endpoint-caption { color:var(--muted); font-size:.7rem; font-weight:400; }
+.owner-page .date-endpoint-weekday { color:var(--muted); font-size:.8rem; font-weight:400; }
+.owner-page #availability-reset-dates { min-height:44px; padding:.4rem .2rem; border:0; background:transparent; color:var(--accent); font-size:.8rem; text-decoration:underline; }
+@media (max-width:500px) {
+	.owner-page .date-endpoint { gap:.4rem; padding:.2rem .5rem; font-size:.8rem; }
+	.owner-page #availability-date-toggle .sync-calendar-icon { width:18px; height:18px; }
+}
+.owner-page .date-picker { position:absolute; top:calc(100% + 8px); left:0; z-index:10; width:360px; max-width:100%; box-sizing:border-box; padding:12px; background:#fff; border:1px solid var(--border); border-radius:18px; box-shadow:0 12px 36px #352e4924; }
+.owner-page .date-picker h2 { font-size:1rem; margin:4px 4px 12px; }
+.owner-page .date-month-navigation { display:flex; align-items:center; gap:4px; }
+.owner-page .date-month-navigation button { flex:0 0 36px; padding:0; font-size:1.5rem; }
+.owner-page .date-month-navigation select { min-width:0; width:0; flex:1.4; padding:4px; }
+.owner-page #availability-date-year { flex:1; }
+.owner-page .date-picker button, .owner-page .date-picker select { min-height:44px; font-family:inherit; color:var(--ink); background:#fff; border:1px solid transparent; border-radius:8px; }
+.owner-page .date-picker select { border-color:var(--border); font-size:.85rem; }
+.owner-page .date-month-label { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+.owner-page #availability-date-grid { margin-top:10px; }
+.owner-page .date-week-row { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); }
+.owner-page .date-weekday { padding:7px 0; text-align:center; font-size:.7rem; color:var(--muted); }
+.owner-page .date-cell { position:relative; display:grid; place-items:center; min-width:0; height:44px; }
+.owner-page .date-picker .date-day { position:relative; z-index:1; box-sizing:border-box; width:min(100%,40px); aspect-ratio:1; min-height:0; padding:0; border-radius:50%; background:transparent; font-size:.85rem; }
+.owner-page .date-day[data-outside="true"] { color:#81748e; }
+.owner-page .date-day:not(:disabled):hover { background:#eee6f6; color:var(--accent); }
+/* Cell-wide bands join without gaps, behind transparent day buttons. Only the
+	endpoint halves stop at circle centres; week edges continue square. */
+.owner-page .date-cell[data-in-range="true"]::before { content:""; position:absolute; top:50%; left:0; right:0; height:40px; transform:translateY(-50%); background:#eee6f7; pointer-events:none; }
+.owner-page .date-cell[data-range-position="start"]::before { left:50%; }
+.owner-page .date-cell[data-range-position="end"]::before { right:50%; }
+.owner-page .date-cell[data-range-position="single"]::before { content:none; }
+.owner-page .date-cell[data-in-range="true"] .date-day { background:transparent; color:var(--ink); }
+.owner-page .date-cell[data-range-position="start"] .date-day,
+.owner-page .date-cell[data-range-position="single"] .date-day { background:var(--accent); color:#fff; font-weight:700; border:2px solid var(--accent); }
+.owner-page .date-cell[data-range-position="end"] .date-day { background:#fff; color:var(--accent); font-weight:700; border:2px solid var(--accent); }
+.owner-page .date-cell[data-preview="true"][data-range-position="end"] .date-day { border-style:dashed; }
+.owner-page .date-picker button:not(:disabled):not(.date-day):hover { background:#eee6f6; color:var(--accent); }
+.owner-page .date-hint { min-height:2.8em; margin:.7rem .2rem; font-size:.78rem; line-height:1.5; color:var(--muted); }
+.owner-page .date-picker-actions { display:flex; justify-content:flex-end; gap:.5rem; padding-top:.5rem; border-top:1px solid var(--border); }
+.owner-page .date-picker-actions button { padding:.5rem 1rem; }
+.owner-page #availability-date-apply { background:var(--accent); color:#fff; }
+.owner-page .date-picker button:disabled { background:#f5f2f7; color:#81748e; cursor:default; }
+.owner-page #availability-date-apply:disabled { background:#f1edf4; color:#716579; }
+.owner-page .availability-dates :is(button, select):focus-visible { position:relative; z-index:1; outline:3px solid var(--focus); outline-offset:1px; }
+@media (forced-colors:active) {
+	.owner-page .date-cell[data-in-range="true"]::before { border-block:1px solid Highlight; }
+	.owner-page .date-cell[data-edge="true"] .date-day { border:2px solid ButtonText; }
+}
 .owner-page #availability-date-help, .owner-page #availability-range-support { margin:.35rem 0; font-size:.8rem; }
 .owner-page #availability-date-error { border-left:3px solid var(--warn); padding:.4rem .6rem; }
 .owner-page #availability-load-scope { padding:.6rem .75rem; border:1px solid var(--border); border-radius:10px; background:#f4eef9; overflow-wrap:anywhere; }
@@ -139,6 +187,7 @@ body.owner-page { --ink:#352e49; --muted:#625a70; --paper:#fcf9f5; --card:#fff; 
 .owner-page .track-names { gap:.25rem; padding:0 .3rem; }
 .owner-page .track-names span { border:1px solid #d6c6e6; background:#fff; color:#513773; border-radius:1rem; padding:.15rem .3rem; font-size:.75rem; }
 .owner-page .week-run { border-radius:5px; }
+.owner-page .child-event, .owner-page .child-all-day { border-radius:5px; }
 .owner-page .availability-details { border-top:1px solid var(--border); padding-top:.65rem; }
 .owner-page .availability-details summary { color:var(--accent); font-weight:600; }
 .owner-page #child-status, .owner-page .source-detail { font-size:.875rem; overflow-wrap:anywhere; }

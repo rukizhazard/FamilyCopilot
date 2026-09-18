@@ -90,21 +90,19 @@
     sources.replaceChildren(); games.replaceChildren(); games.removeAttribute("aria-busy");
     $("basketball-source-details").hidden = true; $("basketball-source-details").open = false;
     $("cancel-games").hidden = true; $("team-recovery").hidden = true; button.disabled = !ready;
-    status.textContent = !ready ? "Choose valid dates below, or Reset dates. Search is blocked; no earlier week is used." : message;
+    status.textContent = !ready ? "Dates unavailable. Choose valid dates in Our week." : message;
   }
-  function syncDates(preserveInputs = false) {
+  function syncDates() {
     const selection = dates.read();
     const next = selection.window ? D.describeWeek(selection.window) : null;
     const stamp = JSON.stringify({ status: selection.status, week: next });
     if (stamp === dateStamp) return false;
     const changed = dateStamp !== undefined;
     dateStamp = stamp; week = next; ready = !!week;
-    if (!preserveInputs) { $("activity-start").value = week?.firstDate || ""; $("activity-end").value = week?.lastDate || ""; }
-    for (const id of ["activity-start", "activity-end"]) $(id).setAttribute("aria-invalid", String(!ready));
     document.querySelector(".shell-date").textContent = week?.label || "Choose dates";
     $("basketball-dates").textContent = week
-      ? `Taipei (UTC+8) · ${selection.status === "default" ? "Default dates · " : ""}Choose 1–7 days.`
-      : "Dates are invalid or storage is unavailable. No hidden fallback. Choose 1–7 inclusive days, or Reset dates.";
+      ? `${week.label} · Taipei (UTC+8)${selection.status === "default" ? " · Default dates" : ""}`
+      : "Dates unavailable. Choose valid dates in Our week.";
     roster = []; renderTeams(); sampleClear();
     clear(changed ? "Dates changed. Earlier results discarded. Choose Find activities to search these dates." : "Choose categories, then Find activities. Nothing is loaded automatically.");
     return changed;
@@ -309,7 +307,6 @@
   function resetTeams() {
     selectedTeams = []; selectedLabels.clear(); roster = []; $("team-name").value = ""; $("only-teams").checked = true; $("team-status").textContent = "";
     syncDates(); invalidate("A fresh start. Choices and results cleared, dates retained."); renderTeams();
-    $("activity-start").value = week?.firstDate || ""; $("activity-end").value = week?.lastDate || "";
   }
   function anyTeams() { selectedTeams = []; selectedLabels.clear(); $("team-status").textContent = ""; invalidate("Any team selected. Choose Find activities to search; nothing loaded automatically."); renderTeams(); }
   $("show-all-teams").addEventListener("click", () => { anyTeams(); button.focus(); });
@@ -324,15 +321,10 @@
     event.stopPropagation(); invalidate(); $("team-name").removeAttribute("aria-invalid"); $("team-status").textContent = "";
   });
   $("team-name").addEventListener("change", event => event.stopPropagation());
-  $("change-activity-dates").addEventListener("click", () => { invalidate(); $("activity-start").focus(); });
   $("edit-preferred-teams").addEventListener("click", () => {
     invalidate("Edit your preferred teams, then Find activities. No replacement was selected automatically."); $("team-name").focus();
   });
-  for (const id of ["activity-start", "activity-end"]) $(id).addEventListener("input", () => {
-    dates.write($("activity-start").value, $("activity-end").value); syncDates(true);
-  });
   $("reset").addEventListener("click", () => { resetTeams(); button.focus(); });
-  $("reset-dates").addEventListener("click", () => { dates.reset(); syncDates(); $("activity-start").focus(); });
   globalThis.ActivityDiscovery = { find, invalidate };
   globalThis.addEventListener("pagehide", resetTeams);
   globalThis.addEventListener("pageshow", event => { syncDates(); if (event.persisted) resetTeams(); });

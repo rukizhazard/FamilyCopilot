@@ -1,5 +1,64 @@
 # Activity UX refresh: isolated design preview
 
+## Read-only inherited activity dates, 18 September 2026
+
+Approved: Activity dates are fixed to the Calendar/Our week selection rather
+than another editable range. The activity page now shows a single date summary
+and a native Change dates link to same-origin Our week. Start/end inputs and
+Reset dates are removed, including the controller's write/reset handlers.
+Activity only reads the existing familycopilot.dates.v1 store. No shared date
+contract, default range, validation limit, source request or storage format is
+changed. No calendar connection or calendar data is required. Start over and
+page lifecycle resets retain dates. Returning from Calendar reads the current
+selection, discards old results and fences late responses without auto-search.
+Invalid/denied storage blocks Find and directs the parent back to Our week.
+
+Owned files: activity-preview/index.html, basketball-ui.js, basketball.css,
+serve-search.js; test/basketball-ui.test.js, test/activity-search-server.test.js,
+test/fixtures/activity-dom.js; and this document. Existing age-spacing changes
+and other chats' calendar/demo changes were preserved. Baseline worktree:
+single /home/davidtang/Projects/FamilyCopilot, branch davidtang/dev, HEAD 6dddfb9.
+
+Verification: new read-only regression failed against the old date inputs.
+`node --test test/activity-preview.test.js test/activity-preview-ui.test.js test/basketball-ui.test.js test/activity-search-server.test.js`
+passed 103/103, exit 0. `node scripts/test-activity-discovery.js`: baseline
+204/205, final 205/206; `TZ=America/Los_Angeles node scripts/test-activity-discovery.js`:
+205/206. Both final bounded runs have only the pre-existing shared calendar
+shell-zone timezone assertion failure in test/shell.test.js, left untouched.
+Tests cover inherited request dates, zero startup calls/writes, reset retention,
+invalid/denied storage, date changes during response/decode and removed DOM.
+Actual browser layout, native-link navigation and physical keyboard checks
+were not available; DOM and mocked HTTP tests are not browser approval.
+
+Integration handoff: same-origin navigation in the same browser tab reuses the
+existing dates-only store. Separate ports do NOT share it. The independent
+service removes the unavailable Calendar links and explicitly identifies its
+dates as separate; it retains its own existing selection or labelled default.
+An explicit dates-only transfer into 8030 is still an integrator-owned contract
+decision, not implemented here. Do not describe 8030 as following 8002 dates.
+The offline preview helper and its disabled public requests/CSP remain unchanged.
+The updated standalone markup transformation requires an owned-service restart;
+no restart is authorized or performed by this edit. Until restarted, its old
+transformation can leave same-origin Calendar links pointing back to itself.
+Integrated static assets require reload, not a backend contract activation.
+No process state revalidation, service operation, live query, 8002/private/Auth
+access, commit or push occurred. Historical PID/port ownership is not reverified.
+
+## Age selector arrow spacing, 18 September 2026
+
+The supplied screenshot showed Any crowded by the native dropdown arrow.
+activity-preview/preview.css replaces the fixed 62px select width with 6em,
+prevents flex shrinking and reserves 2em inline-end padding. Native select
+behavior, 44px controls and wrapping age chips remain unchanged.
+test/activity-preview.test.js asserts these spacing safeguards; its targeted
+regression failed before the CSS change. The final command
+`node --test --test-reporter=dot test/activity-preview.test.js test/activity-preview-ui.test.js`
+passed. `node scripts/test-activity-discovery.js` baseline and final: 204/205,
+with the existing shared main-card timezone assertion failure left untouched.
+No browser visual/physical-input verification was available. Scope: stylesheet,
+test and this record. Static reload only; no backend contract changes, restart,
+process operations, live queries or private/calendar access.
+
 ## Remove sport coverage hint sentence, 18 September 2026
 
 Removed only "Live coverage: TPBL basketball only; other sports are not sourced

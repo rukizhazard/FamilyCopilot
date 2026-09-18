@@ -71,14 +71,12 @@
           </div>
         </fieldset>
         <div class="discovery-dates" role="group" aria-label="Activity dates">
-          <label for="activity-start">Start date<input type="date" id="activity-start" min="2000-01-01" max="2100-12-31" aria-describedby="basketball-dates"></label>
-          <label for="activity-end">End date<input type="date" id="activity-end" min="2000-01-01" max="2100-12-31" aria-describedby="basketball-dates"></label>
-          <button type="button" class="text-button" id="reset-dates">Reset dates</button>
+          <p id="basketball-dates" aria-live="polite">Dates unavailable.</p>
+          <a id="calendar-dates-link" class="text-button" href="/">Change dates</a>
         </div>
-        <p class="hint" id="basketball-dates" aria-live="polite">Taipei (UTC+8) · Choose 1–7 days.</p>
         <details class="date-help">
           <summary>About these dates</summary>
-          <p class="hint">Only dates are remembered in this same-origin tab, also used by Our week. Start over keeps dates; Reset dates forgets them. Neither loads calendars.</p>
+          <p class="hint">Dates follow Our week in this tab. Change them there; no calendar connection is required.</p>
         </details>
         <fieldset class="party">
           <legend>Who's coming? <span class="optional" id="age-note">Ages (optional)</span></legend>
@@ -111,7 +109,7 @@
       <section id="basketball-panel" aria-labelledby="basketball-title">
         <h2 id="basketball-title" tabindex="-1" hidden>Public listings · Basketball</h2>
         <p id="basketball-status" role="status" aria-live="polite" aria-atomic="true"></p>
-        <div id="team-recovery" class="game-actions" hidden><button type="button" id="show-all-teams">Show all teams on next search</button><button type="button" id="change-activity-dates">Change dates</button><button type="button" id="edit-preferred-teams">Edit preferred teams</button></div>
+        <div id="team-recovery" class="game-actions" hidden><button type="button" id="show-all-teams">Show all teams on next search</button><a id="change-activity-dates" class="text-button" href="/">Change dates</a><button type="button" id="edit-preferred-teams">Edit preferred teams</button></div>
         <details id="basketball-source-details" hidden><summary>Sources &amp; coverage · Partial Taiwan search</summary><div id="basketball-sources"></div></details>
         <div id="basketball-games" class="cards" aria-label="Basketball listings"></div>
       </section>

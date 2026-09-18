@@ -77,7 +77,7 @@ test("pasted explanations and secondary day paging stay in closed Details with a
   assert.match(h.get("availability-saved-help").textContent, /Confirm loads.*Update refreshes parents only/);
   h.details.open = false;
   await h.fire("availability-display-next"); await h.fire("availability-display-previous");
-  assert.deepEqual(h.calls, []); assert.equal(h.storage.values.size, 0);
+  assert.deepEqual(h.calls, []); assert.equal(h.storage.values.size, 1); // Explicit dates-only fixture selection.
 });
 
 test("fresh, cached and stale success summaries are visible only after opening Details", async t => {

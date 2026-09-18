@@ -21,8 +21,9 @@ function standaloneMarkup(html) {
   return activityMarkup(html)
     .replace('<a href="/">Our week</a>', '<span aria-disabled="true" title="Calendars are not available on this independent service">Our week (separate)</span>')
     .replace('id="activity-source">Activity discovery', 'id="activity-source">Independent activity search · TPBL on demand')
-    .replace("Only dates are remembered in this same-origin tab, also used by Our week.",
-      "Dates stay in this activity tab, separate from calendar-service dates. No calendar access is needed.");
+    .replace(/<a id="(?:calendar-dates-link|change-activity-dates)" class="text-button" href="\/">Change dates<\/a>/g, "")
+    .replace("Dates follow Our week in this tab. Change them there; no calendar connection is required.",
+      "Dates stay in this activity tab, separate from calendar-service dates. This standalone service does not receive Calendar changes.");
 }
 function createActivitySearchServer({ search, now } = {}) {
   const basketball = createBasketballRoute({ search, now });

@@ -50,10 +50,31 @@
       <p id="member-demo-help" class="member-demo-help">Demo member list only · Calendars and Sync stay unchanged. <button id="member-reset" type="button" hidden>Reset members</button></p>
       <p id="member-message" class="small" role="status" hidden></p>
       <div class="availability-confirmation">
-        <div class="availability-dates" role="group" aria-label="Selected dates for Activities and initial calendar display" aria-describedby="availability-date-help">
-          <label for="availability-start">Start date<input id="availability-start" type="date" min="2000-01-01" max="2100-12-31" value="2026-10-09" required autocomplete="off"></label>
-          <label for="availability-end">End date<input id="availability-end" type="date" min="2000-01-01" max="2100-12-31" value="2026-10-11" required autocomplete="off"></label>
+        <div class="availability-dates" id="availability-date-control" role="group" aria-label="Selected dates for Activities and initial calendar display" aria-describedby="availability-date-help">
+          <button id="availability-date-toggle" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="availability-date-picker" aria-describedby="availability-date-help availability-date-error">
+            <span class="date-endpoint"><span class="sync-calendar-icon" aria-hidden="true"></span><span class="date-endpoint-text"><span class="date-endpoint-caption">Start</span><span id="availability-start-label">Choose date</span><span id="availability-start-weekday" class="date-endpoint-weekday"></span></span></span>
+            <span class="date-endpoint"><span class="sync-calendar-icon" aria-hidden="true"></span><span class="date-endpoint-text"><span class="date-endpoint-caption">End</span><span id="availability-end-label">Choose date</span><span id="availability-end-weekday" class="date-endpoint-weekday"></span></span></span>
+            <span id="availability-date-label" hidden>Choose dates</span>
+          </button>
+          <div id="availability-date-picker" class="date-picker" role="dialog" aria-labelledby="availability-date-title" aria-describedby="availability-date-hint" hidden>
+            <h2 id="availability-date-title">Choose your dates</h2>
+            <div class="date-month-navigation">
+              <button id="availability-date-previous" type="button" aria-label="Previous month">‹</button>
+              <select id="availability-date-month" aria-label="Month"></select>
+              <select id="availability-date-year" aria-label="Year"></select>
+              <button id="availability-date-next" type="button" aria-label="Next month">›</button>
+            </div>
+            <p id="availability-date-month-label" class="date-month-label" aria-live="polite"></p>
+            <div id="availability-date-grid" role="grid" aria-labelledby="availability-date-month-label" aria-multiselectable="true"></div>
+            <p id="availability-date-hint" class="date-hint" role="status">Choose a start date, then an end date. Up to 7 days.</p>
+            <div class="date-picker-actions"><button id="availability-date-cancel" type="button">Cancel</button><button id="availability-date-apply" type="button">Apply</button></div>
+          </div>
+          <div hidden>
+            <label for="availability-start">Start date<input id="availability-start" type="date" min="2000-01-01" max="2100-12-31" value="" required autocomplete="off"></label>
+            <label for="availability-end">End date<input id="availability-end" type="date" min="2000-01-01" max="2100-12-31" value="" required autocomplete="off"></label>
+          </div>
         </div>
+        <button id="availability-reset-dates" type="button" hidden>Reset dates</button>
         <p id="availability-date-error" role="status" hidden></p>
         <button id="availability-supported-dates" hidden>Choose 9–15 October 2026</button>
       </div>
@@ -71,7 +92,7 @@
         </div>
       </div>
       <div id="availability-legend" class="week-key" hidden><ul class="week-legend" aria-label="Calendar status legend">
-        <li data-status="free_or_elsewhere">No busy time*</li><li data-status="tentative">Tentative</li><li data-status="busy">Busy</li><li data-status="oof">Away</li><li data-status="unknown">Unknown</li>
+        <li data-status="free_or_elsewhere">No busy time*</li><li data-status="tentative">Tentative</li><li data-status="busy">Busy</li><li data-status="oof">Away</li>
       </ul>
       <p id="week-help" class="small">*May include working elsewhere. Opens at 6:00 AM; scroll up for earlier hours.</p></div>
       <div id="availability-grid" role="region" tabindex="0" aria-label="Weekly calendar, 9–11 October 2026, Mike and Debby, Asia/Taipei" aria-describedby="week-help" hidden></div>

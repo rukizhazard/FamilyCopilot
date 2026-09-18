@@ -1,5 +1,132 @@
 # Our week: Kimi in the shared calendar
 
+## Empty initial dates for the demo, 18 September 2026
+
+Fresh Our week now leaves both dates unselected (Choose date placeholders, no
+weekdays). Opening the picker does not select its displayed month/day. Sync and
+saved viewing remain disabled until an explicit valid range is applied. Existing
+remembered choices are preserved; use the new Reset dates action to return an
+already-used demo tab to empty. This is not the calendar Clear action: it uses
+normal range fencing and the existing dates-only invalid tombstone, hides results
+and retains completed parent/child snapshots and the remembered source. Reloading
+a reset/tombstoned selection remains empty with existing invalid-date guidance.
+No change to shared storage schema, Activities' own default, provider bounds or
+calendar refresh/consent. No automatic storage or API work on fresh startup.
+
+Offline: baseline 107/107; final 301/301 each in UTC, Asia/Taipei and Los Angeles
+for the twelve-file picker regression list below plus member-demo-ui. Loaded-week
+fixtures now explicitly seed their chosen dates; separate fresh-tab tests use no
+selection. Tests cover disabled actions, no initial highlight/write/query and
+Reset dates retaining a synthetic child snapshot while fencing the old view.
+Owned synthetic memory-only 8036 browser showed empty startup and disabled Sync;
+keyboard selection/Apply then Reset returned to empty, zero API calls, 375px no
+overflow. A focus-locator timeout was followed by direct DOM confirmation of focus
+on the date trigger. No real calendar tab/cache/provider access or shared restart.
+Static reload only; no commit/push.
+
+## Two-date display and connected range selection, 18 September 2026
+
+Clarified request: improve range selection, not collapse the two displayed dates.
+The shared calendar trigger now shows Start/End dates and weekdays side by side.
+Selected ranges have a continuous lavender band across cells/week rows, solid
+round start and outlined round end. The previous white day-button background
+masked the cell highlight; day buttons now stay transparent over the band.
+Single-day selection has one circle and no protruding band.
+
+After choosing a start, pointer hover or keyboard movement previews a valid
+1–7-day range; the preview endpoint is dashed and the hint says Select to finish.
+Preview does not commit the draft, aria-selection, storage or any request. A
+second selection sets the end; Apply still commits both dates atomically through
+the existing handler. Cancel and pointer leave restore the appropriate draft
+view. Source, cache, provider bounds, Activities schema and Sync are unchanged.
+
+Verification: 103/103 focused baseline; the same twelve-file regression command
+documented below now passes 295/295 each in UTC, Asia/Taipei and Los Angeles.
+New tests cover side-by-side labels/weekdays, cross-week and reverse range bands,
+single-day selection, bounded pointer/keyboard preview and transparent buttons.
+Owned synthetic memory-only preview used 8036 because 8035 was occupied (untouched).
+Actual keyboard selection/preview/Apply passed; computed browser styles confirmed
+full-width middle bands, half-width endpoint bands, transparent middle buttons,
+round endpoints and six selected dates across a week boundary. At 1500px/375px,
+no page overflow; both date fields and picker fit mobile, with no API calls during
+the checks. Real-pointer automation timed out waiting for stability; pointer
+handlers were tested offline, not claimed as physical-pointer browser proof.
+Preview stopped and 8036 independently confirmed empty; diagnostics and final
+whitespace review passed. Static reload only. No real tabs, provider/private-cache
+access, shared restart or commit/push.
+
+## Single-calendar date range picker, 18 September 2026
+
+Replaced the two visible date inputs with one range button and one month calendar.
+Choose two dates (either order), then Apply; the same date twice selects one day.
+Month/year selectors, previous/next month, arrow keys, Home/End, PageUp/PageDown
+(Shift for years), Escape and normal Tab navigation are supported. Selected days
+have accessible selection state and endpoint labels/borders, not color alone.
+Cancel, outside click and focus leaving discard only the page-local draft.
+
+Apply assigns both existing backing inputs together and calls the existing date
+handler once. The 1–7 inclusive-day rule, 2000–2100 bounds, remembered dates-only
+schema and Activities consumers are unchanged. UTC is used only for civil-date
+arithmetic, not to change Taipei provider bounds. Dates within October 9–15 keep
+the full approved query scope; other scopes still fence pending results and retain
+completed snapshots. No automatic Sync, source enrollment, provider call or new
+persistence. No backend, shared-date module, Activities or child-controller edit.
+
+Baseline: 190/190 focused tests. Final: 292/292 in each of UTC, Asia/Taipei and
+America/Los_Angeles using `node --test` on `date-range-picker`, `availability-ui`,
+`date-selection`, `our-week`, `week-display`, `child-sync-ui`, `week-polish-ui`,
+`owner-presentation`, `quiet-week-ui`, `basketball-ui`, `activity-preview-ui` and
+`school-calendar-ui` under `test/` (each `.test.js`). New picker regressions cover
+atomic Apply, cancel, invalid memory, reverse/same-day/7-day ranges, leap/year
+boundaries, 2000/2100 limits, keyboard and late-response fencing/cache preservation.
+Editor diagnostics and whitespace checks passed; pre-existing concurrent edits
+were preserved. No full-suite rerun or commit/push.
+
+Owned memory-only synthetic preview on 8035 (public searches disabled): actual
+keyboard Enter/arrows/Tab/Apply/Escape/PageDown and restored dates after reload
+passed; zero API calls during those checks. Measured 1500px/375px layouts had no
+horizontal overflow and the picker fit the mobile width. Browser screenshot and
+pointer tooling was unreliable (stability timeouts/stale image), so complete visual
+and real-pointer acceptance is not claimed. Preview stopped; final page-close
+could not be confirmed. Shared 8002 and real calendar tabs remained untouched.
+Static reload only; no restart, live-calendar validation or new approval needed.
+
+## Missing remembered source repaired again, 18 September 2026
+
+User reported missing Kimi, then explicitly identified the visible message
+`Kimi is not connected.` The UI emits this for `source_missing`, not CSS hiding.
+Local metadata was idle/workflow_disabled, live/disk, all protocol markers true,
+safeIdle true; 55 focused UI tests passed. This did not inspect private storage
+or establish why the reference disappeared. Clear and safety invalidation can
+remove it, but neither is established as the cause of this occurrence.
+
+User reaffirmed the request to connect Kimi and permission to cache it; interpreted
+as authorization for this repair of the same source/disclosure/date scope, not
+permission for background or unbounded retries. After 8/8 operator-helper tests,
+ran `node scripts/enroll-kimi-once.js --approved-enroll-once` once: unique exact
+Kimi label among five returned sources (list partial), imported six projected
+events, result partial false, sourceRemembered/localIdle/disabledVerified/success
+all true. No parent query, explicit Clear, private file read, restart or deployment.
+Only safe counts/status output. Independent native cleanup passed. This repair
+is complete; the deletion cause remains unverified, so recurrence is not claimed
+fixed. No additional refresh was run merely to prove persistence. No commit/push.
+
+## Compact legend, 18 September 2026
+
+Removed the Unknown legend chip as requested. This only changes the legend;
+unknown parent results and unloaded/failed child context retain their existing
+indicators. Loaded child gaps remain white, never verified free time. No provider,
+storage or lifecycle changes; static reload only.
+
+## Matching event corners, 18 September 2026
+
+Kimi timed/all-day blocks now share the parents' 5px corner radius. Previously
+the theme only rounded `.week-run`. CSS-only correction with style assertions;
+131/131 availability/presentation/child-week tests passed, diagnostics clean.
+No timing, overlap, status, focus or provider changes; no live operations or
+restart. No new browser review for this one-property styling fix. Reload static
+assets to apply.
+
 ## White loaded-event gaps, 18 September 2026
 
 Requested presentation-only change: loaded Kimi tracks use white gaps without
