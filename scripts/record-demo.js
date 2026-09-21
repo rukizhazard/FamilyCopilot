@@ -262,4 +262,416 @@ async function main() {
   }
 }
 
-main().catch(error => { console.error(`Demo stopped: ${error.message}`); process.exitCode = 1; });
+const chatStory = [
+  "A little time together starts with the things your family enjoys.",
+  "What could we do together in October? Let's explore a few ideas.",
+  "The family calendar appears in the conversation, alongside the planning journey.",
+  "A basketball game or a movie? Two ideas to explore, with details still worth checking.",
+  "October feels too far away. How about this weekend?",
+  "A closer movie option, ready to consider. You decide what happens next."
+];
+
+function captureOptions(args) {
+  assert.equal(args[0], "--chat-preview");
+  if (args.length === 1) return {};
+  assert(args.length >= 5 && args.length <= 9, "Use --chat-preview --snapshot <file> --sha256 <reviewed manifest hash> [--review-frame|--review-scenes] [--simulate-loading] [--simulate-calendar] [--viewport=1440x900]");
+  const flags = args.slice(5);
+  assert(flags.every(flag => ["--review-frame", "--review-scenes", "--simulate-loading", "--simulate-calendar", "--viewport=1440x900"].includes(flag)));
+  assert(!flags.includes("--simulate-calendar") || flags.includes("--simulate-loading"));
+  assert.equal(new Set(flags).size, flags.length);
+  assert(!(flags.includes("--review-frame") && flags.includes("--review-scenes")));
+  assert.equal(args[1], "--snapshot"); assert.equal(args[3], "--sha256");
+  assert.match(args[4], /^[a-f0-9]{64}$/, "Invalid reviewed snapshot hash");
+  return { snapshot: path.resolve(args[2]), snapshotSha256: args[4], reviewFrame: flags.includes("--review-frame"),
+    reviewScenes: flags.includes("--review-scenes"), simulateLoading: flags.includes("--simulate-loading"), simulateCalendar: flags.includes("--simulate-calendar"),
+    tallViewport: flags.includes("--viewport=1440x900") };
+}
+
+function captureLayout(options) {
+  return options.tallViewport
+    ? { viewport: { width: 1440, height: 900 }, width: 1440, height: 1020, filter: "pad=1440:1020:0:0:color=0x25291f" }
+    : { viewport: { width: 1280, height: 640 }, width: 1920, height: 1080, filter: "scale=1920:960,pad=1920:1080:0:0:color=0x25291f" };
+}
+
+function installDemoResponseDelay({ calendarPhases = false } = {}) {
+  let activities;
+  const wrapped = new Set();
+  window.demoTiming = { delayMs: 2000, calls: 0, completed: 0 };
+  if (calendarPhases) {
+    let calendar;
+    window.demoTiming.calendarCalls = 0;
+    Object.defineProperty(window, "FamilyChatCalendar", { configurable: true, get: () => calendar, set(value) {
+      calendar = { ...value, mountCalendar(...args) {
+        const controller = value.mountCalendar(...args);
+        return { ...controller,
+          async loadSynthetic(...parameters) {
+            window.demoTiming.calendarCalls++;
+            await new Promise(resolve => window.setTimeout(resolve, 2000));
+            return controller.loadSynthetic(...parameters);
+          }
+        };
+      } };
+    } });
+  }
+  Object.defineProperty(window, "FamilyChatActivities", { configurable: true, get: () => activities, set(value) {
+    activities = value;
+    if (value.searchActivities && !wrapped.has(value.searchActivities)) {
+      const searchActivities = async (request, options) => {
+        window.demoTiming.calls++;
+        await new Promise(resolve => window.setTimeout(resolve, 2000));
+        const result = await value.searchActivities(request, options);
+        window.demoTiming.completed++;
+        return result;
+      };
+      wrapped.add(searchActivities);
+      activities = { ...value, searchActivities };
+    }
+  } });
+}
+async function smoothSceneScroll(element) {
+  const view = element.ownerDocument.defaultView;
+  const started = view.performance.now();
+  let previous = view.scrollY, stableFrames = 0;
+  element.scrollIntoView({ block: "start", behavior: "smooth" });
+  await new Promise((resolve, reject) => {
+    const check = () => {
+      const elapsed = view.performance.now() - started;
+      stableFrames = Math.abs(view.scrollY - previous) < 0.5 ? stableFrames + 1 : 0;
+      previous = view.scrollY;
+      if (elapsed >= 200 && stableFrames >= 4) return resolve();
+      if (elapsed >= 4000) return reject(new Error("Demo scroll did not settle"));
+      view.requestAnimationFrame(check);
+    };
+    view.requestAnimationFrame(check);
+  });
+}
+async function sceneAction(page, action) {
+  const locator = page.locator(action.selector);
+  if (["click", "press", "type"].includes(action.kind) && locator.evaluate) {
+    const visible = await locator.evaluate(element => {
+      const bounds = element.getBoundingClientRect();
+      const composer = document.querySelector("#chat-composer");
+      const bottom = composer && getComputedStyle(composer).position === "fixed" && !composer.contains(element) ? composer.getBoundingClientRect().top : innerHeight;
+      return bounds.top >= 0 && bounds.bottom <= bottom;
+    });
+    if (!visible) await locator.evaluate(smoothSceneScroll);
+  }
+  if (action.kind === "type") await locator.pressSequentially(action.text, { delay: 65 });
+  else if (action.kind === "click") await locator.click();
+  else if (action.kind === "press") {
+    assert(["Enter", "Space", "Escape"].includes(action.key), "Unapproved key");
+    await locator.press(action.key);
+  }
+  else if (action.kind === "checked") assert.equal(await locator.isChecked(), action.value);
+  else if (action.kind === "visible") await locator.waitFor({ state: action.value ? "visible" : "hidden" });
+  else if (action.kind === "scroll") await locator.evaluate(smoothSceneScroll);
+  else if (action.kind === "count") await page.waitForFunction(({ selector, value }) => document.querySelectorAll(selector).length === value, action);
+  else if (action.kind === "text") await page.waitForFunction(({ selector, text }) => document.querySelector(selector)?.textContent.includes(text), action);
+  else if (action.kind === "value") assert.equal(await locator.inputValue(), action.text);
+  else if (action.kind === "images") {
+    const images = await locator.evaluateAll(elements => elements.map(image => image.complete && image.naturalWidth > 0));
+    assert(images.length > 0 && images.every(Boolean), "Activity illustrations loaded");
+  } else throw Error("Unknown scene action");
+}
+
+async function simulatedSearchStarted(page, beforeCalls) {
+  await page.waitForFunction(previous => window.demoTiming.calls > previous || document.querySelector("#chat-page").dataset.processing !== "true", beforeCalls);
+  return await page.evaluate(() => window.demoTiming.calls) > beforeCalls;
+}
+
+async function chatPreview(options) {
+  const { loadSnapshot, collectAssets, digest } = require("./demo-snapshot");
+  const snapshot = options.snapshot ? loadSnapshot(options.snapshot, options.snapshotSha256) : null;
+  const scenario = snapshot?.manifest.scenario;
+  const tools = process.env.FAMILYCOPILOT_DEMO_TOOLS;
+  assert(tools && path.isAbsolute(tools), "Set FAMILYCOPILOT_DEMO_TOOLS.");
+  const { chromium } = require(path.join(tools, "node_modules/playwright"));
+  const ffmpeg = require(path.join(tools, "node_modules/ffmpeg-static"));
+  const crypto = require("node:crypto");
+  const origin = "http://familycopilot.localhost";
+  const assets = snapshot?.assets || new Map([...collectAssets(root, [
+    "activity-preview/chat-assets/basketball-synthetic.svg", "activity-preview/chat-assets/movie-synthetic.svg"
+  ])].map(([name, bytes]) => [`/${name}`, bytes]));
+  const hashes = Object.fromEntries([...assets].map(([name, bytes]) => [name, digest(bytes)]));
+  const layout = captureLayout(options);
+  const reviewOnly = options.reviewFrame || options.reviewScenes;
+  const output = await fs.mkdtemp(path.join(root, reviewOnly ? "browser-artifacts/demo/chat-review-" : "browser-artifacts/demo/chat-preview-"));
+  const failures = [], timeline = [];
+  const browser = await chromium.launch({ headless: true });
+  let context;
+  try {
+    context = await browser.newContext({ viewport: layout.viewport, deviceScaleFactor: 1,
+      locale: "en-US", timezoneId: "Asia/Taipei", serviceWorkers: "block",
+      ...(reviewOnly ? {} : { recordVideo: { dir: output, size: layout.viewport } }) });
+    await context.route("**/*", async route => {
+      const url = new URL(route.request().url());
+      if (url.origin !== origin || url.search || !assets.has(url.pathname) || route.request().method() !== "GET") {
+        failures.push("unexpected_request"); await route.abort(); return;
+      }
+      const mime = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml",
+        ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".woff2": "font/woff2" };
+      await route.fulfill({ body: assets.get(url.pathname), contentType: mime[path.extname(url.pathname)] });
+    });
+    await context.addInitScript(() => {
+      window.demoViolations = [];
+      window.demoScrollTrace = [];
+      document.addEventListener("scroll", () => {
+        if (window.demoScrollTrace.length < 3000) window.demoScrollTrace.push({ at: Date.now(), y: scrollY });
+      });
+      const deny = () => { window.demoViolations.push("forbidden_io"); throw Error("forbidden_io"); };
+      for (const name of ["fetch", "XMLHttpRequest", "WebSocket", "localStorage", "sessionStorage", "indexedDB", "caches"]) {
+        Object.defineProperty(window, name, { configurable: true, get: deny });
+      }
+    });
+    if (options.simulateLoading) await context.addInitScript(installDemoResponseDelay, { calendarPhases: Boolean(options.simulateCalendar) });
+    const page = await context.newPage();
+    page.setDefaultTimeout(10000);
+    page.on("pageerror", error => failures.push(error.message));
+    const video = page.video(), started = Date.now();
+    await page.goto(`${origin}/chat/index.html`);
+    await page.locator("#chat-input").waitFor({ state: "visible" });
+    assert(await page.evaluate(() => isSecureContext && typeof crypto.randomUUID === "function"));
+    await page.evaluate(() => document.fonts.ready);
+    await page.waitForTimeout(900);
+    if (options.reviewFrame) {
+      const session = await context.newCDPSession(page);
+      await session.send("DOM.enable");
+      await session.send("CSS.enable");
+      const { root: documentNode } = await session.send("DOM.getDocument");
+      const { nodeId } = await session.send("DOM.querySelector", { nodeId: documentNode.nodeId, selector: "#preference-teams-summary" });
+      const { fonts } = await session.send("CSS.getPlatformFontsForNode", { nodeId });
+      await page.screenshot({ path: path.join(output, "font-review.png") });
+      assert.deepEqual(await page.evaluate(() => window.demoViolations), []);
+      assert.deepEqual(failures, []);
+      loadSnapshot(options.snapshot, options.snapshotSha256);
+      const report = { output, snapshotSha256: options.snapshotSha256, fonts, forbiddenRequests: failures.length,
+        recording: false, sharedServicesTouched: false, humanVisualReview: "pending" };
+      await fs.writeFile(path.join(output, "review.json"), JSON.stringify(report, null, 2) + "\n", { flag: "wx" });
+      console.log(JSON.stringify(report));
+      return;
+    }
+    const scene = async (index, action, hold = 5500) => {
+      const start = (Date.now() - started) / 1000;
+      await action();
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+      await page.screenshot({ path: path.join(output, `scene-${index + 1}.png`) });
+      if (!options.reviewScenes) await page.waitForTimeout(hold);
+      timeline.push({ text: scenario ? scenario.scenes[index].text : chatStory[index], start, end: (Date.now() - started) / 1000 });
+    };
+    if (scenario) {
+      for (const [index, shot] of scenario.scenes.entries()) {
+        await scene(index, async () => {
+          for (const action of shot.actions) {
+            const submission = options.simulateLoading && action.kind === "press" && action.selector === "#chat-input" && action.key === "Enter";
+            const beforeCalls = submission ? await page.evaluate(() => window.demoTiming.calls) : null;
+            await sceneAction(page, action);
+            if (submission && options.simulateCalendar) {
+              const seen = new Set();
+              const processingStarted = Date.now();
+              while (await page.locator("#chat-page").getAttribute("data-processing") === "true") {
+                assert(Date.now() - processingStarted < 12000, "Capture-only processing did not settle");
+                const status = page.locator("#chat-status"), text = await status.innerText();
+                if (await page.locator("#chat-page").getAttribute("data-processing") !== "true" || !await status.isVisible()) break;
+                if (!seen.has(text)) {
+                  seen.add(text);
+                  const bounds = await status.boundingBox();
+                  if (!bounds && await page.locator("#chat-page").getAttribute("data-processing") !== "true") break;
+                  assert(bounds && bounds.y >= 0 && bounds.y + bounds.height <= layout.viewport.height);
+                  await page.screenshot({ path: path.join(output, `processing-${index + 1}-${seen.size}.png`) });
+                }
+                await page.waitForTimeout(100);
+              }
+            } else if (submission && await simulatedSearchStarted(page, beforeCalls)) {
+              await page.waitForFunction(() => document.querySelector("#chat-page").dataset.processing === "true");
+              await page.waitForTimeout(350);
+              const status = page.locator("#chat-status");
+              assert.match(await status.innerText(), /Loading|Searching|Finding/);
+              const bounds = await status.boundingBox();
+              assert(bounds && bounds.y >= 0 && bounds.y + bounds.height <= layout.viewport.height, "UI processing status must stay in view");
+              await page.screenshot({ path: path.join(output, `processing-${index + 1}.png`) });
+              await page.waitForFunction(() => document.querySelector("#chat-page").dataset.processing === "false");
+            }
+          }
+        }, shot.holdMs);
+      }
+    } else {
+    await scene(0, async () => {});
+    await scene(1, async () => {
+      await page.locator("#chat-input").pressSequentially("What could we do together in October?", { delay: 65 });
+    }, 1600);
+    await scene(2, async () => {
+      await page.locator("#chat-send").click();
+      await page.waitForFunction(() => document.querySelectorAll("#activity-results article").length === 2);
+      assert.match(await page.locator("#chat-calendar-status").textContent(), /Mike: Loaded/);
+      await page.locator("#calendar-conversation").scrollIntoViewIfNeeded();
+    });
+    await scene(3, async () => {
+      await page.locator("#activity-results").evaluate(element => element.scrollIntoView({ block: "start", behavior: "instant" }));
+      const images = await page.locator("#activity-results img").evaluateAll(elements => elements.map(image => image.complete && image.naturalWidth > 0));
+      assert(images.length > 0 && images.every(Boolean), "Activity illustrations loaded");
+    }, 6500);
+    await scene(4, async () => {
+      await page.locator("#chat-input").pressSequentially("October feels too far away. How about this weekend?", { delay: 65 });
+    }, 1500);
+    await scene(5, async () => {
+      await page.locator("#chat-send").click();
+      await page.waitForFunction(() => document.querySelectorAll("#activity-results article").length === 1);
+      await page.locator("#activity-results article").scrollIntoViewIfNeeded();
+      assert.match(await page.locator("#activity-results").textContent(), /Skybound/);
+      assert.match(await page.locator("#chat-messages").textContent(), /2026-09-19/);
+      assert.equal(await page.locator("#availability-start").inputValue(), "2026-10-09");
+    }, 7000);
+    }
+    assert.deepEqual(await page.evaluate(() => window.demoViolations), []);
+    assert.deepEqual(failures, []);
+    const timing = options.simulateLoading ? await page.evaluate(() => window.demoTiming) : null;
+    if (timing) {
+      assert.equal(timing.calls, 2); assert.equal(timing.completed, 2); assert.equal(timing.delayMs, 2000);
+      if (options.simulateCalendar) assert.equal(timing.calendarCalls, 2);
+    }
+    const scrollTrace = (await page.evaluate(() => window.demoScrollTrace)).map(sample => ({ time: (sample.at - started) / 1000, y: sample.y }));
+    await fs.writeFile(path.join(output, "scroll-trace.json"), JSON.stringify(scrollTrace, null, 2) + "\n", { flag: "wx" });
+    if (options.reviewScenes) {
+      loadSnapshot(options.snapshot, options.snapshotSha256);
+      const report = { output, snapshotSha256: options.snapshotSha256, viewport: layout.viewport, scenes: timeline.length,
+        forbiddenRequests: 0, browserErrors: 0, recording: false, simulatedResponseTiming: timing, humanVisualReview: "pending" };
+      await fs.writeFile(path.join(output, "review.json"), JSON.stringify(report, null, 2) + "\n", { flag: "wx" });
+      console.log(JSON.stringify(report));
+      return;
+    }
+    await context.close(); context = null;
+    const raw = await video.path(), duration = Math.ceil(timeline.at(-1).end * 25) / 25;
+    const srt = timeline.map((scene, index) => `${index + 1}\n${timestamp(scene.start)} --> ${timestamp(scene.end)}\n${scene.text}\n`).join("\n");
+    await fs.writeFile(path.join(output, "familycopilot-chat.en.srt"), srt, { flag: "wx" });
+    const assTime = seconds => timestamp(seconds, ".").replace(/^0/, "").slice(0, -1);
+    const header = "[Script Info]\nScriptType: v4.00+\nPlayResX: 1920\nPlayResY: 1080\n[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Caption,DejaVu Sans,30,&H00FFFFFF,&H00FFFFFF,&H001F2925,&H001F2925,0,0,0,0,100,100,0,0,1,0,0,2,100,100,40,1\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n";
+    const captionHeader = header.replace("PlayResX: 1920", `PlayResX: ${layout.width}`).replace("PlayResY: 1080", `PlayResY: ${layout.height}`);
+    await fs.writeFile(path.join(output, "captions.ass"), captionHeader + timeline.map(scene =>
+      `Dialogue: 0,${assTime(scene.start)},${assTime(scene.end)},Caption,,0,0,0,,${scene.text}\n`).join(""), { flag: "wx" });
+    command(ffmpeg, ["-nostdin", "-hide_banner", "-loglevel", "error", "-n", "-i", raw, "-vf",
+      `tpad=stop_mode=clone:stop_duration=${duration},${layout.filter},ass=captions.ass`, "-t", duration.toFixed(3),
+      "-r", "25", "-c:v", "libx264", "-preset", "fast", "-crf", "20", "-pix_fmt", "yuv420p", "-an",
+      "-movflags", "+faststart", "familycopilot-chat-preview.mp4"], { cwd: output, timeout: 240000 });
+    command(ffmpeg, ["-nostdin", "-hide_banner", "-loglevel", "error", "-i", "familycopilot-chat-preview.mp4", "-f", "null", "-"], { cwd: output });
+    command(ffmpeg, ["-nostdin", "-hide_banner", "-loglevel", "error", "-n", "-ss", String(Math.max(0, duration - 2)),
+      "-i", "familycopilot-chat-preview.mp4", "-frames:v", "1", "final-frame.png"], { cwd: output });
+    if (snapshot) loadSnapshot(options.snapshot, snapshot.manifestSha256);
+    const manifest = { output, durationSeconds: duration, width: layout.width, height: layout.height, viewport: layout.viewport, timeline, sourceHashes: hashes,
+      snapshot: snapshot ? { path: options.snapshot, sha256: snapshot.manifestSha256, scenario } : null,
+      rawFile: path.basename(raw), rawSha256: crypto.createHash("sha256").update(await fs.readFile(raw)).digest("hex"),
+      videoSha256: crypto.createHash("sha256").update(await fs.readFile(path.join(output, "familycopilot-chat-preview.mp4"))).digest("hex"),
+      syntheticOnly: true, forbiddenRequests: failures.length, browserErrors: 0, fullDecodePassed: true,
+      narration: "none: captioned review cut; English Jenny narration pending approval", liveServicesTouched: false,
+      calendarFit: "not_checked", realTeamIncluded: snapshot ? null : false,
+      activityEvidence: scenario?.activityEvidence || "synthetic", simulatedResponseTiming: timing,
+      continuousCapture: true, sceneScrolling: "native smooth", scrollTrace: "scroll-trace.json", humanReview: "pending" };
+    await fs.writeFile(path.join(output, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n", { flag: "wx" });
+    console.log(JSON.stringify({ output, durationSeconds: duration, fullDecodePassed: true }));
+  } finally {
+    if (context) await context.close();
+    await browser.close();
+  }
+}
+
+const movieSourceUrl = "https://www.vscinemas.com.tw/vsweb/film/detail.aspx?id=8786";
+function allowedMovieRequest(url, method, type) {
+  if (method !== "GET" || url.protocol !== "https:") return false;
+  if (type === "document") return url.href === movieSourceUrl;
+  return ["script", "stylesheet", "image", "font"].includes(type) &&
+    ["www.vscinemas.com.tw", "www.unicornpopcorn.com.tw", "ajax.googleapis.com", "cdnjs.cloudflare.com", "fonts.googleapis.com", "fonts.gstatic.com"].includes(url.hostname);
+}
+async function recordMovieSource(options) {
+  const { loadSnapshot, digest } = require("./demo-snapshot");
+  const snapshot = loadSnapshot(options.snapshot, options.snapshotSha256);
+  assert.equal(snapshot.manifest.scenario.scenes[4].text, "This movie could be a fun weekend option.");
+  const tools = process.env.FAMILYCOPILOT_DEMO_TOOLS; assert(tools && path.isAbsolute(tools));
+  const { chromium } = require(path.join(tools, "node_modules/playwright"));
+  const ffmpeg = require(path.join(tools, "node_modules/ffmpeg-static"));
+  const output = await fs.mkdtemp(path.join(root, "browser-artifacts/demo/movie-source-"));
+  const save = (name, value) => fs.writeFile(path.join(output, name), JSON.stringify(value, null, 2) + "\n", { flag: "wx", mode: 0o600 });
+  await save("attempt.json", { target: movieSourceUrl, approval: "Owner requested clicking the real Chiikawa link for v2 video", maximumDocumentRequests: 1, automaticRetries: 0, snapshotSha256: options.snapshotSha256 });
+  const browser = await chromium.launch({ headless: true });
+  let context, publicEnabled = false, documentRequests = 0, officialStarted = 0;
+  const allowed = [], blocked = [], errors = [];
+  try {
+    context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1,
+      locale: "en-US", timezoneId: "Asia/Taipei", serviceWorkers: "block",
+      recordVideo: { dir: output, size: { width: 1440, height: 900 } } });
+    await context.route("**/*", async route => {
+      const request = route.request(), url = new URL(request.url());
+      if (url.origin === "http://familycopilot.localhost" && !url.search && request.method() === "GET" && snapshot.assets.has(url.pathname)) {
+        const mime = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".woff2": "font/woff2" };
+        return route.fulfill({ body: snapshot.assets.get(url.pathname), contentType: mime[path.extname(url.pathname)] });
+      }
+      if (publicEnabled && allowedMovieRequest(url, request.method(), request.resourceType()) && allowed.length < 120) {
+        if (request.resourceType() === "document" && ++documentRequests > 1) { blocked.push("extra_document"); return route.abort(); }
+        allowed.push({ url: url.href, type: request.resourceType() }); return route.continue();
+      }
+      blocked.push({ url: url.origin + url.pathname, type: request.resourceType(), method: request.method() }); return route.abort();
+    });
+    await context.addInitScript(() => {
+      if (location.hostname !== "familycopilot.localhost") return;
+      const deny = () => { throw Error("Synthetic application forbids external IO"); };
+      for (const name of ["fetch", "XMLHttpRequest", "WebSocket", "localStorage", "sessionStorage", "indexedDB", "caches"]) {
+        Object.defineProperty(window, name, { configurable: true, get: deny });
+      }
+      document.addEventListener("DOMContentLoaded", () => {
+        const cursor = document.createElement("div");
+        cursor.style.cssText = "position:fixed;z-index:2147483646;width:18px;height:18px;border:2px solid #355e50;background:#ffffff80;border-radius:50%;pointer-events:none;left:-40px;top:-40px;transform:translate(-50%,-50%)";
+        document.body.append(cursor);
+        document.addEventListener("mousemove", event => { cursor.style.left = `${event.clientX}px`; cursor.style.top = `${event.clientY}px`; });
+      });
+    });
+    const page = await context.newPage(), appVideo = page.video(), appStarted = Date.now();
+    page.setDefaultTimeout(10000); page.on("pageerror", error => errors.push(error.message));
+    await page.goto("http://familycopilot.localhost/chat/index.html");
+    await page.evaluate(() => document.fonts.ready);
+    for (const scene of snapshot.manifest.scenario.scenes.slice(0, 5)) for (const action of scene.actions) await sceneAction(page, action);
+    assert.deepEqual(errors, []); assert.equal(blocked.length, 0);
+    const link = page.locator(`#activity-results a[href="${movieSourceUrl}"]`).first();
+    assert.equal(await link.getAttribute("rel"), "noopener noreferrer");
+    await link.scrollIntoViewIfNeeded();
+    const bounds = await link.boundingBox(); assert(bounds);
+    await page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2, { steps: 14 });
+    await page.waitForTimeout(700);
+    await page.screenshot({ path: path.join(output, "link-before-click.png") });
+    publicEnabled = true;
+    const popup = context.waitForEvent("page");
+    const clickAt = (Date.now() - appStarted) / 1000;
+    await link.click();
+    const official = await popup, officialVideo = official.video(); officialStarted = Date.now();
+    await official.waitForLoadState("domcontentloaded", { timeout: 45000 });
+    assert.equal(official.url(), movieSourceUrl);
+    await official.locator("h2").filter({ hasText: "CHIIKAWA THE MOVIE THE SECRET OF THE MERMAID ISLAND" }).waitFor({ state: "visible", timeout: 10000 });
+    await official.waitForFunction(() => [...document.images].some(image => image.src.includes("film_20260604010.jpg") && image.complete && image.naturalWidth > 0), null, { timeout: 10000 });
+    await official.locator("h1").first().scrollIntoViewIfNeeded();
+    await official.evaluate(() => document.fonts.ready);
+    await official.screenshot({ path: path.join(output, "official-page.png") });
+    const officialReady = (Date.now() - officialStarted) / 1000;
+    await official.waitForTimeout(5000);
+    assert.equal(documentRequests, 1); assert.deepEqual(errors, []);
+    loadSnapshot(options.snapshot, options.snapshotSha256);
+    await context.close(); context = null;
+    const appRaw = await appVideo.path(), officialRaw = await officialVideo.path();
+    const filter = `[0:v]trim=start=${clickAt - .6}:end=${clickAt + .2},setpts=PTS-STARTPTS,fps=25,settb=AVTB[click];[1:v]trim=start=${officialReady + .4}:end=${officialReady + 4.2},setpts=PTS-STARTPTS,fps=25,settb=AVTB[official];[click][official]concat=n=2:v=1:a=0,pad=1440:1020:0:0:color=0x25291f[video]`;
+    command(ffmpeg, ["-nostdin", "-hide_banner", "-loglevel", "error", "-n", "-i", appRaw, "-i", officialRaw,
+      "-filter_complex", filter, "-map", "[video]", "-an", "-t", "4.6", "-r", "25", "-c:v", "libx264", "-preset", "fast", "-crf", "20", "-pix_fmt", "yuv420p", "-movflags", "+faststart", "familycopilot-movie-source.mp4"], { cwd: output });
+    command(ffmpeg, ["-nostdin", "-hide_banner", "-loglevel", "error", "-i", "familycopilot-movie-source.mp4", "-f", "null", "-"], { cwd: output });
+    const manifest = { version: 1, kind: "familycopilot.demo.public-movie-source", videoFile: "familycopilot-movie-source.mp4",
+      videoSha256: digest(await fs.readFile(path.join(output, "familycopilot-movie-source.mp4"))), durationSeconds: 4.6, width: 1440, height: 1020,
+      clickedHref: movieSourceUrl, officialUrl: movieSourceUrl, documentRequests, allowed, blocked, fullDecodePassed: true,
+      raw: [{ file: path.basename(appRaw), sha256: digest(await fs.readFile(appRaw)) }, { file: path.basename(officialRaw), sha256: digest(await fs.readFile(officialRaw)) }],
+      clickAt, officialReady, snapshot: { path: options.snapshot, sha256: options.snapshotSha256 }, browserErrors: errors,
+      bookingActions: 0, privateCalendarReads: 0, sharedServicesTouched: false, capturedAt: new Date().toISOString(),
+      limitations: ["Live public movie details only. No screening, availability, ticket purchase or booking verified.", "One real link click; loading trimmed between separate app and official-page videos.", "Third-party tracking, frames and non-GET calls blocked. No shared browser or prior login state."], visualReview: "pending" };
+    await save("manifest.json", manifest); console.log(JSON.stringify({ output, documentRequests, allowed: allowed.length, blocked: blocked.length, fullDecodePassed: true }));
+  } catch (error) {
+    await save("failure.json", { message: error.message, documentRequests, allowed, blocked, automaticRetry: false }); throw error;
+  } finally { if (context) await context.close(); await browser.close(); }
+}
+module.exports = { chatStory, timestamp, subtitleChunks, captureOptions, captureLayout, sceneAction, smoothSceneScroll, installDemoResponseDelay, simulatedSearchStarted, allowedMovieRequest };
+if (require.main === module) {
+  Promise.resolve().then(() => process.argv[2] === "--movie-source-approved" ? recordMovieSource(captureOptions(["--chat-preview", ...process.argv.slice(3)])) : process.argv.includes("--chat-preview") ? chatPreview(captureOptions(process.argv.slice(2))) : main()).catch(error => {
+    console.error(`Demo stopped: ${error.message}`); process.exitCode = 1;
+  });
+}

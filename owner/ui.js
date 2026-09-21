@@ -1,5 +1,6 @@
 "use strict";
 (() => {
+  if (document.getElementById("calendar-host")) return;
   const { initial, validList, transition } = globalThis.OwnerCalendar;
   const $ = id => document.getElementById(id);
   const csrf = document.querySelector('meta[name="owner-csrf"]').content;

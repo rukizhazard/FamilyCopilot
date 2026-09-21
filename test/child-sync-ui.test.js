@@ -88,6 +88,9 @@ test("common Sync sends exact child false then parent false, child true then par
     if (path === "/api/availability" && parentDelayed) return parentWait.promise;
   } });
   const done = h.fire("availability-load"); await settle();
+  assert.equal(h.get("child-status").textContent, "");
+  assert.equal(h.visible("child-status"), false);
+  assert.equal(h.get("availability-sync-label").textContent, "Syncing…");
   assert.deepEqual(paths(h), ["/api/child/sync"]);
   for (const id of ["availability-load", "availability-refresh", "availability-saved"]) { assert.equal(h.get(id).disabled, true); await h.fire(id); }
   assert.equal(await h.childActions().sync(true), "cancel");

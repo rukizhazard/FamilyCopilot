@@ -1,5 +1,195 @@
 # Our week: Kimi in the shared calendar
 
+## Chat Calendar month overview, 18 September 2026
+
+The conversation Calendar now opens as a month overview, not the October 9-11
+time grid. Its 42 civil-date cells show at most one marker per loaded source per
+day, derived from parent busy/tentative/out-of-office runs or noncancelled child
+events. Empty/unloaded dates do not invent markers or establish free time.
+Month cells contain source labels, never event titles or times. An explicit day
+selection opens the existing detailed Calendar UI locally; routine details stay
+closed. Source freshness, partial/stale/errors and lifecycle fencing remain intact.
+
+Start/End controls are removed from the chat UI, including expanded Details.
+Hidden internal values keep the existing controller and fixed approved October
+9-15 query scope compatible. Month navigation and selecting a day change only
+presentation, never query bounds, shared dates, consent or provider requests.
+Standalone owner date controls are unchanged. The public contract remains
+`familycopilot.chat.v1` with only expand/collapse/dispose; no event export was added.
+
+Files: `owner/chat-calendar-template.js`, `owner/availability-ui.js`,
+`owner/chat-calendar.css`, `test/chat-calendar.test.js` and this record.
+Four focused month tests passed, covering initial absence of markers, exactly
+seven fixture coverage dates, source markers, hidden dates, day focus, no-query
+navigation, retained dates/freshness, invalidation/Clear and year boundaries.
+The 15-file regression matrix below passed **353/353 in each of UTC,
+Asia/Taipei and America/Los_Angeles**, with zero failed/cancelled/skipped:
+
+```text
+node --test --test-reporter=tap test/chat-calendar.test.js test/chat-integration.test.js test/chat-contract.test.js test/chat-conversation.test.js test/owner-ui.test.js test/availability-ui.test.js test/child-calendar-ui.test.js test/child-sync-ui.test.js test/our-week.test.js test/date-selection.test.js test/owner-presentation.test.js test/week-display.test.js test/quiet-week-ui.test.js test/child-saved-ui.test.js test/week-polish-ui.test.js
+```
+
+Browser review used a new owned synthetic page at
+`http://127.0.0.1:42111/chat/index.html`. The existing PID 5097 listener was
+rechecked as a GET/HEAD static-asset allowlist in this checkout, with no API route;
+it was neither adopted nor restarted. Measured 1920/375/321 CSS-pixel layouts had
+no document overflow; mobile marker labels fit without truncation. Desktop and
+mobile screenshots were inspected. Native Enter/Tab/Shift+Tab operated Sync,
+previous/next month and day selection, which focused the details grid. Expanded
+source Details exposed zero date inputs. Startup and interactions produced zero
+fetch/XHR requests. Final mobile CSS was rechecked in the browser. No real tab,
+provider, private snapshot, live service or cloud resource was accessed.
+
+Builder handoff: shared/chat files remain Builder-owned. This completes the
+month presentation and date-input removal, not real-data embedding. The owner's
+real-demo approval is recorded, but the current mount is still synthetic-only;
+real embedding needs a coordinated implementation of the shared live boundary,
+not a repeat consent question or a silent fixture-to-network switch. No GPT call
+is wanted for this demo. The second Kimi Sync investigation remains deferred.
+No backend activation, commit or push was performed or required for these assets.
+
+## Compact chat Calendar source details, 18 September 2026
+
+The owner requested removal of the repeated sample/source/window/timestamp wall
+from the conversation Calendar. The chat template now places those existing
+controller-owned paragraphs inside a single, initially closed Details disclosure.
+It remains accessible outside the collapsible Calendar body. Opening it retains
+exact coverage, original independent timestamps, saved/fresh provenance and
+disclosures without another request. The default surface has only a concise
+sample-calendar/date/zone line, three source states and necessary errors.
+Partial, missing, loading, unavailable and stale states remain explicit when
+collapsed. Cleanup/disposal safety notices remain outside Details.
+
+Changed files: `owner/chat-calendar-template.js`, `owner/chat-calendar.css`,
+`owner/availability-ui.js`, `test/chat-calendar.test.js` and this record. The
+shared availability controller updates optional chat-only summary nodes; the
+standalone page has none and retains its existing presentation. No provider,
+consent, date, request, cache, event export or lifecycle contract changed.
+This is a Calendar presentation refinement of `familycopilot.chat.v1`; Builder
+continues to consume only expand/collapse/dispose, never source summaries/data.
+
+Baseline Calendar/availability/week tests passed. The updated collapsed-source
+regression failed against the old always-visible template, then passed after the
+change. Added repeated-Sync, closed/open Details and compact missing/stale-state
+checks. Calendar/availability/chat-integration/week tests passed 161/161; the same
+15-file matrix recorded below passed **343/343 in each of UTC, Asia/Taipei and
+America/Los_Angeles**, zero failed/cancelled/skipped. Editor diagnostics and scoped
+whitespace checks passed. This supersedes the prior 342-per-zone count only for
+this newly executed matrix.
+
+Fresh browser rendering is not verified for this change: the previous 8041 preview
+had no listener, and direct WSL file navigation returned `ERR_UNEXPECTED (-9)`.
+No service was started or restarted, no existing page was reloaded, and no private
+data/provider was accessed. Earlier screenshots do not validate this new layout.
+Reload current static assets for the change; a preview serving in-memory startup
+copies needs its owner to refresh the preview assets. No production backend
+activation, commit or push is needed or performed.
+
+Builder handoff: the owner also asked whether the chat input should stay fixed
+during the demo. Recommended behavior is a bottom-anchored composer, constrained
+to the conversation width, with reserved scroll space so the last message and
+Calendar controls are never covered. Account for safe-area insets, mobile virtual
+keyboard/visual viewport, textarea growth and keyboard focus. The Builder-owned
+chat stylesheet/shell were inspected but not changed; this Calendar increment
+does not claim that the fixed composer is implemented or transfer file ownership.
+
+## Chat Calendar offline milestone complete, 18 September 2026
+
+The owner's request to finish the Calendar work closes the approved synthetic
+`familycopilot.chat.v1` milestone using the combined Calendar and Builder evidence.
+Calendar's previous browser-tool limitations below are historical observations,
+not outstanding automated acceptance after incorporating
+[Builder's completed integrated browser review](chat-integration-contract.md#13-isolated-synthetic-browser-review).
+
+That review records measured 1920/375/321 CSS-pixel layouts, desktop/mobile
+screenshots without overlapping controls or document overflow, browser-keyboard
+Sync and collapse/reopen, narrow-grid ArrowRight scrolling, and awaited synthetic
+Calendar disposal. It also verifies that the integrated conversation can refine
+activity dates without calendar coupling, with zero fetch/XHR or external
+requests. Calendar's own checks below additionally establish retained grid,
+dates, original freshness and manual scroll, plus the two late-response date-race
+regressions. The final Calendar/chat matrix passed 342/342 in each of UTC,
+Asia/Taipei and America/Los_Angeles.
+
+These are combined, previously executed checks, not a new browser session or
+repeated test run in this close-out. No reproducible product defect remains from
+this review that requires a Calendar code repair. The verbose mobile status strip
+is a possible later presentation refinement, not a failed functional check or
+permission to hide source/coverage/freshness/unknowns.
+
+Calendar implementation and automated integration acceptance are complete for
+this offline milestone. Human parent review, assistive technology and physical
+device/pointer testing remain distinct release/usability reviews, not claims made
+by automated browser keyboard tests. Real calendar embedding, provider validation
+and the explicitly deferred second Kimi Sync hang are outside this completion.
+
+This close-out edits only this Calendar record; Builder's evidence and all product
+files remain unchanged. Link/anchor and whitespace checks passed. No new process
+was started or stopped; a read-only socket check found no listener on the former
+8041 review port. No live service, real browser tab, private snapshot, provider,
+deployment, commit or push was accessed or performed. No activation is needed.
+
+## Chat Calendar integration follow-up, 18 September 2026
+
+The owner explicitly approved continuing Calendar's conversation-UX integration
+and synthetic review, while deferring the real second Kimi Sync hang. That issue
+is not a blocker for this offline milestone. Contract remains
+`familycopilot.chat.v1`; no live embedding, provider or storage change is implied.
+
+This increment changes only [test/chat-calendar.test.js](../test/chat-calendar.test.js)
+and this record. Two new regressions hold a child or parent response pending,
+collapse Calendar, change dates outside the scope and back, then deliver the old
+response. Both verify no restored grid/child events, no new Sync, no external date
+storage or Calendar event export, and no destructive Clear. Existing implementation
+passed both cases; no product-code repair was necessary. Other writers' changes
+and the Builder-owned contract/shell were preserved.
+
+Baseline `node --test --test-reporter=dot test/chat-calendar.test.js
+test/availability-ui.test.js test/our-week.test.js` passed. The new focused command
+`node --test --test-name-pattern='collapsed date-away-and-back'
+test/chat-calendar.test.js` passed both selected tests (23 unrelated tests skipped).
+Final command, separately under UTC, Asia/Taipei and America/Los_Angeles:
+
+```sh
+node --test --test-reporter=tap test/chat-calendar.test.js test/chat-integration.test.js test/chat-contract.test.js test/chat-conversation.test.js test/owner-ui.test.js test/availability-ui.test.js test/child-calendar-ui.test.js test/child-sync-ui.test.js test/our-week.test.js test/date-selection.test.js test/owner-presentation.test.js test/week-display.test.js test/quiet-week-ui.test.js test/child-saved-ui.test.js test/week-polish-ui.test.js
+```
+
+Each run passed **342/342**, zero failures/cancellations/skips, within a 90-second
+bound. New-test editor diagnostics and scoped whitespace checks passed.
+
+Browser review used a new disposable page on the already-running 8041 preview,
+not the shared user page. Read-only process inspection established PID 1726,
+workspace `/home/davidtang/Projects/FamilyCopilot`, branch `davidtang/demo-v2`, and
+an inline Node static server with a fixed asset allowlist, in-memory startup
+copies, loopback/Host/method guards, and no API/private-file routes. These are
+observations, not ownership of that pre-existing process; it was not restarted,
+stopped or adopted. No preview process was created by this increment.
+Only the new review page was closed; a subsequent browser lookup returned
+page-not-found. The original shared page was left untouched.
+
+Browser DOM actions confirmed synthetic Sync, collapse focus transfer to the
+toggle, preservation of manual scroll on reopen, and no page overflow at measured
+375 CSS pixels or the wider desktop check. The grid retains internal horizontal
+scroll. The scripted September 19-20 refinement left October Calendar dates,
+grid identity and original freshness unchanged. Resource timing contained zero
+fetch/XHR requests throughout these actions. This is synthetic presentation
+evidence, not live-calendar access or a claim of actual AI.
+
+Physical Enter did not activate Sync and pointer actionability timed out in the
+browser tool. Functional checks therefore used DOM-dispatched actions; actual
+keyboard/pointer acceptance remains open. Viewport screenshots were obtainable,
+but did not reliably reflect requested scrolling, so full grid visual acceptance
+is not claimed. The status strip remains vertically verbose on mobile and needs
+further presentation review without hiding source/coverage/freshness/unknowns.
+The date-picker implementation mentioned in historical memory was absent from
+this checkout's actual controller; no speculative replacement was added.
+
+At this checkpoint, Calendar's own browser tooling had not completed visual and
+keyboard acceptance. The completion record above incorporates Builder's successful
+integrated review without repeating it. No production activation is needed for
+these test/document changes. No real tab/snapshot, port 8002, provider, cloud
+resource, dependency, commit or push was touched.
+
 ## White loaded-event gaps, 18 September 2026
 
 Requested presentation-only change: loaded Kimi tracks use white gaps without

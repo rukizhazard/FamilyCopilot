@@ -1,6 +1,16 @@
 /* Saved views and capability-gated remembered-source Sync. No source selection or browser storage. */
-(() => {
+((root, initialize) => {
+  if (typeof module === "object" && module.exports) module.exports = initialize;
+  else {
+    root.FamilyCalendarControllers ||= {};
+    root.FamilyCalendarControllers.child = initialize;
+    if (!root.document.getElementById("calendar-host")) initialize(root);
+  }
+})(globalThis, function initializeChild(globalThis) {
   "use strict";
+  const { document, window, fetch, setTimeout, clearTimeout, Date, CustomEvent } = globalThis;
+  const listen = globalThis.listen || ((target, type, handler) => target.addEventListener(type, handler));
+  const focusCalendar = globalThis.focusCalendar || (target => target.focus());
   const C = globalThis.ChildCalendar, $ = id => document.getElementById(id);
   if (!C || !$("child-status")) return;
   const mode = document.querySelector('meta[name="child-mode"]')?.content;
@@ -45,14 +55,15 @@
     node.setAttribute("aria-label", node.title);
   });
   function status(message, focus = false, detailsOnly = false) {
+    if (globalThis.calendarDisposed?.()) return;
     const hidden = detailsOnly && !focus && !blocked && !expired;
-    if (hidden && document.activeElement === $("child-status")) $("availability-clear").focus();
+    if (hidden && document.activeElement === $("child-status")) focusCalendar($("availability-clear"));
     $("child-status").textContent = message;
     $("child-status").setAttribute("data-urgent", String(focus || blocked));
     $("child-status").hidden = hidden;
     $("child-status-details").textContent = hidden ? message : "";
     $("child-status-details").hidden = !hidden || !message;
-    if (focus) $("child-status").focus();
+    if (focus) focusCalendar($("child-status"));
   }
   function publish(lifecycle, result = null) {
     if (lifecycle !== "loaded") clearNames();
@@ -139,7 +150,7 @@
     hide(expired ? "expired" : blocked ? "unavailable" : "cleared"); controls(); status(message, false, true);
     if (notify) void cancel(kind, leaving);
   }
-  function draw(data, disclosure, sourceName, useSync) {
+  function draw(data, disclosure, sourceName, useSync, refresh = false) {
     clearNames();
     const result = C.project(data, disclosure);
     eventNames = result.events.map(e => disclosure === "details" && !e.redacted && e.title.trim() ? e.title : "");
@@ -149,7 +160,10 @@
     $("child-imported-access").hidden = false;
     // Only provenance scalars are retained for the five-minute freshness redraw.
     const checkedAt = result.checkedAt;
-    const message = () => status(`Kimi · ${synthetic ? "SAMPLE" : "Outlook"} · ${sourceName} · ${syncAvailable ? `Checked ${checkedAt} · Sync uses remembered source` : `Saved only, checked ${checkedAt}`} · ${Date.now() - Date.parse(checkedAt) >= 300000 ? "Stale; may be out of date" : "Recent snapshot, not continuous verification"}. 9–15 October 2026 Taipei. ${syncAvailable ? "Cached results keep their original check time; no background refresh." : "Outlook not rechecked; Update refreshes parents only."}`, false, true);
+    const coverage = new Intl.DateTimeFormat("en-GB", { timeZone: result.window.timezone, day: "numeric", month: "long", year: "numeric" })
+      .formatRange(new Date(result.window.start), new Date(Date.parse(result.window.end) - 1)).replace(/ /g, "");
+    const provenance = globalThis.calendarDisposed ? useSync && refresh ? "Fresh fixture result (synthetic) · " : "Saved fixture; original check time · " : "";
+    const message = () => status(`Kimi · ${synthetic ? "SAMPLE" : "Outlook"} · ${sourceName} · ${provenance}${syncAvailable ? `Checked ${checkedAt} · Sync uses remembered source` : `Saved only, checked ${checkedAt}`} · ${Date.now() - Date.parse(checkedAt) >= 300000 ? "Stale; may be out of date" : "Recent snapshot, not continuous verification"}. ${coverage} Taipei. ${syncAvailable ? "Cached results keep their original check time; no background refresh." : "Outlook not rechecked; Update refreshes parents only."}`, false, true);
     message(); staleTimer = setTimeout(message, Math.max(1, 300000 - (Date.now() - Date.parse(checkedAt))));
   }
   const saved = () => loadInternal(false);
@@ -162,7 +176,7 @@
     hide(); const version = ++generation;
     const [startDate, endDate] = dates();
     pending = true; publish("loading"); controls();
-    status(useSync ? refresh ? "Syncing Kimi's remembered source…" : "Opening Kimi's saved view or syncing its remembered source…" : "Opening Kimi's saved view only… No Outlook request.");
+    status(useSync ? "" : "Opening Kimi's saved view only… No Outlook request.", false, useSync);
     await clearing;
     if (version !== generation) return "cancel";
     if (Date.now() >= expires) { expire(); return "cancel"; }
@@ -186,7 +200,7 @@
         publish("idle"); status("Kimi · No saved view for these dates. Schedule unknown; Outlook not queried.");
         return "missing";
       }
-      draw(result.data, result.access.disclosure, result.access.sourceName, useSync);
+      draw(result.data, result.access.disclosure, result.access.sourceName, useSync, refresh);
       return "saved";
     } catch (e) {
       if (version !== generation) return "cancel";
@@ -222,16 +236,18 @@
     const next = dates().join(); if (next === lastDates) return; lastDates = next;
     reset("Dates changed. Kimi page data hidden; saved view kept.", "range");
   }
-  for (const id of ["availability-start", "availability-end"]) for (const event of ["input", "change"]) $(id).addEventListener(event, dateEdit);
-  $("availability-supported-dates")?.addEventListener("click", dateEdit);
+  for (const id of ["availability-start", "availability-end"]) for (const event of ["input", "change"]) listen($(id), event, dateEdit);
+  if ($("availability-supported-dates")) listen($("availability-supported-dates"), "click", dateEdit);
   function release() {
     // Fence now, drain prior cleanup, then let common Clear send its sole deletion.
     released = true;
     reset("Calendar view closed. Kimi page data hidden.", "leave", false, false);
-    return clearing;
+    return globalThis.calendarDisposed?.() ? clearing.then(() => {
+      if (blocked || cleanupPending) throw new Error("calendar_cleanup_unconfirmed");
+    }) : clearing;
   }
-  window.addEventListener("owner-session-cleared", release);
-  window.addEventListener("week-safety-changed", event => {
+  listen(window, "owner-session-cleared", release);
+  listen(window, "week-safety-changed", event => {
     const d = event.detail;
     if (!C.exact(d, ["version", "revision", "pending", "blocked", "expired"]) || d.version !== 1 ||
       !Number.isSafeInteger(d.revision) || d.revision < revision || [d.pending, d.blocked, d.expired].some(v => typeof v !== "boolean")) return;
@@ -246,9 +262,11 @@
     }
     controls();
   });
-  window.addEventListener("pagehide", () => reset("Page left. Kimi page data hidden; saved view kept.", "leave", true, !coordination));
-  window.addEventListener("pageshow", e => { if (e.persisted) reset("Restored page. Saved data has not been loaded.", "leave", false, !coordination); else dateEdit(); });
-  window.addEventListener("focus", () => { if (Date.now() >= expires) expire(); else dateEdit(); });
+  if (!globalThis.calendarDisposed) {
+    listen(window, "pagehide", () => reset("Page left. Kimi page data hidden; saved view kept.", "leave", true, !coordination));
+    listen(window, "pageshow", e => { if (e.persisted) reset("Restored page. Saved data has not been loaded.", "leave", false, !coordination); else dateEdit(); });
+  }
+  listen(window, "focus", () => { if (Date.now() >= expires) expire(); else dateEdit(); });
   function expire() {
     if (expired) return;
     expired = true;
@@ -259,4 +277,4 @@
   $("child-retention").textContent = !retention ? updateHelp : `Kimi: permitted names/times and minimal reviewed settings ${retention === "disk" ? "are saved privately on this device until Clear, separate from parent busy times" : "stay in memory until Clear or server restart"}. ${syncAvailable ? "The remembered source stays server-side, separate from the saved view. Sync reuses that confirmed source and disclosure, never a cached name. No source references, provider IDs, handles or tokens reach browser storage. View saved only cannot detect Outlook revocation and never queries on a miss." : "No provider IDs, handles or tokens are saved. Saved viewing cannot detect Outlook revocation or authorize live refresh."} The page view expires after 30 minutes; saved retention is separate.`;
   coordination = globalThis.FamilyWeekActions?.register({ saved, release, ...(syncAvailable ? { sync } : {}) });
   publish(available ? "idle" : "unavailable"); controls();
-})();
+});

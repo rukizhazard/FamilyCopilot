@@ -6,7 +6,6 @@
   const VERSION = "familycopilot.chat.v1";
   const ZONE = "Asia/Taipei";
   const REFERENCE = "2026-09-18T04:00:00Z";
-  const AREA = "Xinyi District, Taipei City";
   const DAY = 86400;
   const OFFSET = 8 * 3600;
   const INVALID = Symbol("invalid");
@@ -150,6 +149,7 @@
   }
 
   function containedOccurrence(item, range) {
+    if (item.startAt === null) return item.category === "movie" && item.endAt === null && item.assessment === "needs_checking";
     const start = instant(item.startAt, "+08:00");
     const lower = { seconds: civilDay(range.startDate) * DAY - OFFSET, fraction: "" };
     const upper = { seconds: (civilDay(range.endDate) + 1) * DAY - OFFSET, fraction: "" };
@@ -167,11 +167,12 @@
   }));
 
   const preferences = record({
-    ages: array(literal(8), 1, 1),
+    ages: array(number(0, 120, true), 1, 1),
     interests: array(text(40), 12, 0, true),
     interestBasis: choice(["demo_fixture", "parent_confirmed"]),
     preferredTeams: array(text(120), 16),
-    origin: record({ area: literal(AREA), precision: literal("district"), landmark: literal(null) }),
+    origin: record({ area: check(value => text(120)(value) !== INVALID && value === value.trim()),
+      precision: literal("district"), landmark: literal(null) }),
     travelMode: nullable(travelMode),
     constraints: record({
       maxTravelMinutes: nullable(number(1, 180, true)),
@@ -211,15 +212,16 @@
     sourceId: publicId(80),
     name: text(120),
     url: httpsUrl,
-    kind: literal("synthetic"),
+    kind: choice(["synthetic", "public_snapshot"]),
     coverage: record({
       range: dateRange,
       categories: array(text(40), 12),
       completeness: choice(["complete", "partial", "unknown"])
     }),
-    retrievedAt: literal(null),
-    freshness: literal("synthetic")
-  });
+    retrievedAt: nullable(utcInstant),
+    freshness: choice(["synthetic", "snapshot"])
+  }, value => value.kind === "synthetic" ? value.retrievedAt === null && value.freshness === "synthetic" :
+    value.url !== null && value.retrievedAt !== null && value.freshness === "snapshot");
 
   const issue = record({
     code: choice(["source_unavailable", "source_unsupported", "scope_incomplete", "candidate_limit", "evidence_unknown", "no_matches"]),
@@ -230,13 +232,13 @@
   const evidence = record({
     id: publicId(80),
     field: choice(["identity", "timing", "venue", "age", "travel", "cost", "setting", "thumbnail"]),
-    kind: choice(["synthetic", "unknown"]),
+    kind: choice(["synthetic", "public_snapshot", "unknown"]),
     sourceId: publicId(80),
     sourceUrl: httpsUrl,
-    retrievedAt: literal(null),
+    retrievedAt: nullable(utcInstant),
     sourceUpdatedAt: literal(null),
     text: text(240)
-  });
+  }, value => value.kind === "public_snapshot" ? value.sourceUrl !== null && value.retrievedAt !== null : value.retrievedAt === null);
 
   const ageGuidance = record({
     minAge: nullable(number(0, 120, true)),
@@ -282,17 +284,18 @@
     const reference = field === "age" ? item.ageGuidance.evidenceId : item[field].evidenceId;
     if (reference === null) return !hasFacts;
     const supporting = byId.get(reference);
-    return !!supporting && supporting.field === field && (!hasFacts || supporting.kind === "synthetic");
+    return !!supporting && supporting.field === field && (!hasFacts || ["synthetic", "public_snapshot"].includes(supporting.kind));
   }
 
   function occurrenceInvariants(item) {
     // The serialized tuple is also a bounded conversation card reference.
     if (cardId(item).length > 400) return false;
+    if (item.startAt === null && (item.category !== "movie" || item.endAt !== null || item.assessment !== "needs_checking")) return false;
     if (item.endAt !== null && compareInstants(instant(item.endAt, "+08:00"), instant(item.startAt, "+08:00")) <= 0) return false;
     const byId = new Map(item.evidence.map(entry => [entry.id, entry]));
     if (byId.size !== item.evidence.length) return false;
-    const supports = field => item.evidence.some(entry => entry.field === field && entry.kind === "synthetic");
-    if (!supports("identity") || !supports("timing") || !supports("venue") ||
+    const supports = field => item.evidence.some(entry => entry.field === field && ["synthetic", "public_snapshot"].includes(entry.kind));
+    if (!supports("identity") || (item.startAt === null ? !item.evidence.some(entry => entry.field === "timing" && entry.kind === "unknown") : !supports("timing")) || !supports("venue") ||
         item.setting !== "unknown" && !supports("setting")) return false;
     const age = item.ageGuidance;
     if (!fieldReference(item, byId, "age", age.rule !== "unknown" || age.minAge !== null || age.maxAge !== null) ||
@@ -314,7 +317,7 @@
     category: text(40),
     title: text(160),
     sourceUrl: httpsUrl,
-    startAt: taipeiInstant,
+    startAt: nullable(taipeiInstant),
     endAt: nullable(taipeiInstant),
     timeZone: literal(ZONE),
     venue: record({ name: nullable(text(160)), area: text(120) }),
@@ -349,10 +352,14 @@
     }
     for (const item of result.items) {
       const origin = sources.get(item.sourceId);
+        if (origin?.kind === "public_snapshot" && (item.sourceUrl === null || item.thumbnail !== null ||
+          item.evidence.some(entry => entry.kind === "synthetic"))) return false;
+        if (item.startAt === null && (origin?.kind !== "public_snapshot" || origin.coverage.completeness === "complete")) return false;
       if (!origin || !containedOccurrence(item, result.range) ||
           !containedOccurrence(item, origin.coverage.range) ||
           result.issues.some(problem => applies(problem, item.sourceId) && failedIssue(problem.code)) ||
-          item.evidence.some(entry => !sources.has(entry.sourceId))) return false;
+          item.evidence.some(entry => !sources.has(entry.sourceId) || entry.kind === "public_snapshot" &&
+            (sources.get(entry.sourceId).kind !== "public_snapshot" || entry.retrievedAt !== sources.get(entry.sourceId).retrievedAt))) return false;
     }
     // This contradiction is invalid even when partial takes status precedence.
     // A different source may independently and truthfully report no matches.
@@ -432,7 +439,7 @@
       if (result.range.startDate !== asked.range.startDate || result.range.endDate !== asked.range.endDate ||
           result.range.timeZone !== asked.range.timeZone) return false;
       const reference = instant(asked.referenceNow, "Z");
-      return result.items.every(item => compareInstants(instant(item.startAt, "+08:00"), reference) >= 0 &&
+      return result.items.every(item => (item.startAt === null || compareInstants(instant(item.startAt, "+08:00"), reference) >= 0) &&
         preferenceMatch(item, asked.preferences));
     } catch { return false; }
   }

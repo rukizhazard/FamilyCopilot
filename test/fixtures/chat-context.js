@@ -6,7 +6,7 @@ function demoContext() {
     version: "familycopilot.chat.v1", sessionId: "demo-1", contextRevision: 1,
     referenceNow: "2026-09-18T04:00:00Z", timeZone: "Asia/Taipei", mode: "synthetic",
     preferences: {
-      ages: [8], interests: [], interestBasis: "demo_fixture", preferredTeams: [],
+      ages: [7], interests: ["basketball", "baseball", "movies", "concerts", "museums", "outdoor-play", "science-discovery"], interestBasis: "demo_fixture", preferredTeams: ["新北中信特攻", "中信兄弟"],
       origin: { area: "Xinyi District, Taipei City", precision: "district", landmark: null },
       travelMode: null,
       constraints: { maxTravelMinutes: null, budget: null, setting: "any", excludedCategories: [] }

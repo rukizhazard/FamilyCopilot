@@ -1,12 +1,15 @@
 /* Cloud-projected child data and strict locally saved views. No inferred availability. */
 (function (root, factory) {
   const api = factory();
+  api.forSyntheticOctober = () => factory(true);
   if (typeof module === "object" && module.exports) module.exports = api;
   else root.ChildCalendar = api;
-})(globalThis, () => {
+})(globalThis, (syntheticOctober) => {
   "use strict";
   const contract = "kimi-calendar-v1";
-  const window = Object.freeze({ start: "2026-10-08T16:00:00Z", end: "2026-10-15T16:00:00Z", timezone: "Asia/Taipei" });
+  const window = Object.freeze(syntheticOctober
+    ? { start: "2026-09-30T16:00:00Z", end: "2026-10-31T16:00:00Z", timezone: "Asia/Taipei" }
+    : { start: "2026-10-08T16:00:00Z", end: "2026-10-15T16:00:00Z", timezone: "Asia/Taipei" });
   const maxBytes = 256 * 1024, maxEvents = 100;
   const exact = (o, keys) => o && typeof o === "object" && !Array.isArray(o) && Object.keys(o).sort().join() === [...keys].sort().join();
   const fail = () => { throw new Error("invalid_child_response"); };
@@ -68,7 +71,7 @@
     }
     return { calendars: data.calendars.map(c => ({ ...c })), partial: data.partial };
   }
-  const datesAllowed = (start, end) => start === "2026-10-09" && end === "2026-10-15";
+  const datesAllowed = (start, end) => start === (syntheticOctober ? "2026-10-01" : "2026-10-09") && end === (syntheticOctober ? "2026-10-31" : "2026-10-15");
   const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   function savedAccess(value) {
     if (!exact(value, ["person", "guardian", "disclosure", "sourceName"]) || value.person !== "Kimi" || value.guardian !== true ||

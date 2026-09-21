@@ -3,6 +3,12 @@ node_modules/
 dist-picker/
 dist-picker-synthetic/
 
+# Local reference artwork with unconfirmed public reuse permission.
+/activity-preview/chat-assets/ctbc-dea.png
+/activity-preview/chat-assets/formosa-dreamers.webp
+/activity-preview/chat-assets/forgotten-island.jpg
+/activity-preview/chat-assets/chiikawa.jpg
+
 # Local environment/credential files. Templates must contain placeholders only.
 .env
 .env.*

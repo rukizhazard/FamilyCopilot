@@ -39,6 +39,28 @@ function result(request = activityRequest()) {
 function addEvidence(item, field) {
   item.evidence.push({ ...clone(item.evidence[0]), id: field, field });
 }
+test("public snapshots require provenance and untimed movies remain incomplete", () => {
+  const value = result(), source = value.sources[0], item = value.items[0];
+  Object.assign(source, { kind: "public_snapshot", url: "https://example.com/films", retrievedAt: "2026-09-20T00:00:00Z", freshness: "snapshot" });
+  item.sourceUrl = source.url;
+  for (const entry of item.evidence) Object.assign(entry, { kind: "public_snapshot", sourceUrl: source.url, retrievedAt: source.retrievedAt });
+  assert.equal(C.validateActivityResult(value, activityRequest()), true);
+  const missing = clone(value); missing.sources[0].retrievedAt = null;
+  assert.equal(C.validateActivityResultShape(missing), false);
+  const mixed = clone(value); mixed.items[0].evidence[0].kind = "synthetic";
+  mixed.items[0].evidence[0].retrievedAt = null;
+  assert.equal(C.validateActivityResultShape(mixed), false);
+  Object.assign(item, { category: "movie", startAt: null, endAt: null, assessment: "needs_checking" });
+  Object.assign(item.evidence.find(entry => entry.field === "timing"), { kind: "unknown", retrievedAt: null });
+  value.status = "partial"; source.coverage.completeness = "partial";
+  value.issues.push({ code: "scope_incomplete", sourceId: source.sourceId, message: "Showtimes not verified." });
+  assert.equal(C.validateActivityResult(value, activityRequest()), true);
+  for (const change of [entry => entry.items[0].assessment = "candidate", entry => entry.items[0].category = "basketball",
+    entry => entry.items[0].endAt = "2026-10-10T11:00:00+08:00", entry => entry.sources[0].coverage.completeness = "complete",
+    entry => entry.items[0].evidence[0].retrievedAt = "2026-09-19T00:00:00Z"]) {
+    const invalid = clone(value); change(invalid); assert.equal(C.validateActivityResultShape(invalid), false);
+  }
+});
 function priced(item, amount = 100) {
   addEvidence(item, "cost");
   item.cost = { amount, currency: "TWD", basis: "per_child", evidenceId: "cost" };
@@ -144,7 +166,7 @@ test("fixture factories return fresh non-calendar context, all functions preserv
   C.activityRequestKey(asked); C.activityCardId(found.items[0]);
   assert.equal(JSON.stringify([context, asked, found]), before);
   const changed = demoContext(); changed.preferences.ages[0] = 9;
-  assert.deepEqual(demoContext().preferences.ages, [8]);
+  assert.deepEqual(demoContext().preferences.ages, [7]);
 });
 
 test("context fixes demo reference, mode, zone, revision and trigger state", () => {
@@ -193,9 +215,23 @@ test("date ranges enforce 1–7 days, 28-day forward window and actual Gregorian
   }
 });
 
-test("preferences retain exact age/coarse origin and bounded optional constraints", () => {
-  const invalids = [p => p.ages = [], p => p.ages = [8, 8], p => p.ages = [9],
-    p => p.origin.landmark = "MRT", p => p.origin.precision = "address", p => p.origin.area = "Other area",
+test("preferences accept editable age/coarse origin and retain bounded optional constraints", () => {
+  for (const age of [0, 5, 9, 120]) {
+    const context = demoContext(), request = activityRequest();
+    for (const value of [context, request]) {
+      value.preferences.ages = [age]; value.preferences.origin.area = "Da'an District, Taipei City";
+    }
+    assert.equal(C.validateDemoContext(context), true); assert.equal(C.validateActivityRequest(request), true);
+    assert.notEqual(C.activityRequestKey(request), C.activityRequestKey(activityRequest()));
+  }
+  for (const age of [-1, 121, 8.5, "8", null, Infinity]) {
+    const value = activityRequest(); value.preferences.ages = [age]; assert.equal(C.validateActivityRequest(value), false);
+  }
+  for (const area of ["", " ", " Xinyi", "Xinyi ", "x".repeat(121), "area\nname", "area\u202ename", null]) {
+    const value = activityRequest(); value.preferences.origin.area = area; assert.equal(C.validateActivityRequest(value), false);
+  }
+  const invalids = [p => p.ages = [], p => p.ages = [8, 8],
+    p => p.origin.landmark = "MRT", p => p.origin.precision = "address",
     p => p.interestBasis = "inferred", p => p.travelMode = "teleport", p => p.interests = [""],
     p => p.interests = ["science", "science"], p => p.interests = ["a".repeat(41)],
     p => p.preferredTeams = ["a".repeat(121)], p => p.constraints.maxTravelMinutes = 0,
@@ -412,11 +448,12 @@ test("incomplete source scope needs a corresponding issue and cannot claim compl
 });
 
 test("known required age violations exclude, recommended mismatch needs checking, shape is preference-independent", () => {
+  const asked = activityRequest(); asked.preferences.ages = [8];
   const found = result(); found.items[0].ageGuidance.minAge = 9;
-  assert.equal(C.validateActivityResultShape(found), true); assert.equal(C.validateActivityResult(found, activityRequest()), false);
-  found.items[0].assessment = "needs_checking"; found.status = "unknown"; assert.equal(C.validateActivityResult(found, activityRequest()), true);
-  found.items[0].ageGuidance.rule = "required"; assert.equal(C.validateActivityResult(found, activityRequest()), false);
-  found.items[0].ageGuidance.minAge = 8; assert.equal(C.validateActivityResult(found, activityRequest()), true);
+  assert.equal(C.validateActivityResultShape(found), true); assert.equal(C.validateActivityResult(found, asked), false);
+  found.items[0].assessment = "needs_checking"; found.status = "unknown"; assert.equal(C.validateActivityResult(found, asked), true);
+  found.items[0].ageGuidance.rule = "required"; assert.equal(C.validateActivityResult(found, asked), false);
+  found.items[0].ageGuidance.minAge = 8; assert.equal(C.validateActivityResult(found, asked), true);
 });
 
 test("hard exclusions and settings filter, unknown setting requires needs checking", () => {

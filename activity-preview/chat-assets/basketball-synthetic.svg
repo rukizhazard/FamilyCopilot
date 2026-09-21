@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450" role="img" aria-labelledby="title desc">
+  <title id="title">Comets vs Grove, fictional basketball artwork</title>
+  <desc id="desc">Original synthetic team badges on a pale green basketball court. Not real team logos.</desc>
+  <rect width="800" height="450" fill="#e5f0e9"/>
+  <g fill="none" stroke="#c1dace" stroke-width="3">
+    <path d="M35 40H765V410H35ZM400 40V410"/><circle cx="400" cy="225" r="88"/>
+    <path d="M35 125H120V325H35M765 125H680V325H765"/>
+  </g>
+  <path d="M210 90L305 132V242Q305 305 210 347Q115 305 115 242V132Z" fill="#164d47"/>
+  <path d="M590 90L685 132V242Q685 305 590 347Q495 305 495 242V132Z" fill="#78679a"/>
+  <path d="M159 238L241 157L218 214L261 202L179 280L199 226Z" fill="#ffd276"/>
+  <path d="M590 145L635 205H614L650 250H606V282H574V250H530L566 205H545Z" fill="#e0f0d7"/>
+  <g font-family="Trebuchet MS, sans-serif" text-anchor="middle" fill="#164d47">
+    <text x="400" y="238" font-size="32" font-weight="700">VS</text>
+    <text x="210" y="387" font-size="27" font-weight="700">COMETS</text>
+    <text x="590" y="387" font-size="27" font-weight="700">GROVE</text>
+    <text x="400" y="430" font-size="16">FICTIONAL TEAMS</text>
+  </g>
+</svg>
