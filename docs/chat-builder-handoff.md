@@ -1,6 +1,239 @@
-# Builder handoff: natural source labels
+# Builder handoff: whole-month calendar and invitation preparation
 
-## Current handoff: 21 September 2026
+## Publication redaction, 22 September 2026
+
+The working tree now uses Parent A, Parent B and Child as editorial display aliases.
+The historical snapshots and hashes below remain unchanged and do not verify this
+revision. No new snapshot, capture or live validation was authorized or performed.
+See [current changes, offline checks and publication blockers](publication-redaction.md).
+
+## Current handoff: month, invitation and first-typing repair, 21 September 2026
+
+The owner explicitly approved product integration and a Producer video revision,
+offline synthetic only with existing narration. Builder owns the product; Producer
+owns media. No further delegation, service, provider, private data, network,
+installation, TTS, real send, commit or push was performed. Existing dirty files,
+ignore rules, original images and Producer outputs were preserved.
+
+### Outcome and ownership
+
+October now opens as a whole-month grid (five actual weeks), before candidate
+times. Day details start closed but every date, member and candidate control still
+opens them explicitly. No conversation auto-collapse or controls removed. Parent
+markers say `Busy periods`, not all-day/unavailable. Child's four existing events
+on October 3, 4, 9 and 16 show their permitted names and times through the existing
+private DOM renderer; no names were added to the title-free bridge. Cancelled,
+unknown and all-day states remain explicit. Dates and unknown/source/freshness
+qualifications are unchanged. Mobile scrolls horizontally inside the month region.
+
+After exact consent, the actual product enters a cancellable, page-local 700ms
+preparation phase, then synchronously revalidates Calendar before creating the
+existing pending state. This is an intentional UI preparation interval, not
+provider processing or delivery. Duplicate submissions share the same promise;
+reset, pause, disposal, changed preferences/context, rejection and the 10-second
+deadline fail closed. No sent/delivered/accepted claim or new IO was added.
+
+The first-typing defect was reproduced on the original 25-asset snapshot using
+`pressSequentially` at 55ms/character in a disposable network-denied browser.
+Desktop scrolled 22px immediately before the first character, while composer
+height stayed 102px. Idle HTML incorrectly retained fixed-composer scroll padding.
+The scoped CSS correction leaves 24px padding for the static idle composer;
+the same 37-character check now stays at scrollY=0 and height=102px. Mobile still
+scrolls its offscreen composer into view, then stays stable while typing. This
+reproduces the product behavior near the reported video timing, not a frame-by-frame
+claim about Producer's old media.
+
+Exact product paths: [chat/chat.css](../chat/chat.css),
+[chat/ui.js](../chat/ui.js), [chat/conversation-core.js](../chat/conversation-core.js),
+[owner/availability-ui.js](../owner/availability-ui.js),
+[owner/chat-calendar-template.js](../owner/chat-calendar-template.js),
+[owner/chat-calendar.css](../owner/chat-calendar.css).
+Tests: [test/chat-calendar.test.js](../test/chat-calendar.test.js),
+[test/chat-conversation.test.js](../test/chat-conversation.test.js),
+[test/chat-integration.test.js](../test/chat-integration.test.js).
+Records: this file, [design reference](designer/README.md),
+[integration contract](chat-integration-contract.md). Exclusive ignored helpers
+and evidence are under `browser-artifacts/product-month-invitation-review-20260921-gPCCqI/`.
+No fixtures, source metadata, HTML entry, domain algorithms, shared helpers,
+package commands, Producer files, images or ignore rules changed in this increment.
+
+### Fixed snapshot and checks
+
+- [Read-only 25-asset snapshot](../browser-artifacts/product-month-invitation-review-20260921-gPCCqI/snapshot/snapshot.json):
+  SHA-256 `c626ab54ed20895f53ea6b458e6e6a2fde904fdca0e9f7b37fe2830c939c0a61`.
+  [Identity and all 25 asset hashes](../browser-artifacts/product-month-invitation-review-20260921-gPCCqI/identity.json).
+  Six product assets changed; the other 19 match restored-image snapshot
+  `dbfa0a215f5a8a0766999d5dbc005021921b281f888af8cf2da39ecb286ff55d`.
+  All four original PNG/JPG/WebP images are byte-identical, not substitutions.
+- [Exact product diff against the received snapshot](../browser-artifacts/product-month-invitation-review-20260921-gPCCqI/owned-product.diff),
+  excluding earlier preference edits already present in the dirty working tree.
+- Baseline: `node --test test/chat-integration.test.js test/chat-conversation.test.js test/chat-calendar.test.js`, **136/136**.
+  Initial Calendar failures were obsolete open-day assertions, not baseline bugs.
+  The first timer-mock attempt cancelled tests; the narrow 700ms callback mock fixed
+  the harness. No failures are counted as passes.
+- Final focused: `node --test test/chat-conversation.test.js test/chat-integration.test.js test/chat-calendar.test.js test/availability-ui.test.js`, **228/228**.
+  Final bounded `npm run test:chat`: **214/214**, no failures, skips or cancellations.
+  [Snapshot-bound test report and all test hashes](../browser-artifacts/product-month-invitation-review-20260921-gPCCqI/test-verification.json),
+  [focused output](../browser-artifacts/product-month-invitation-review-20260921-gPCCqI/focused.tap),
+  [chat output](../browser-artifacts/product-month-invitation-review-20260921-gPCCqI/chat.tap).
+  Sources and tests matched before/after. Consent, mount, reset, revalidation,
+  preferences, revocation, literal DOM text and busy-only redaction remain covered.
+- [Original typing reproduction](../browser-artifacts/product-month-invitation-review-20260921-gPCCqI/baseline-report.json),
+  [final snapshot browser report](../browser-artifacts/product-month-invitation-review-20260921-gPCCqI/final-report.json),
+  [reusable browser verifier](../browser-artifacts/product-month-invitation-review-20260921-gPCCqI/review.cjs),
+  [packaging and hash-bound test verifier](../browser-artifacts/product-month-invitation-review-20260921-gPCCqI/freeze.cjs).
+  Desktop 1440x900/mobile 390x844 passed. No page overflow or clipped event cells;
+  day keyboard focus, preference save/cancel, reset and returned composer focus
+  passed. Spinner transforms changed across animation frames; reduced-motion
+  computed animation was `none`. Observed consent-to-pending completion was
+  785ms desktop/793ms mobile including browser assertions, with a 700ms product timer.
+  Every calendar command stayed synchronous. All requests were allowlisted static
+  assets fulfilled from memory; forbidden network/storage APIs, page errors and
+  unexpected requests were zero. Browsers closed; no listener/shared tab was used.
+- Visually inspected [desktop month](../browser-artifacts/product-month-invitation-review-20260921-gPCCqI/final-1440-month.png),
+  [desktop preparing](../browser-artifacts/product-month-invitation-review-20260921-gPCCqI/review1-1440-preparing.png),
+  [mobile preparing](../browser-artifacts/product-month-invitation-review-20260921-gPCCqI/final-390-preparing.png),
+  [desktop pending](../browser-artifacts/product-month-invitation-review-20260921-gPCCqI/final-1440-pending.png),
+  [mobile month](../browser-artifacts/product-month-invitation-review-20260921-gPCCqI/review1-390-month.png).
+  Cached font configuration was process-local; no fonts were installed.
+
+### Producer selectors and timing
+
+Use `#calendar-month` / `#calendar-month-days` for the whole-month shot. Do not
+click a date in the first video flow. `#calendar-day-details` remains closed until
+an explicit date/member/candidate action. Keep source context and month note in
+the story; do not substitute the earlier static concept or crop away limitations.
+
+Preparation is `#chat-status[data-action="send_demo_invitation"]` with the exact
+text `Preparing Parent A's invitation...`, existing `role=status`/polite live region,
+and `html[data-processing="true"] #chat-status::before` spinner. Keyboard focus
+moves to this region while busy, then returns to `#chat-input`. The native product
+interval is 700ms; animation rotates once per second unless reduced motion is set.
+After completion, `#coordination-status` says `Parent A pending response` and
+`#coordination-result` awaits his response. Existing Calendar `Details` and
+`#calendar-invitation-source` retain the no-delivery truth.
+
+Optional Producer-only longer dwell must wrap the `prepareInvitation({ signal })`
+option passed to `FamilyChatConversation.createConversation`, preserving the
+original callback and abort signal, resolving on abort and cleaning its timer.
+Do not modify product assets or delay `coordinateMeeting`: that contract remains
+synchronous. Do not extend to the 10-second timeout. Existing
+`installDemoResponseDelay` only covers calendar loading/activity search and does
+not cover this new preparation callback. Producer should record the actual product
+state and preserve its spinner, not paint an overlay or fake delivery success.
+
+### Remaining boundaries
+
+The 74.64-second `family-story-Jk0E21` baseline is untouched. Producer still owns
+the authorized synthetic re-record/edit using existing narration and the four
+original images, with no fresh network/movie-page access. No media work was done
+by Builder and no further agent was launched. Human continuous video review,
+audition, parent usability, physical-device/assistive-technology review, provider
+feasibility and image publication rights remain unverified. These tests are not
+production-readiness or real-calendar evidence. No publish/commit/push approval
+was granted or consumed. Earlier handoffs below are historical.
+
+## Previous handoff: approved preferences integration, 21 September 2026
+
+Applied the reviewed static preference design to the working chat, not another
+draft. Prominent family avatars/names/roles; seven default interests have identical
+icon dimensions, typography, grid tracks and alignment; known team typography and
+bilingual names derive from state. Custom interests use the existing neutral icon,
+custom teams stay text, and all values use safe DOM text nodes. Location/settings
+remain secondary. Existing editable controls, Apply/Cancel, custom teams, age/area,
+reset, explicit update, mount lifecycle, keyboard focus and real Send are preserved.
+No automatic conversation collapse. No fixture, core algorithm, Calendar source,
+member-before-shared-times order, consent, Child ownership or date changes.
+
+### Exact owned paths
+
+- Product: [chat/index.html](../chat/index.html), [chat/chat.css](../chat/chat.css),
+  [chat/ui.js](../chat/ui.js).
+- Existing tests: [test/chat-integration.test.js](../test/chat-integration.test.js).
+- Records: this file, [design reference](designer/README.md),
+  [integration contract](chat-integration-contract.md).
+- Ignored verifier: [check.cjs](../browser-artifacts/preferences-product-review-20260921-builder-a7e4/check.cjs).
+  It generates fresh evidence directories and snapshots, routes frozen bytes in
+  memory, blocks network/storage, and closes each browser. No listening server.
+- Pre-existing Producer changes to demo records/workflow, render helper and
+  real-calendar demo tests were preserved. The already-dirty design reference
+  retains its static-review entry; the untracked approved draft is unchanged.
+  No Producer files, media, package commands, fixtures or `.gitignore` were edited.
+
+### Reviewed snapshot and evidence
+
+- [Read-only snapshot](../browser-artifacts/preferences-product-mrqNiA/snapshot/snapshot.json),
+  SHA-256 `a74147a68b7db1cba4725c29ba30c69859e4823582a22626775e5fdec39df8f7`.
+  Exactly 21 public static assets. Its embedded scenario describes editable
+  preferences and the normal first October query, not a recording authorization.
+- Four accepted missing images (`ctbc-dea.png`, `formosa-dreamers.webp`,
+  `forgotten-island.jpg`, `chiikawa.jpg`) remain missing. They are omitted from the
+  snapshot; the offline browser serves bounded 404s for those exact paths, proving
+  the product's existing fallback without replacement art or source changes.
+- [Browser report](../browser-artifacts/preferences-product-mrqNiA/report.json):
+  1440x900 and 390x844 passed; 40x40 interest icons, identical per-viewport item
+  geometry, 750 weight, 17px/14px labels, bundled font loaded. No page overflow,
+  preference-item overlap, forbidden I/O or page errors. Keyboard editor entry,
+  Tab/Space/Escape, cancel/save, age/location, custom malicious text, Add team,
+  reload, first query, processing actions, member-calendar order, explicit update,
+  reset/input focus and scroll-end card clearance passed. Preferences never
+  initiate a search or remount Calendar; first query used real synthetic adapters.
+- [Desktop 1440x900](../browser-artifacts/preferences-product-mrqNiA/desktop-1440x900.png),
+  [mobile 390x844](../browser-artifacts/preferences-product-mrqNiA/mobile-390x844.png),
+  [mobile full page](../browser-artifacts/preferences-product-mrqNiA/mobile-full.png),
+  [desktop results](../browser-artifacts/preferences-product-mrqNiA/desktop-results.png),
+  [mobile result viewport](../browser-artifacts/preferences-product-mrqNiA/mobile-results-viewport.png).
+  Final opening screenshots and result/scroll-end evidence were visually inspected.
+  Mobile uses normal scrolling; full-page screenshots alone do not prove fixed
+  composer clearance, which is separately asserted and saved at scroll end.
+- Baseline `node --test test/chat-integration.test.js`: **38/38**. First family
+  markup checks exposed two obsolete static regex expectations, repaired in that
+  same test; all behavior cases stayed green. Final focused check: **39/39**,
+  including neutral custom icons, prototype-like strings and literal HTML text.
+- `npm run test:chat`: **211/211**, zero failures, with source/test hashes before
+  and after in [unit evidence](../browser-artifacts/preferences-product-jF2Xh3/unit-report.json).
+  Those product hashes are identical to the final snapshot's assets.
+- Final [pinned unit report](../browser-artifacts/chat-handoff-Cee2WA/unit-report.json)
+  and [full output](../browser-artifacts/chat-handoff-Cee2WA/unit-tests.txt):
+  **211/211**, zero failures/skips/cancellations, matching all 21 asset hashes and
+  test/helper hashes before/after. Editor diagnostics passed.
+- Earlier isolated attempts remain preserved: `preferences-product-TxpAFI`
+  double-counted observer calls, and `preferences-product-icwEGv` measured during
+  the entry animation. Only verifier fixes were needed: wrapper deduplication and
+  waiting for existing animation completion. `preferences-product-jF2Xh3` passed;
+  the final run adds explicit scroll-end clearance evidence. No failures hidden
+  by deleting outputs or changing product behavior.
+
+| Owned source | SHA-256 |
+| --- | --- |
+| `chat/index.html` | `c510515e0e178627ebd7f26de920b7cfde16228ae3977e3b44c7c2bdd96d930d` |
+| `chat/chat.css` | `9f3192cd53ad0a359df65339ff55c047d9361b7d036bf56e5f6e4c8171d2a828` |
+| `chat/ui.js` | `5b17c776281dd9573d1c06881af1234d954940d6bd575de9672cdfcb71e9a46e` |
+| `test/chat-integration.test.js` | `03ce183d7fb570daed18d4f02850a5b9b19b146233b9f77f4ee876ea28156609` |
+
+Reproduce pinned unit validation without browsers or services:
+
+```sh
+node scripts/test-chat-handoff.js browser-artifacts/preferences-product-mrqNiA/snapshot/snapshot.json a74147a68b7db1cba4725c29ba30c69859e4823582a22626775e5fdec39df8f7
+```
+
+### Runtime boundary and remaining gates
+
+Code-only inspection of [serve-chat-preview.js](../scripts/serve-chat-preview.js)
+shows that each allowed request reads disk and uses `Cache-Control: no-store`.
+These edits change existing allowlisted assets, so a process using that handler
+on 34393 can serve them on a user reload without restart. No port, process or
+shared tab was inspected, contacted, refreshed or restarted; current runtime state
+is not independently verified. Reload discards page-local conversation preferences.
+
+No live/private/provider access, TTS, installs, delegation, capture, media changes,
+commit or push. Parent usability, physical-device/assistive-technology and provider
+review remain unverified. The scoped product verification is complete; no unused
+recording, media integration or publication approval exists. The next step is
+owner review of this operational page. Old footage does not contain this revision.
+Historical handoffs below retain their original evidence and limitations.
+
+## Previous handoff: natural source labels, 21 September 2026
 
 ### Outcome and exact copy
 
@@ -15,11 +248,11 @@ This entry supersedes the old standalone-disclosure/framing requirements below.
 | Calendar source Details badge | `DEMO / Fictional calendars only` | `Sample calendars / Synthetic schedules` |
 | Chat closed summary | `Demo details` | `Details` |
 | Composer | `Demo invitation` | `#meeting-disclosure` removed entirely, including CSS and UI binding |
-| Running invitation action | `Creating Mike's demo invitation (no real send)...` | `Preparing Mike's invitation...` |
-| Queued invitation action | `Create Mike's demo invitation (no real send)` | `Prepare Mike's invitation` |
-| Calendar pending status | `Demo invitation / Mike pending response` | `Mike pending response` |
-| Calendar result | `Demo invitation sent to Mike... Waiting for his response. No real invitation or calendar change.` | `Mike's invitation for Kimi's school meeting, Friday, October 16, 2026, 3:30-4:30 PM (Asia/Taipei), is awaiting his response.` |
-| Timeline note | Repeated demo/no-delivery/no-change prose | `Current user: Debby. Mike's response and travel are not confirmed.` |
+| Running invitation action | `Creating Parent A's demo invitation (no real send)...` | `Preparing Parent A's invitation...` |
+| Queued invitation action | `Create Parent A's demo invitation (no real send)` | `Prepare Parent A's invitation` |
+| Calendar pending status | `Demo invitation / Parent A pending response` | `Parent A pending response` |
+| Calendar result | `Demo invitation sent to Parent A... Waiting for his response. No real invitation or calendar change.` | `Parent A's invitation for Child's school meeting, Friday, October 16, 2026, 3:30-4:30 PM (Asia/Taipei), is awaiting his response.` |
+| Timeline note | Repeated demo/no-delivery/no-change prose | `Current user: Parent B. Parent A's response and travel are not confirmed.` |
 | Invitation source fact | Repeated chat instructions and timeline prose | Existing Calendar Details, `#calendar-invitation-source`: `Invitations use sample data and stay on this page. No invitation is delivered and no calendars are changed.` |
 | Retry | `Retry this scene before continuing the demo.` | `Retry this request before continuing.` |
 | Completion status | `Scripted demo complete. Start a new conversation to replay.` | `This conversation's supported requests are complete. Start a new conversation to begin again.` |
@@ -29,7 +262,7 @@ This entry supersedes the old standalone-disclosure/framing requirements below.
 
 Source Details member-list labels use `sample` instead of `demo`; retention uses
 `Sample snapshots`; candidate Details uses `sample display rules`. Calendar
-identity now says `Mike, Debby and Kimi have sample schedules here. Names do not
+identity now says `Parent A, Parent B and Child have sample schedules here. Names do not
 establish real calendar access or authorization.` It no longer falsely calls the
 people fictional. Internal enum/ID/class names containing demo remain unchanged.
 
@@ -51,8 +284,8 @@ Offline tests establish DOM placement/lifecycle, not viewport visibility while
 scrolling. Producer must establish sample context and never describe real delivery.
 Removing all sample/no-delivery evidence would mislead and is not implemented.
 
-Kimi owns October 16, 2026, 15:30-16:30 Taipei. Debby's 30-minute overlap and both
-parent busy-only tracks remain. Mike is pending, never accepted or confirmed.
+Child owns October 16, 2026, 15:30-16:30 Taipei. Parent B's 30-minute overlap and both
+parent busy-only tracks remain. Parent A is pending, never accepted or confirmed.
 Bare Yes cannot send; exact consent, revalidation, deduplication, revocation and
 expiry remain unchanged. Saved-public provenance, unknown availability and
 unverified showtimes stay intact. No provider, event write or live functionality.
@@ -111,7 +344,7 @@ It was not edited, rehearsed or recorded by Builder.
 2. Scenes 9 and 11: remove the visible/text assertions expecting `Demo invitation`;
    use `count #meeting-disclosure 0`. Establish `Sample calendars` via
    `#chat-calendar-heading`; scene 11 can assert `#coordination-status` contains
-   `Mike pending response`. Natural chat reply and Kimi ownership assertions remain.
+   `Parent A pending response`. Natural chat reply and Child ownership assertions remain.
 3. Limitation 4: replace the old DEMO/disclosure framing requirement with the
    source placement described above. The no-delivery text is available at
    `#chat-calendar-source-details #calendar-invitation-source`; open its existing
@@ -135,9 +368,9 @@ B is a small presentation-only change using the existing Calendar UI:
 `Family calendars` -> expanded month overview -> expanded member day tracks ->
 shared candidate-times summary. No new domain computation, provider access,
 fixture data, calendar permissions, storage or dependency is needed.
-The day grid retains separate Mike, Debby and Kimi tracks; this does not mean
+The day grid retains separate Parent A, Parent B and Child tracks; this does not mean
 three independent full-calendar views or unrestricted detailed calendar access.
-Parents remain busy-only. Kimi's permitted sample event names/times remain in
+Parents remain busy-only. Child's permitted sample event names/times remain in
 Calendar. Missing time is unknown; candidate times are not guaranteed availability.
 
 Progress: `Loading family members' calendars...` then
@@ -152,8 +385,8 @@ same independent status above the composer. It stays visible with meeting contex
 or history, including pending, No, Undo, stale context and return to activities;
 reset/disposal clears it. Calendar DEMO context and its existing no-delivery
 details remain. Natural dialogue, explicit consent and revalidation are unchanged.
-Kimi still owns the October 16, 2026, 15:30-16:30 Taipei school meeting. Debby's
-30-minute overlap remains; Mike is pending, never accepted. No real send exists.
+Child still owns the October 16, 2026, 15:30-16:30 Taipei school meeting. Parent B's
+30-minute overlap remains; Parent A is pending, never accepted. No real send exists.
 
 ### Immutable snapshot and executed checks
 
@@ -209,7 +442,7 @@ After the approved explicit conversation request loads the synthetic calendars:
    coverage is unknown and does not fetch additional dates.
 3. Select `#calendar-month-days [data-month-date="2026-10-16"]` to review the
    meeting day, then show `#calendar-day-details` / `#availability-grid` and
-   `.track-names`. Mike/Debby remain busy-only; Kimi shows School meeting.
+   `.track-names`. Parent A/Parent B remain busy-only; Child shows School meeting.
    The day-details panel is already expanded; do not blindly toggle its summary.
    Member buttons `#calendar-person-0`, `#calendar-person-1`, `#calendar-person-2`
    inside source Details all focus this same grid, not separate calendar pages.
@@ -219,8 +452,8 @@ After the approved explicit conversation request loads the synthetic calendars:
    selects that candidate's day in the same grid without another load. It is not
    the school-meeting day and must not be presented as that meeting's availability.
 5. For the meeting, show `#coordination-timeline` / `#coordination-result` and
-   retain `#meeting-disclosure` with the pending conversation. Preserve Kimi
-   ownership, Debby's overlap, explicit consent and Mike awaiting response.
+   retain `#meeting-disclosure` with the pending conversation. Preserve Child
+   ownership, Parent B's overlap, explicit consent and Parent A awaiting response.
 
 Selectors and DOM order are verified offline, not visually rehearsed. Use the
 fresh immutable bytes for a separately approved desktop review and 1x continuous
@@ -233,15 +466,15 @@ calendar/provider/network access, TTS, installs, commit or push occurred. No
 operational approval remains available from this task: browser/rehearsal/capture,
 capture-only loading simulation and any paid synthesis need separate approval.
 
-## Historical handoff: Kimi school-event ownership, 21 September 2026
+## Historical handoff: Child school-event ownership, 21 September 2026
 
-The school meeting belongs to Kimi's sample calendar, not Debby's or Mike's.
+The school meeting belongs to Child's sample calendar, not Parent B's or Parent A's.
 The comparison now derives its interval from that calendar event instead of a
-separate hard-coded meeting. The heading is `Kimi's school meeting`; the first
-timeline row stays `Kimi / School meeting` before and after proposals/invitations.
-October 16 has a Kimi month marker and the selected-day details show the event.
+separate hard-coded meeting. The heading is `Child's school meeting`; the first
+timeline row stays `Child / School meeting` before and after proposals/invitations.
+October 16 has a Child month marker and the selected-day details show the event.
 The sample event remains October 16, 2026, 15:30-16:30 Asia/Taipei. Parent busy
-data is unchanged: Debby 15:00-16:00 (30-minute overlap), Mike 17:00-18:00.
+data is unchanged: Parent B 15:00-16:00 (30-minute overlap), Parent A 17:00-18:00.
 Missing child context fails closed. No event is added to either parent's calendar.
 
 ### Fixed snapshot and evidence
@@ -273,9 +506,9 @@ Owned paths: the three product files above, `test/chat-calendar.test.js`,
 `docs/chat-handoff-scenario.json`, `docs/chat-integration-contract.md`,
 `docs/designer/README.md` and this handoff. Unrelated working-tree changes remain.
 
-Producer must use this fixed snapshot and show Kimi as event owner, with parents
+Producer must use this fixed snapshot and show Child as event owner, with parents
 as separate attendance candidates/busy-only rows. Preserve natural invitation
-dialogue, exact explicit consent, Mike pending response and the independent
+dialogue, exact explicit consent, Parent A pending response and the independent
 simulation disclosure described below. Names refer to real people; calendar
 content here is sample data, not verified real schedules or publication consent.
 The five-scene specification is not a rehearsed media scenario. No private data,
@@ -317,16 +550,16 @@ node scripts/test-chat-handoff.js browser-artifacts/demo/snapshot-ab2c0ca7-2ed6-
 
 ### Exact dialogue and Producer requirements
 
-Offer: `Your work meeting overlaps by half an hour. Mike's calendar looks clear
-then. If only one parent needs to attend, shall I invite Mike to Kimi's school
+Offer: `Your work meeting overlaps by half an hour. Parent A's calendar looks clear
+then. If only one parent needs to attend, shall I invite Parent A to Child's school
 meeting on Friday, October 16, 2026, 3:30-4:30 PM (Asia/Taipei)?`
 
-Supported consent remains `Yes, one parent is enough. Please send Mike an
-invitation.` or, in this established context, `Yes, please send Mike an
+Supported consent remains `Yes, one parent is enough. Please send Parent A an
+invitation.` or, in this established context, `Yes, please send Parent A an
 invitation.` Bare Yes, ambiguity or changed/incomplete calendars cannot send.
 No parser, authority, freshness, deduplication or provider behavior changed.
 
-Result: `Mike's invitation for Kimi's school meeting on Friday, October 16,
+Result: `Parent A's invitation for Child's school meeting on Friday, October 16,
 2026, 3:30-4:30 PM (Asia/Taipei) is awaiting his response.` It does not claim
 acceptance or confirmed attendance. The actual operation remains page-local.
 
@@ -343,7 +576,7 @@ disclosure visible alongside the invitation conversation during framing and
 editing; do not crop it out or replace product copy in postproduction. The
 updated [Builder scenario](chat-handoff-scenario.json) asserts its visibility,
 exact text and reset behavior. It is still a five-scene handoff specification,
-not a rehearsed media scenario. Preserve explicit consent and Mike pending.
+not a rehearsed media scenario. Preserve explicit consent and Parent A pending.
 No current browser/rehearsal/capture/TTS approval is supplied by this handoff.
 
 This snapshot also includes the preceding Stop removal and action-specific
@@ -432,10 +665,10 @@ media files were not edited. Its four typed inputs remain supported unchanged:
 1. `What could we do together in October?`
 2. `Could we do something sooner, like this weekend?`
 3. `Can you check my schedule for the school meeting?`
-4. `Yes, one parent is enough. Please send Mike an invitation.`
+4. `Yes, one parent is enough. Please send Parent A an invitation.`
 
 The exact invitation offer and result below remain unchanged, including
-`No real invitation or calendar change.` and Mike pending response. Producer can
+`No real invitation or calendar change.` and Parent A pending response. Producer can
 retain the nine-scene scenario when preparing a new media snapshot from these
 frozen product assets. The new Builder snapshot still embeds its five-scene test
 specification; it must not be mistaken for the nine-scene media scenario. New
@@ -496,17 +729,17 @@ node scripts/demo-snapshot.js --verify browser-artifacts/demo/snapshot-320af2d1-
 
 ### Exact supported school dialogue
 
-1. Debby: `Can you check my schedule for the school meeting?`
-2. Copilot: `Your work meeting overlaps by half an hour. Mike's calendar looks clear then. If only one parent needs to attend, shall I invite him? Demo invitation to Mike: Kimi's school meeting, Friday, October 16, 2026, 3:30-4:30 PM (Asia/Taipei).`
-3. Debby: `Yes, one parent is enough. Please send Mike an invitation.` The shorter
-   `Yes, please send Mike an invitation.` is also supported in this context only.
-4. Copilot: `Demo invitation sent to Mike for Kimi's school meeting, Friday, October 16, 2026, 3:30-4:30 PM (Asia/Taipei). Waiting for his response. No real invitation or calendar change.`
+1. Parent B: `Can you check my schedule for the school meeting?`
+2. Copilot: `Your work meeting overlaps by half an hour. Parent A's calendar looks clear then. If only one parent needs to attend, shall I invite him? Demo invitation to Parent A: Child's school meeting, Friday, October 16, 2026, 3:30-4:30 PM (Asia/Taipei).`
+3. Parent B: `Yes, one parent is enough. Please send Parent A an invitation.` The shorter
+   `Yes, please send Parent A an invitation.` is also supported in this context only.
+4. Copilot: `Demo invitation sent to Parent A for Child's school meeting, Friday, October 16, 2026, 3:30-4:30 PM (Asia/Taipei). Waiting for his response. No real invitation or calendar change.`
 
 The school story ends at this pending action, not another proposal or asking
-Debby to contact Mike. The supporting status reads `Demo invitation / Mike pending
-response`. A stable page-local ID, `demo-school-meeting-mike-20261016`, identifies
-the single record; duplicates do not create or send another invitation. Mike's
-response remains pending. The busy-only timeline retains Debby's conflict, since
+Parent B to contact Parent A. The supporting status reads `Demo invitation / Parent A pending
+response`. A stable page-local ID, `demo-school-meeting-parent-a-20261016`, identifies
+the single record; duplicates do not create or send another invitation. Parent A's
+response remains pending. The busy-only timeline retains Parent B's conflict, since
 an invitation is not attendance confirmation. No reminder feature was added.
 
 Both calendars are checked immediately and revalidated on explicit send. Bare Yes,
@@ -579,7 +812,7 @@ prices/stock/routes and image public-use rights remain unverified as applicable.
 
 Date: 20 September 2026. Recipient: Demo Producer. Builder is the sole product
 writer; Producer remains read-only on product assets. **Unit-only handoff.**
-This replaces the old Mike-conflict/Debby-proposal handoff. The historical
+This replaces the old Parent A-conflict/Parent B-proposal handoff. The historical
 `37f671af9060540cc75fbf0a5eb42eb0c8e4a3e5c43c4fad497fda8b4f3101cc` snapshot and
 existing media are unchanged and are not evidence for this revision.
 
@@ -603,11 +836,11 @@ node scripts/test-chat-handoff.js browser-artifacts/demo/snapshot-3d2949bd-81b7-
 
 ## Exact interaction
 
-1. In a fresh conversation, Debby enters `Can you check my schedule for the school meeting?`.
+1. In a fresh conversation, Parent B enters `Can you check my schedule for the school meeting?`.
 2. Copilot replies `Your work meeting overlaps with the school meeting by 30 minutes. Does only one parent need to attend?`.
-3. Debby enters `Yes. Could Mike go instead?`. This establishes one-parent attendance and requests assessment, not a proposal.
-4. Copilot replies `Mike has no conflicting events in the loaded calendar. Shall I propose that he attend?`.
-5. Debby enters `Yes`. Copilot replies `I propose that Mike attend instead, pending Mike's confirmation. His willingness and travel still need checking. I haven't contacted him or changed any calendars.`.
+3. Parent B enters `Yes. Could Parent A go instead?`. This establishes one-parent attendance and requests assessment, not a proposal.
+4. Copilot replies `Parent A has no conflicting events in the loaded calendar. Shall I propose that he attend?`.
+5. Parent B enters `Yes`. Copilot replies `I propose that Parent A attend instead, pending Parent A's confirmation. His willingness and travel still need checking. I haven't contacted him or changed any calendars.`.
 6. `Undo` or `Cancel` withdraws the proposal. `No` declines; unknown or qualified replies do not consent. New conversation, pause, changed preferences or calendar context also withdraw consent.
 7. `Continue activities` closes this exchange without searching. Then `What could we do together in October?` starts the unchanged October 9-11 scene; `Could we do something sooner, like this weekend?` advances to September 19-20 with explicit outside-coverage uncertainty.
 
@@ -623,10 +856,10 @@ An editorial "Another user story" separator is not a product chat message.
 
 | Condition | Offline result |
 | --- | --- |
-| Identity and data | Stable Mike = person 0, Debby = person 1. Debby is explicitly the synthetic current user. Her October 16 15:00-16:00 work interval overlaps the 15:30-16:30 meeting by a computed 30 minutes. Mike's 17:00-18:00 busy interval does not overlap. |
-| Calendar presentation | Busy-only timeline, overlap marker and before/after comparison match Debby-to-Mike direction. No raw event titles reach chat or activity requests. |
-| Two consent boundaries | Review records revision; one-parent reply assesses Mike; separate Yes proposes. Each boundary rechecks current coverage, freshness, person status and alternate overlap. |
-| Fail closed | Partial, missing, stale, unavailable, revoked, changed revision, Mike conflict and expiry block further consent and retire proposals. Meeting-only expiry notifies chat without an activity timer. |
+| Identity and data | Stable Parent A = person 0, Parent B = person 1. Parent B is explicitly the synthetic current user. Her October 16 15:00-16:00 work interval overlaps the 15:30-16:30 meeting by a computed 30 minutes. Parent A's 17:00-18:00 busy interval does not overlap. |
+| Calendar presentation | Busy-only timeline, overlap marker and before/after comparison match Parent B-to-Parent A direction. No raw event titles reach chat or activity requests. |
+| Two consent boundaries | Review records revision; one-parent reply assesses Parent A; separate Yes proposes. Each boundary rechecks current coverage, freshness, person status and alternate overlap. |
+| Fail closed | Partial, missing, stale, unavailable, revoked, changed revision, Parent A conflict and expiry block further consent and retire proposals. Meeting-only expiry notifies chat without an activity timer. |
 | Fresh-start preparation | No startup query. Exact school question loads only in-memory synthetic fixtures; no activity request, date change or request-budget use. Duplicate loading coalesces; stop/reset/preferences/timeout fence late completion. |
 | Withdrawal and activities | Undo/Cancel/No/reset/context invalidation tested. Meeting replies never dispatch activity search; explicit exit preserves both existing outing scenes and limits. |
 
@@ -649,7 +882,7 @@ No product asset changed after packaging. Packaging alone is not testing.
 | Pinned `test-chat-handoff.js` command above, invoking `node scripts/test-workflow.js chat` | Final 196/196, including all new tests. |
 
 ```sh
-node --test --test-name-pattern='^meeting-only expiry|^coordination requires|^fresh Debby school|^school meeting is a conversation' test/chat-calendar.test.js test/chat-integration.test.js
+node --test --test-name-pattern='^meeting-only expiry|^coordination requires|^fresh Parent B school|^school meeting is a conversation' test/chat-calendar.test.js test/chat-integration.test.js
 ```
 
 Final runner files: `test/chat-contract.test.js`, `test/chat-conversation.test.js`,
@@ -681,7 +914,7 @@ No Producer scripts, production tests or media/workflow records were edited.
 ## Limits and next step
 
 - Bounded exact dialogue only, not general NLP or proactive/background monitoring.
-- Mike's willingness, travel and confirmation remain unknown. No one was contacted;
+- Parent A's willingness, travel and confirmation remain unknown. No one was contacted;
   no notification or calendar write exists. Calendar gaps are never free time.
 - No browser execution, screenshots, desktop/mobile layout, actual keyboard,
   accessibility, rehearsal, capture or parent usability verification this turn.

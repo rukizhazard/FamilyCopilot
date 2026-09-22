@@ -92,14 +92,18 @@
 .chat-calendar .calendar-month-heading button { width: 44px; padding: 0; font-size: 24px; }
 .chat-calendar .calendar-month-weekdays, .chat-calendar .calendar-month-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
 .chat-calendar .calendar-month-weekdays { text-align: center; padding-block: .6rem; font-size: 12px; }
-.chat-calendar .calendar-month-day { height: 100px; min-width: 0; padding: 4px; display: flex; flex-direction: column; gap: 3px; align-items: stretch; text-align: left; overflow: hidden; border-radius: 4px; }
+.chat-calendar .calendar-month-day { height: 126px; min-width: 0; padding: 4px; display: flex; flex-direction: column; gap: 3px; align-items: stretch; text-align: left; overflow: auto; border-radius: 4px; }
 .chat-calendar .calendar-month-day:disabled { opacity: 1; color: #64716d; background: #f5f7f5; }
 .chat-calendar .calendar-month-day[data-outside="true"] { color: #7e8983; background: #fafbfa; }
 .chat-calendar .calendar-month-day[aria-current="date"] { border: 2px solid var(--calendar-accent); }
 .chat-calendar .calendar-month-number { line-height: 18px; }
-.chat-calendar .calendar-month-marker { display: block; font-size: 11px; line-height: 16px; border-radius: 2px; padding-inline: 2px; background: #e1eafa; color: #253e68; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-calendar .calendar-month-marker { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 3px; flex-shrink: 0; font-size: 11px; line-height: 16px; border-radius: 2px; padding-inline: 3px; background: #e1eafa; color: #253e68; }
 .chat-calendar .calendar-month-marker[data-person="1"] { background: #f8e4d9; color: #642b16; }
 .chat-calendar .calendar-month-marker[data-person="2"] { background: #dfefe6; color: #174c36; }
+.chat-calendar .calendar-month-event { display: block; flex-shrink: 0; padding: 3px; border-radius: 2px; background: #dfefe6; color: #174c36; font-size: 11px; line-height: 15px; }
+.chat-calendar .calendar-month-event strong { margin-right: 4px; }
+.chat-calendar .calendar-month-event-time { display: block; }
+.chat-calendar .calendar-month-event[data-status="cancelled"] { border: 1px dashed currentColor; }
 .chat-calendar .calendar-month-day-state { font-size: 10px; line-height: 14px; overflow-wrap: anywhere; }
 .chat-calendar .calendar-month-note { font-size: 12px; color: var(--calendar-muted); }
 .chat-calendar .calendar-candidate-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; list-style: none; padding: 0; margin: 16px 0; }
@@ -129,6 +133,8 @@
 .chat-calendar .coordination-note { font-size: 12px; color: var(--calendar-muted); }
 @media (max-width: 500px) {
   .chat-calendar { padding: .65rem; }
+  .chat-calendar #calendar-month { overflow-x: auto; }
+  .chat-calendar .calendar-month-weekdays, .chat-calendar .calendar-month-days { min-width: 840px; }
   .chat-calendar .availability-actions button { flex: 1; }
   .chat-calendar .calendar-month-day { padding-inline: 1px; }
   .chat-calendar .calendar-month-marker { padding-inline: 0; font-size: 10px; }

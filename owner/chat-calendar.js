@@ -105,21 +105,21 @@
       get("coordination-review").disabled = !ready;
       get("coordination-review").setAttribute("aria-expanded", String(coordinationOpen));
       get("coordination-body").hidden = !coordinationOpen;
-      const mike = result?.people.find(person => person.person === 0), debby = result?.people.find(person => person.person === 1);
+      const parentA = result?.people.find(person => person.person === 0), parentB = result?.people.find(person => person.person === 1);
       get("coordination-status").textContent = !checked ? "Calendar context is missing, incomplete or out of date. No proposal can be confirmed." :
-        debby.status === "conflict" ? `Debby (you) has ${debby.overlapMinutes} minutes of overlap with the meeting. ${mike.status === "no_conflict" ? "Mike has no overlapping busy time reported." : "Mike's calendar also needs checking."}` :
-        "No overlapping busy time reported for Debby (you). Availability is not guaranteed.";
-      const canPropose = checked && debby.status === "conflict" && mike.status === "no_conflict";
+        parentB.status === "conflict" ? `Parent B (you) has ${parentB.overlapMinutes} minutes of overlap with the meeting. ${parentA.status === "no_conflict" ? "Parent A has no overlapping busy time reported." : "Parent A's calendar also needs checking."}` :
+        "No overlapping busy time reported for Parent B (you). Availability is not guaranteed.";
+      const canPropose = checked && parentB.status === "conflict" && parentA.status === "no_conflict";
       if (!canPropose) { proposalRevision = null; invitation = null; }
       get("coordination-status").dataset.proposed = String(proposalRevision !== null);
-      if (proposalRevision !== null) get("coordination-status").textContent = "This proposal avoids your conflict by having Mike attend instead. His confirmation is still needed.";
+      if (proposalRevision !== null) get("coordination-status").textContent = "This proposal avoids your conflict by having Parent A attend instead. His confirmation is still needed.";
       get("coordination-result").hidden = proposalRevision === null;
       get("coordination-result").textContent = proposalRevision === null ? "" :
-        `Before: Debby (you) attending overlaps your calendar by ${debby.overlapMinutes} minutes. Proposed: Mike attends instead; no overlap with his reported busy time. Your commitments stay unchanged. Awaiting Mike's confirmation.`;
+        `Before: Parent B (you) attending overlaps your calendar by ${parentB.overlapMinutes} minutes. Proposed: Parent A attends instead; no overlap with his reported busy time. Your commitments stay unchanged. Awaiting Parent A's confirmation.`;
       if (invitation) {
-        get("coordination-status").textContent = "Mike pending response";
+        get("coordination-status").textContent = "Parent A pending response";
         get("coordination-result").hidden = false;
-        get("coordination-result").textContent = "Mike's invitation for Kimi's school meeting, Friday, October 16, 2026, 3:30-4:30 PM (Asia/Taipei), is awaiting his response.";
+        get("coordination-result").textContent = "Parent A's invitation for Child's school meeting, Friday, October 16, 2026, 3:30-4:30 PM (Asia/Taipei), is awaiting his response.";
       }
       get("coordination-result").dataset.invitationId = invitation?.id || "";
       const timeline = get("coordination-timeline"); timeline.replaceChildren();
@@ -127,8 +127,8 @@
       if (!checked || !coordinationOpen) return;
       const format = value => new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Taipei", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(value));
       const baseline = Date.parse("2026-10-16T14:00:00+08:00");
-      const rows = [["Kimi / School meeting", [result.meeting]],
-        ["Debby (you) / Busy only", debby.busy], ["Mike / Busy only", mike.busy]];
+      const rows = [["Child / School meeting", [result.meeting]],
+        ["Parent B (you) / Busy only", parentB.busy], ["Parent A / Busy only", parentA.busy]];
       for (const [label, intervals] of rows) {
         const row = document.createElement("div"), title = document.createElement("strong"), rail = document.createElement("div");
         row.className = "coordination-row"; title.textContent = label; rail.className = "coordination-rail";
@@ -138,7 +138,7 @@
           block.style.left = `${(Date.parse(interval.startAt) - baseline) / 14400000 * 100}%`;
           block.style.width = `${(Date.parse(interval.endAt) - Date.parse(interval.startAt)) / 14400000 * 100}%`;
           rail.append(block);
-          if (label === "Debby (you) / Busy only" && proposalRevision === null) {
+          if (label === "Parent B (you) / Busy only" && proposalRevision === null) {
             const start = Math.max(Date.parse(interval.startAt), Date.parse(result.meeting.startAt));
             const end = Math.min(Date.parse(interval.endAt), Date.parse(result.meeting.endAt));
             if (end > start) {
@@ -171,8 +171,8 @@
       }
       availabilityController.redraw();
       const result = coordinationReady ? transport.coordination() : null;
-      const mike = result?.people.find(person => person.person === 0), debby = result?.people.find(person => person.person === 1);
-      if (result?.status !== "checked" || debby?.status !== "conflict" || mike?.status !== "no_conflict") {
+      const parentA = result?.people.find(person => person.person === 0), parentB = result?.people.find(person => person.person === 1);
+      if (result?.status !== "checked" || parentB?.status !== "conflict" || parentA?.status !== "no_conflict") {
         invitation = null;
         proposalRevision = null; meetingRevision = null; alternateRevision = null; return { state: "unavailable" };
       }
@@ -180,12 +180,12 @@
       if (action === "review") {
         coordinationOpen = true; proposalRevision = null; meetingRevision = result.revision; alternateRevision = null;
         availabilityController.redraw();
-        return { state: "ask", overlapMinutes: debby.overlapMinutes };
+        return { state: "ask", overlapMinutes: parentB.overlapMinutes };
       }
       if (meetingRevision === null || meetingRevision !== result.revision) return { state: "unavailable" };
       if (action === "send_invitation") {
-        invitation = Object.freeze({ id: "demo-school-meeting-mike-20261016", revision: result.revision,
-          recipient: "Mike", startAt: "2026-10-16T15:30:00+08:00", endAt: "2026-10-16T16:30:00+08:00",
+        invitation = Object.freeze({ id: "demo-school-meeting-parent-a-20261016", revision: result.revision,
+          recipient: "Parent A", startAt: "2026-10-16T15:30:00+08:00", endAt: "2026-10-16T16:30:00+08:00",
           timeZone: "Asia/Taipei", response: "pending" });
         proposalRevision = null; meetingRevision = null; alternateRevision = null;
         availabilityController.redraw();
@@ -277,9 +277,9 @@
       controllers.child(environment);
       view.nodes.get("availability-date-help").textContent = "Sample calendars cover all of October 2026. Browsing months does not load other dates.";
       view.nodes.get("owner-source-notice").textContent = "Fictional data only. No provider, local service, file or browser storage access.";
-      view.nodes.get("availability-identity").textContent = "Mike, Debby and Kimi have sample schedules here. Names do not establish real calendar access or authorization.";
+      view.nodes.get("availability-identity").textContent = "Parent A, Parent B and Child have sample schedules here. Names do not establish real calendar access or authorization.";
       view.nodes.get("availability-retention").textContent = "Sample snapshots remain in this Calendar instance only. Sync replaces fixtures; Clear deletes fixtures. Collapse and leave do not delete snapshots.";
-      view.nodes.get("child-retention").textContent = "Kimi (sample): fictional reviewed source and permitted names/times, in memory only. No real guardian consent or source authorization is granted. Sync and saved viewing use fixtures only.";
+      view.nodes.get("child-retention").textContent = "Child (sample): fictional reviewed source and permitted names/times, in memory only. No real guardian consent or source authorization is granted. Sync and saved viewing use fixtures only.";
       listen(view.toggle, "click", () => collapsed ? expand() : collapse());
       listen(view.nodes.get("coordination-review"), "click", () => {
         if (meetingListeners.size) {

@@ -68,7 +68,7 @@ test("processing lists only current and upcoming actions for activities, meeting
   assert.deepEqual(core.snapshot().processingActions, []);
   changes.length = 0;
   core.reviewMeeting();
-  await core.submit("Yes, please send Mike an invitation.");
+  await core.submit("Yes, please send Parent A an invitation.");
   assert.deepEqual(changes.filter(state => state.processingActions.length).map(state => state.processingActions), [
     ["check_school_meeting"], ["send_demo_invitation"]
   ]);
@@ -79,6 +79,37 @@ test("processing lists only current and upcoming actions for activities, meeting
   assert.deepEqual(changes.find(state => state.status === "preparing").processingActions, ["load_calendars", "check_school_meeting"]);
   assert.ok(changes.every(state => !state.processingActions.includes("search_saved_activities")));
   core.dispose();
+});
+test("async invitation preparation deduplicates, revalidates and fails closed across interruption", async () => {
+  for (const outcome of ["complete", "reset", "pause", "dispose", "calendarChanged", "preferences", "reject", "timeout", "stale"]) {
+    let resolve, reject, signal;
+    const commands = [], timers = new Map(); let sequence = 0;
+    const core = Core.createConversation({ searchActivities: request => empty(request),
+      prepareInvitation(options) { signal = options.signal; return new Promise((done, fail) => { resolve = done; reject = fail; }); },
+      coordinateMeeting(action) {
+        commands.push(action);
+        return action === "review" ? { state: "ask", overlapMinutes: 30 } : { state: outcome === "stale" ? "unavailable" : "invited" };
+      },
+      schedule(callback, delay) { timers.set(++sequence, { callback, delay }); return sequence; },
+      unschedule(timer) { timers.delete(timer); }
+    });
+    await core.reviewMeeting();
+    const pending = core.submit("Yes, please send Parent A an invitation.");
+    assert.equal(core.submit("Yes, please send Parent A an invitation."), pending);
+    assert.equal(core.snapshot().status, "sending_demo_invitation");
+    assert.deepEqual(commands, ["review"]);
+    if (["reset", "pause", "dispose", "calendarChanged"].includes(outcome)) core[outcome]();
+    if (outcome === "preferences") core.applyPreferences({ ...core.snapshot().context.preferences, ages: [8] });
+    if (outcome === "timeout") [...timers.values()].find(timer => timer.delay === 10000).callback();
+    if (outcome === "reject") reject(Error("preparation failed")); else resolve();
+    await pending;
+    assert.equal(commands.filter(command => command === "send_invitation").length, ["complete", "stale"].includes(outcome) ? 1 : 0);
+    assert.equal(core.snapshot().meetingState === "invited", outcome === "complete");
+    assert.equal(core.snapshot().processingActions.length, 0);
+    assert.equal(signal.aborted, true);
+    assert.equal(timers.size, 0);
+    core.dispose();
+  }
 });
 test("reset during meeting progress prevents the retired review or invitation action", async () => {
   for (const target of ["checking_meeting", "sending_demo_invitation"]) {
@@ -91,7 +122,7 @@ test("reset during meeting progress prevents the retired review or invitation ac
       onChange(state) { if (state.status === target) core.reset(); }
     });
     await core.submit("October ideas"); core.reviewMeeting();
-    if (target === "sending_demo_invitation") await core.submit("Yes, please send Mike an invitation.");
+    if (target === "sending_demo_invitation") await core.submit("Yes, please send Parent A an invitation.");
     assert.equal(commands.includes(target === "checking_meeting" ? "review" : "send_invitation"), false);
     assert.deepEqual(core.snapshot().processingActions, []);
     assert.equal(core.snapshot().context.triggerState, "not_started");
@@ -175,7 +206,7 @@ test("meeting replies require explicit consent and reject malformed summaries wi
     assert.equal(core.snapshot().meetingState, "ask");
     await core.submit("對");
     assert.equal(core.snapshot().meetingState, "ask");
-    await core.submit("Yes, please send Mike an invitation.");
+    await core.submit("Yes, please send Parent A an invitation.");
     assert.equal(core.snapshot().meetingState, invalid ? "unavailable" : "invited");
     assert.equal(core.snapshot().demoStep, 1);
     assert.equal(requests.length, 1);
@@ -203,13 +234,13 @@ test("fresh school question checks both parents and offers one explicit demo inv
   await core.submit("Can you check my schedule for the school meeting?");
   assert.equal(preparations, 1);
   assert.equal(core.snapshot().messages[0].text, "Can you check my schedule for the school meeting?");
-  assert.match(core.snapshot().messages.at(-1).text, /overlaps by half an hour.*Mike's calendar looks clear then.*If only one parent needs to attend, shall I invite Mike to Kimi's school meeting on Friday, October 16, 2026, 3:30-4:30 PM \(Asia\/Taipei\)\?/);
-  for (const reply of ["Maybe", "yes, but don't send", "Yes. Could Mike go instead?", "Yes", "Please send Mike an invitation if he's willing"]) await core.submit(reply);
+  assert.match(core.snapshot().messages.at(-1).text, /overlaps by half an hour.*Parent A's calendar looks clear then.*If only one parent needs to attend, shall I invite Parent A to Child's school meeting on Friday, October 16, 2026, 3:30-4:30 PM \(Asia\/Taipei\)\?/);
+  for (const reply of ["Maybe", "yes, but don't send", "Yes. Could Parent A go instead?", "Yes", "Please send Parent A an invitation if he's willing"]) await core.submit(reply);
   assert.deepEqual(commands, ["review"]);
-  await core.submit("Yes, one parent is enough. Please send Mike an invitation.");
+  await core.submit("Yes, one parent is enough. Please send Parent A an invitation.");
   assert.equal(core.snapshot().meetingState, "invited");
-  assert.match(core.snapshot().messages.at(-1).text, /Mike's invitation for Kimi's school meeting on Friday, October 16, 2026, 3:30-4:30 PM \(Asia\/Taipei\) is awaiting his response/);
-  await core.submit("Yes, one parent is enough. Please send Mike an invitation.");
+  assert.match(core.snapshot().messages.at(-1).text, /Parent A's invitation for Child's school meeting on Friday, October 16, 2026, 3:30-4:30 PM \(Asia\/Taipei\) is awaiting his response/);
+  await core.submit("Yes, one parent is enough. Please send Parent A an invitation.");
   assert.equal(commands.filter(command => command === "send_invitation").length, 1);
   assert.equal(core.snapshot().dispatched, 0); assert.equal(core.snapshot().demoStep, 0);
   assert.equal(requests.length, 0);
@@ -255,7 +286,7 @@ test("each meeting consent boundary rejects negative replies and withdraws on re
             { state: { send_invitation: "invited", cancel: "cancelled", decline: "declined" }[action] };
         } });
       await core.submit("Can you check my schedule for the school meeting?");
-      if (phase === "invited") await core.submit("Yes, please send Mike an invitation.");
+      if (phase === "invited") await core.submit("Yes, please send Parent A an invitation.");
       const confirmed = commands.filter(command => command === "send_invitation").length;
       if (change === "preferences") {
         const preferences = core.snapshot().context.preferences; preferences.ages = [12]; core.applyPreferences(preferences);
@@ -264,10 +295,10 @@ test("each meeting consent boundary rejects negative replies and withdraws on re
       else await core.submit(change);
       assert.ok(["cancel", "decline"].includes(commands.at(-1)), `${phase}: ${change}`);
       assert.notEqual(core.snapshot().meetingState, "invited");
-      if (change !== "reset") await core.submit("Yes, please send Mike an invitation.");
+      if (change !== "reset") await core.submit("Yes, please send Parent A an invitation.");
       assert.equal(commands.filter(command => command === "send_invitation").length, confirmed);
       assert.equal(requests.length, 0);
-      if (["calendar", "preferences"].includes(change)) assert.doesNotMatch(JSON.stringify(core.snapshot().messages), /awaiting his response|Mike's calendar looks clear/);
+      if (["calendar", "preferences"].includes(change)) assert.doesNotMatch(JSON.stringify(core.snapshot().messages), /awaiting his response|Parent A's calendar looks clear/);
       core.dispose();
     }
   }
@@ -285,7 +316,7 @@ test("failed meeting preparation and malformed review summaries never grant cons
       }
     });
     await core.submit("Can you check my schedule for the school meeting?");
-    await core.submit("Yes, please send Mike an invitation.");
+    await core.submit("Yes, please send Parent A an invitation.");
     assert.equal(core.snapshot().meetingState, "unavailable");
     assert.equal(commands.includes("send_invitation"), false); assert.equal(searches.length, 0);
     assert.doesNotMatch(JSON.stringify(core.snapshot()), /private detail|privateTitle|never retain/);

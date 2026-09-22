@@ -3,7 +3,7 @@
   const Contract = typeof module !== "undefined" && module.exports ? require("../shared/chat-contract") : root.FamilyChatContract;
   const copy = value => JSON.parse(JSON.stringify(value));
   const dayMs = 86400000;
-  const invitationResult = "Mike's invitation for Kimi's school meeting on Friday, October 16, 2026, 3:30-4:30 PM (Asia/Taipei) is awaiting his response.";
+  const invitationResult = "Parent A's invitation for Child's school meeting on Friday, October 16, 2026, 3:30-4:30 PM (Asia/Taipei) is awaiting his response.";
 
   function initialContext() {
     return {
@@ -42,13 +42,14 @@
     return Contract.validateActivityRequest(request) ? range : null;
   }
 
-  function createConversation({ searchActivities, prepareSession = null, assessActivities = null, coordinateMeeting = null, onChange = () => {}, context = initialContext(),
+  function createConversation({ searchActivities, prepareSession = null, assessActivities = null, coordinateMeeting = null, prepareInvitation = null, onChange = () => {}, context = initialContext(),
     schedule = (callback, delay) => root.setTimeout(callback, delay),
     unschedule = timer => root.clearTimeout(timer) } = {}) {
     if (typeof searchActivities !== "function" || typeof onChange !== "function" ||
       prepareSession !== null && typeof prepareSession !== "function" ||
       assessActivities !== null && typeof assessActivities !== "function" ||
       coordinateMeeting !== null && typeof coordinateMeeting !== "function" ||
+      prepareInvitation !== null && typeof prepareInvitation !== "function" ||
         typeof schedule !== "function" || typeof unschedule !== "function" || !Contract.validateDemoContext(context)) {
       throw new Error("invalid_conversation_options");
     }
@@ -56,7 +57,7 @@
     let current = copy(seed), generation = 0, sequence = 0, dispatched = 0;
     let active = null, accepted = null, result = null, status = "not_started", disposed = false;
     let demoStep = 0, lastSubmission = null;
-    let meetingState = null, meetingPreparation = null;
+    let meetingState = null, meetingPreparation = null, invitationPreparation = null;
     let calendarAssessment = null, assessmentTimer = null;
     let messages = [];
     current.triggerState = "not_started";
@@ -80,6 +81,11 @@
     }
     function invalidate() {
       generation++;
+      if (invitationPreparation) {
+        const previous = invitationPreparation;
+        invitationPreparation = null;
+        unschedule(previous.timer); previous.controller.abort(); previous.finish();
+      }
       if (meetingPreparation) {
         unschedule(meetingPreparation.timer); meetingPreparation.finish(); meetingPreparation = null;
       }
@@ -122,7 +128,7 @@
       } catch { return { state: "unavailable" }; }
     }
     function reviewMeeting() {
-      if (disposed || active || meetingPreparation || !["not_started", "active"].includes(current.triggerState)) return Promise.resolve();
+      if (disposed || active || meetingPreparation || invitationPreparation || !["not_started", "active"].includes(current.triggerState)) return Promise.resolve();
       if (messages.length > 16) messages = [messages[0], ...messages.slice(-13)];
       if (current.triggerState === "not_started") {
         current.sessionId = nextId("session"); current.triggerState = "active";
@@ -136,7 +142,7 @@
             unschedule(record.timer); meetingPreparation = null; status = "ready";
             if (failed) {
               meetingState = "unavailable";
-              message("assistant", "meeting_status", "I couldn't check both calendars. Please review the school meeting again before inviting Mike.");
+              message("assistant", "meeting_status", "I couldn't check both calendars. Please review the school meeting again before inviting Parent A.");
               publish();
             } else reviewMeeting();
             finish();
@@ -156,9 +162,9 @@
       meetingState = answer.state;
       status = result?.status || "ready";
       message("assistant", "meeting_question", answer.state === "ask" ?
-        `Your work meeting overlaps by ${answer.overlapMinutes === 30 ? "half an hour" : `${answer.overlapMinutes} minutes`}. Mike's calendar looks clear then. If only one parent needs to attend, shall I invite Mike to Kimi's school meeting on Friday, October 16, 2026, 3:30-4:30 PM (Asia/Taipei)?` :
+        `Your work meeting overlaps by ${answer.overlapMinutes === 30 ? "half an hour" : `${answer.overlapMinutes} minutes`}. Parent A's calendar looks clear then. If only one parent needs to attend, shall I invite Parent A to Child's school meeting on Friday, October 16, 2026, 3:30-4:30 PM (Asia/Taipei)?` :
         answer.state === "invited" ? invitationResult :
-        "I can't confirm an alternative from both calendars. Please check the school meeting again before inviting Mike.");
+        "I can't confirm an alternative from both calendars. Please check the school meeting again before inviting Parent A.");
       publish();
     }
     function replyToMeeting(text) {
@@ -174,19 +180,33 @@
         message("assistant", "meeting_status", "Okay, I'll leave the invitation aside.");
       } else if (["no", "both parents need to attend", "不", "不是", "兩位都要"].includes(answer)) {
         meetingCommand("decline"); meetingState = "closed";
-        message("assistant", "meeting_status", "I won't invite Mike.");
-      } else if (meetingState === "ask" && ["yes, one parent is enough. please send mike an invitation", "yes, please send mike an invitation"].includes(answer)) {
+        message("assistant", "meeting_status", "I won't invite Parent A.");
+      } else if (meetingState === "ask" && ["yes, one parent is enough. please send parent a an invitation", "yes, please send parent a an invitation"].includes(answer)) {
         const invitationGeneration = generation;
+        let finish;
+        const promise = new Promise(resolve => { finish = resolve; });
+        const record = { promise, finish, timer: null, controller: new AbortController() };
+        invitationPreparation = record;
+        const complete = failed => {
+          if (disposed || invitationPreparation !== record || generation !== invitationGeneration || current.triggerState !== "active") return;
+          invitationPreparation = null; unschedule(record.timer); record.controller.abort();
+          const result = failed ? { state: "unavailable" } : meetingCommand("send_invitation");
+          if (failed) meetingCommand("cancel");
+          meetingState = result.state; status = "ready";
+          message("assistant", "meeting_invitation", result.state === "invited" ? invitationResult :
+            "The calendar check is no longer current or complete. Please review the school meeting again before inviting Parent A.");
+          publish(); finish();
+        };
+        record.timer = schedule(() => complete(true), 10000);
         status = "sending_demo_invitation"; publish();
-        if (disposed || generation !== invitationGeneration || current.triggerState !== "active") return;
-        const result = meetingCommand("send_invitation"); meetingState = result.state;
-        status = "ready";
-        message("assistant", "meeting_invitation", result.state === "invited" ? invitationResult :
-          "The calendar check is no longer current or complete. Please review the school meeting again before inviting Mike.");
+        if (invitationPreparation !== record) return promise;
+        try { Promise.resolve(prepareInvitation?.({ signal: record.controller.signal })).then(() => complete(false), () => complete(true)); }
+        catch { complete(true); }
+        return promise;
       } else {
         message("assistant", "meeting_status", meetingState === "ask" ?
-          "If one parent is enough, shall I invite Mike? Please explicitly ask me to send the invitation, or say No or Cancel." : meetingState === "invited" ?
-          "Mike's invitation is already awaiting his response." :
+          "If one parent is enough, shall I invite Parent A? Please explicitly ask me to send the invitation, or say No or Cancel." : meetingState === "invited" ?
+          "Parent A's invitation is already awaiting his response." :
           "Please review the school meeting again, or say Continue activities.");
       }
       publish();
@@ -330,6 +350,7 @@
     }
     function submit(text) {
       if (disposed || !["not_started", "active"].includes(current.triggerState)) return Promise.resolve();
+      if (invitationPreparation) return invitationPreparation.promise;
       if (meetingPreparation) return meetingPreparation.promise;
       if (active) return active.promise;
       if (typeof text !== "string" || !text.trim() || text.length > 500 || /[\u0000-\u001f\u007f]/.test(text)) {
@@ -337,7 +358,7 @@
       }
       const meetingRequest = ["can you check my schedule for the school meeting", "review school meeting", "review a school meeting", "school meeting"].includes(text.trim().toLowerCase().replace(/[.!?]+$/, ""));
       if (meetingState && !meetingRequest) {
-        replyToMeeting(text); return Promise.resolve();
+        return replyToMeeting(text) || Promise.resolve();
       }
       if (meetingRequest) {
         message("parent", "text", text); return reviewMeeting();

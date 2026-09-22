@@ -106,7 +106,7 @@ test("sync matches second source by reference despite rename and duplicate names
 });
 test("sync never guesses first/default/name: partial missing unavailable, complete missing revoked", async () => {
   for (const partial of [false, true]) {
-    for (const calendars of [[], [{ id: first, name: "Kimi" }]]) {
+    for (const calendars of [[], [{ id: first, name: "Child" }]]) {
       const f = fixture({ raw: { calendars, partial } }), r = await f.run("sync");
       assert.equal(r.code, partial ? "unavailable" : "revoked"); assert.equal(r.cleanup, "workflow_disabled");
       assert.equal(r.data, undefined); assert.equal(f.backends.length, 1); assert.equal(f.calls.includes("import"), false);

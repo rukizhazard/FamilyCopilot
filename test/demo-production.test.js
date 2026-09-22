@@ -3,6 +3,74 @@ const test = require("node:test"), assert = require("node:assert/strict");
 const { sampleWeek, syntheticMarkup, story } = require("../scripts/record-integrated-demo");
 const { wavInfo, escapeXML, stamp, chunks, narrationDelay } = require("../scripts/finish-integrated-demo");
 const A = require("../owner/availability-core");
+test("intro dubbing trims only measured silence without accelerating speech or exceeding two minutes", () => {
+  const { dubTimingPlan } = require("../scripts/render-demo-intro");
+  const bounds = [0, 6, 12, 16, 20, 24, 28, 37, 42, 49];
+  const brief = { replaceOpeningSeconds: 8.4, preservedDemoSeconds: 68.36,
+    scenes: bounds.slice(1).map((end, index) => ({ id: index + 1, start: bounds[index], end, narration: "First sentence. Second sentence." })) };
+  const speech = { voice: "en-US-JennyNeural", style: "friendly", rate: "-3%",
+    audio: brief.scenes.map((scene, index) => ({ text: scene.narration, file: `voice-${index + 1}.wav`, seconds: 4 })) };
+  const silences = brief.scenes.map(() => [{ start: 0, end: 0.2 }, { start: 1, end: 2 }, { start: 3, end: 4 }]);
+  const before = JSON.stringify({ brief, speech, silences });
+  const plan = dubTimingPlan(brief, speech, silences);
+  assert.deepEqual(plan.scenes[0].pieces, [{ start: 0.14, end: 1.16 }, { start: 1.84, end: 3.12 }]);
+  assert.equal(plan.voiceTempo, 1); assert.equal(plan.videoSpeed, 1); assert(plan.duration < 120);
+  assert.equal(JSON.stringify({ brief, speech, silences }), before);
+  assert(plan.scenes.every(scene => scene.voiceStart + scene.voiceSeconds < scene.start + scene.duration));
+  const changed = structuredClone(speech); changed.audio[0].text = "Unapproved wording.";
+  assert.throws(() => dubTimingPlan(brief, changed, silences));
+  const long = structuredClone(speech); long.audio.forEach(clip => { clip.seconds = 15; });
+  assert.throws(() => dubTimingPlan(brief, long, brief.scenes.map(() => [{ start: 0, end: 0.2 }, { start: 14, end: 15 }])));
+  const malformed = structuredClone(silences); malformed[0][1].end = NaN;
+  assert.throws(() => dubTimingPlan(brief, speech, malformed));
+});
+test("animated intro replaces only the opening and rejects excess duration or invalid scene timing", () => {
+  const { animatedIntroPlan } = require("../scripts/render-demo-intro");
+  const source = { videoSha256: "a".repeat(64), segments: [
+    { start: 0, duration: 8.4, speed: 1, captions: [] },
+    { start: 8.4, duration: 68.36, speed: 1, captions: [{ start: 9.63, end: 11.89, text: "Existing voice." }] }
+  ] };
+  const boundaries = [0, 6, 12, 16, 20, 24, 28, 37, 42, 49];
+  const brief = { version: 1, kind: "familycopilot.demo.intro-brief", sourceVideoSha256: source.videoSha256,
+    replaceOpeningSeconds: 8.4, sourceDurationSeconds: 76.76, introTargetSeconds: 49,
+    fullVideoTargetSeconds: 117.36, fullVideoExclusiveLimitSeconds: 120,
+    scenes: boundaries.slice(1).map((end, index) => ({ id: index + 1, start: boundaries[index], end, narration: "Proposed vision." })) };
+  const before = JSON.stringify({ brief, source });
+  const plan = animatedIntroPlan(brief, source);
+  assert.equal(plan.duration, 117.36);
+  assert.equal(plan.sourceStart, 8.4);
+  assert.deepEqual(plan.captions.at(-1), { start: 50.23, end: 52.49, text: "Existing voice." });
+  assert.equal(JSON.stringify({ brief, source }), before);
+  const long = structuredClone(brief);
+  long.scenes[8].end = 52; long.introTargetSeconds = 52; long.fullVideoTargetSeconds = 120.36;
+  assert.throws(() => animatedIntroPlan(long, source), /strictly shorter/);
+  const gap = structuredClone(brief); gap.scenes[2].start += 0.04;
+  assert.throws(() => animatedIntroPlan(gap, source));
+  const invalid = structuredClone(brief); invalid.scenes[2].narration = "";
+  assert.throws(() => animatedIntroPlan(invalid, source));
+  const changedCaption = structuredClone(brief);
+  changedCaption.scenes[6].captionCues = [{ start: 28.2, seconds: 5.4, text: "Different words." }];
+  assert.throws(() => animatedIntroPlan(changedCaption, source));
+  assert.throws(() => animatedIntroPlan({ ...brief, sourceVideoSha256: "b".repeat(64) }, source));
+  const fast = structuredClone(source); fast.segments[1].speed = 1.1;
+  assert.throws(() => animatedIntroPlan(brief, fast));
+});
+test("invitation capture dwell preserves original callback and aborts its timer", async () => {
+  const { installInvitationDwell, captureOptions } = require("../scripts/record-demo");
+  const vm = require("node:vm");
+  let callback, options, cleared = 0, calls = 0;
+  const window = { setTimeout(fn, delay) { assert.equal(delay, 2500); callback = fn; return 42; }, clearTimeout(id) { assert.equal(id, 42); cleared++; } };
+  vm.runInNewContext(`(${installInvitationDwell.toString()})()`, { window });
+  window.FamilyChatConversation = { createConversation(value) { options = value; return "controller"; } };
+  assert.equal(window.FamilyChatConversation.createConversation({ prepareInvitation: async () => { calls++; } }), "controller");
+  const controller = new AbortController();
+  const pending = options.prepareInvitation({ signal: controller.signal });
+  assert.equal(calls, 1); controller.abort(); await pending; assert.equal(cleared, 1);
+  const normal = options.prepareInvitation({ signal: new AbortController().signal }); callback(); await normal; assert.equal(cleared, 2);
+  const args = ["--chat-preview", "--snapshot", "snapshot.json", "--sha256", "a".repeat(64)];
+  assert.throws(() => captureOptions([...args, "--readable-pacing"]));
+  assert.equal(captureOptions([...args, "--simulate-loading", "--simulate-calendar", "--viewport=1440x900", "--readable-pacing"]).readablePacing, true);
+});
 test("calendar timing simulation is opt-in and preserves calendar and meeting results", async () => {
   const { installDemoResponseDelay, captureOptions } = require("../scripts/record-demo");
   const callbacks = [], calls = [];
@@ -109,6 +177,16 @@ test("two-agent workflow definitions, local links and example scenario stay vali
   assert.equal(scripts.test, "node scripts/test-workflow.js quick");
   assert.equal(scripts["demo:plan"], "node scripts/finish-real-calendar-demo.js --plan-chat");
 });
+test("capture missing-image declarations only allow the four optional local references", () => {
+  const { validateScenario } = require("../scripts/demo-snapshot");
+  const scenario = require("../docs/demo-scenario.example.json");
+  const image = "/activity-preview/chat-assets/chiikawa.jpg";
+  assert.doesNotThrow(() => validateScenario({ ...scenario, missingImageAssets: [image] }));
+  for (const missingImageAssets of [["/api/availability"], ["https://example.com/image.jpg"], [image, image], ["/chat/index.html"], image]) {
+    assert.throws(() => validateScenario({ ...scenario, missingImageAssets }));
+  }
+});
+
 test("demo snapshots survive source edits but reject corruption, traversal, symlinks and overwrite", context => {
   const fs = require("node:fs"), path = require("node:path"), os = require("node:os");
   const { createSnapshot, loadSnapshot, validateScenario } = require("../scripts/demo-snapshot");
@@ -309,7 +387,7 @@ test("family story introduces interests before basketball and ends at the source
   assert(narrationDelay(4, true) > 5.8);
   assert.equal(narrationDelay(3, true), 0.15);
   assert.equal(narrationDelay(4, false), 0.15);
-  assert.match(story[2].text, /consider.*might fit.*check Kimi's plans/s);
+  assert.match(story[2].text, /consider.*might fit.*check Child's plans/s);
   assert.match(story[7].text, /official game page/);
   assert.doesNotMatch(story.map(s => s.text).join(" "), /Start over|invented game|Synthetic Away|fictional|sample calendars|saved profile|automatically.*free/i);
   for (const s of story) assert.equal(chunks(s.text).join(" "), s.text);

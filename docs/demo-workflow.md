@@ -133,7 +133,107 @@ root is `/home/davidtang/.cache/familycopilot-demo-tools`, selected by
 
 ## Current delivery and remaining review
 
-Current revision: [73.96-second Jenny MP4](../browser-artifacts/demo/family-story-Pjd8Et/familycopilot-family-story.mp4),
+Latest narrated revision: [118.64-second Jenny MP4](../browser-artifacts/demo/motion-jenny-BrfRBw/familycopilot-animated-jenny.mp4),
+[English SRT](../browser-artifacts/demo/motion-jenny-BrfRBw/familycopilot-animated-jenny.en.srt),
+[manifest](../browser-artifacts/demo/motion-jenny-BrfRBw/manifest.json),
+[verification](../browser-artifacts/demo/motion-jenny-BrfRBw/preservation-verification.json),
+[review notes](../browser-artifacts/demo/motion-jenny-BrfRBw/review-notes.json).
+Owner approved adding Jenny narration and one scoped synthesis batch: 9 requests,
+675 characters, one credential read, no retries. That authorization is consumed.
+The 50.28-second animated vision intro now has narration; the original demo and
+narrated ending remain at 1x. Only speech silence and animation holds were edited;
+no words removed or speech accelerated. Full decode, exact audio sample length,
+hashes, captions, nine new-voice and two retained-voice comparisons, six source
+frames, nine motion checks and 32 production tests passed. Selected final frames
+inspected. Full human audition/viewing and public image reuse rights remain pending.
+No new capture, product changes, private access, public search or uploads.
+
+Previous silent-intro preview: [117.36-second MP4](../browser-artifacts/demo/motion-preview-vkQSin/familycopilot-animated-preview.mp4),
+[English SRT](../browser-artifacts/demo/motion-preview-vkQSin/familycopilot-animated-preview.en.srt),
+[manifest](../browser-artifacts/demo/motion-preview-vkQSin/manifest.json),
+[review notes](../browser-artifacts/demo/motion-preview-vkQSin/review-notes.json).
+Owner approved the condensed nine-scene product-vision animation and offline
+production, explicitly choosing no new narration for this preview. The new
+49-second intro is silent with English captions; the previous demo from 8.4s
+onward, including Jenny's narrated ending, remains at 1x. Full decode, 2934 frames,
+hashes, captions, ten layout checks, six source-frame and six motion comparisons,
+two audio comparisons and 31 production tests passed. Selected visual review
+completed; continuous human viewing/audition and public image rights remain pending.
+No new TTS, credentials, product capture, private access, public requests or uploads.
+
+Previous fully narrated revision: [76.76-second Jenny MP4](../browser-artifacts/demo/family-story-9snm0K/familycopilot-family-story.mp4),
+[English SRT](../browser-artifacts/demo/family-story-9snm0K/familycopilot-family-story.en.srt),
+[manifest](../browser-artifacts/demo/family-story-9snm0K/manifest.json),
+[verification](../browser-artifacts/demo/family-story-9snm0K/verification.json).
+Owner preferred the previous narrated ending. Restored existing waiting-response
+and "Family Copilot. Less coordinating. More living." Jenny clips and title.
+Improved fades and all four readable-pacing fixes retained, all media at 1x.
+Ending audio verified non-silent at 70.61-76.13s, before the final fade.
+No new capture, synthesis, private access or network requests. Human continuous
+viewing/audition and public image reuse rights remain pending.
+
+Previous revision: [76.28-second Jenny MP4](../browser-artifacts/demo/family-story-0q93Fh/familycopilot-family-story.mp4),
+[English SRT](../browser-artifacts/demo/family-story-0q93Fh/familycopilot-family-story.en.srt),
+[manifest](../browser-artifacts/demo/family-story-0q93Fh/manifest.json),
+[verification](../browser-artifacts/demo/family-story-0q93Fh/verification.json).
+Readable pacing: cursor approach 1.24s, hover 1.20s, white wait 0.6s; school
+question visible 2.20s; invitation animation visible 2.43s. Product unchanged:
+preparation dwell is capture-only. New approved personal Jenny closing finishes
+on the pending screen, then soft fade to silent Family Copilot title. One named
+90-character synthesis request, no retry/private data. All action/audio remains1x.
+Full decode, hashes, 15 white frames, source mappings and selected visual checks
+passed. Human continuous review/audition and image publication rights pending.
+Movie click is offline intercepted, followed by prior separate official-page still.
+
+Previous revision: [69.76-second Jenny MP4](../browser-artifacts/demo/family-story-38u5Sm/familycopilot-family-story.mp4),
+[English SRT](../browser-artifacts/demo/family-story-38u5Sm/familycopilot-family-story.en.srt),
+[manifest](../browser-artifacts/demo/family-story-38u5Sm/manifest.json),
+[verification](../browser-artifacts/demo/family-story-38u5Sm/verification.json).
+First typing stays at scrollY=0; first story shows the updated whole month then
+activities, without opening a day or narrating shared availability. Native 700ms
+invitation preparation is visible near 57 seconds, then Parent A remains pending.
+All 25 assets match Builder's reviewed snapshot, including four original images.
+Thirteen existing Jenny clips, all1x; one-second white movie transition retained.
+Decode, hashes, source-frame and animation-pixel checks passed. Human continuous
+viewing/audition and public image reuse rights remain pending.
+
+Previous revision: [74.64-second Jenny MP4](../browser-artifacts/demo/family-story-Jk0E21/familycopilot-family-story.mp4),
+[English SRT](../browser-artifacts/demo/family-story-Jk0E21/familycopilot-family-story.en.srt),
+[manifest](../browser-artifacts/demo/family-story-Jk0E21/manifest.json),
+[verification](../browser-artifacts/demo/family-story-Jk0E21/verification.json).
+Four original reference images restored; all 21 product assets unchanged.
+One isolated synthetic recording, all video/audio 1x, fourteen reused Jenny clips,
+white movie wait at 39.40-40.40. No external requests, new speech or shared services.
+Full decode, source hashes, frame comparisons, 25 white frames and seven selected
+visual checks passed. Longest measured silence 3.768 seconds. Human continuous
+review/audition and public image reuse rights remain pending. Calendar concept
+and proposed first-story changes are not applied in this image-only correction.
+
+Previous revision: [74.20-second Jenny MP4](../browser-artifacts/demo/family-story-8ecJla/familycopilot-family-story.mp4),
+[English SRT](../browser-artifacts/demo/family-story-8ecJla/familycopilot-family-story.en.srt),
+[manifest](../browser-artifacts/demo/family-story-8ecJla/manifest.json).
+Now records the integrated equal-interest preference UI, not the static draft.
+All 21 assets match Builder's reviewed snapshot. Four unbundled reference images
+show existing product fallback; no substitute images. Same native-speed story,
+fourteen reused Jenny clips and white movie wait at 39.16-40.16. One isolated
+synthetic recording, no public requests/new speech/shared service operations.
+29 production tests, full decode, hashes, source-frame comparisons, all 25 white
+frames and selected visual checks passed. Human continuous review/audition pending.
+The older movie click/page evidence remains a separate historical insert.
+
+Previous revision: [73.96-second Jenny MP4](../browser-artifacts/demo/family-story-CX1r7l/familycopilot-family-story.mp4),
+[English SRT](../browser-artifacts/demo/family-story-CX1r7l/familycopilot-family-story.en.srt),
+[manifest](../browser-artifacts/demo/family-story-CX1r7l/manifest.json).
+Movie click now leads to a white browser area at 39.00-40.00 seconds, then the
+existing official-page still; caption band retained. All 25 white frames and both
+boundaries verified. Narration, subtitles, duration and 1x action timing unchanged.
+Offline edit only, no new capture, synthesis or site access. Separate
+[preferences static draft](designer/preferences-review.html) has desktop/mobile
+review evidence but is not integrated into product or video. 28 production tests,
+decode, hashes, audio comparison and transition visual checks passed. Human
+continuous viewing/audition remain pending. See [production record](demo-video.md).
+
+Previous revision: [73.96-second Jenny MP4](../browser-artifacts/demo/family-story-Pjd8Et/familycopilot-family-story.mp4),
 [English SRT](../browser-artifacts/demo/family-story-Pjd8Et/familycopilot-family-story.en.srt),
 [manifest](../browser-artifacts/demo/family-story-Pjd8Et/manifest.json).
 Opening production note and visible Demo wording removed. Brief preferences,
@@ -164,7 +264,7 @@ Opening animation and first question/calendar footage now play at 1x. The loaded
 calendar result stays visible through its dedicated narration, including all
 three member Loaded labels. A 3.84-second editorial result hold is not measured
 loading time; no sequential member loading was fabricated. Existing movie-page
-join, preference bridge and Kimi ownership remain. No new capture, network or
+join, preference bridge and Child ownership remain. No new capture, network or
 TTS. Decode, hashes, calendar frame comparisons and audio checks passed; human
 continuous viewing/audition remain pending. See [production record](demo-video.md).
 
@@ -175,7 +275,7 @@ Includes the requested real Chiikawa page: original card click followed by a hel
 screenshot from a separately opened integrated-browser tab at the same URL.
 The owner approved this workaround after the headless Access Denied attempt.
 Not continuous navigation; no confirmed screening, booking, login or new TTS.
-Animation, preference bridge and latest Kimi ownership remain. 27 production
+Animation, preference bridge and latest Child ownership remain. 27 production
 tests, full decode, source hashes, final-frame and audio checks passed; human
 viewing/audition remain pending. See [production record](demo-video.md).
 
@@ -183,7 +283,7 @@ Previous revision: [48.92-second Jenny MP4](../browser-artifacts/demo/family-sto
 [English SRT](../browser-artifacts/demo/family-story-gyjx2k/familycopilot-family-story.en.srt),
 [manifest](../browser-artifacts/demo/family-story-gyjx2k/manifest.json).
 Actual animation restored; preference/calendar bridge added; 1.12x offline
-speech and tighter cuts; latest Kimi-owned school event shown before/after consent.
+speech and tighter cuts; latest Child-owned school event shown before/after consent.
 One new approved Jenny bridge request used, all other clips reused. Full decode,
 source hashes, animation pixel-change and audio checks passed; longest measured
 silence is 1.614 seconds. Human viewing/audition remain pending. A subsequently
@@ -232,7 +332,7 @@ Previous invitation review (copy issue since fixed): [68.16-second silent MP4](.
 Approved September 21 isolated rehearsal and one capture passed all nine scenes
 with zero forbidden I/O/browser errors. Full decode, hashes and caption bounds
 passed; thirteen final frames were inspected. Chapter at 0:37, school question
-at 0:40, labelled demo invitation pending Mike, family closing at 1:03.16.
+at 0:40, labelled demo invitation pending Parent A, family closing at 1:03.16.
 No real send/write or new speech. One product-copy issue remains: `Previous search
 retired.` is visible during weekend loading at 0:26.8; see the
 [Builder issue and acceptance criteria](demo-video.md), historical Remaining Builder Copy Issue section.
@@ -248,9 +348,9 @@ Latest existing video, earlier story: [67.04-second silent MP4](../browser-artif
 [English SRT](../browser-artifacts/demo/family-story-cpocKr/familycopilot-family-story.en.srt),
 [manifest](../browser-artifacts/demo/family-story-cpocKr/manifest.json),
 [selected-frame review](../browser-artifacts/demo/family-story-cpocKr/visual-review.json).
-The nine-second introduction identifies Debby and Mike as Kimi's parents. A
+The nine-second introduction identifies Parent B and Parent A as Child's parents. A
 chapter at 0:37.44 introduces the separate school conversation. Reset and Undo
-are omitted; the proposal remains pending Mike's confirmation, followed by a
+are omitted; the proposal remains pending Parent A's confirmation, followed by a
 five-second family/brand closing. Existing footage only; no capture or synthesis.
 22/22 production tests, full decode, hashes, caption bounds and eleven selected
 frames passed review. The September card remains poster-heavy. Human continuous
@@ -258,11 +358,11 @@ viewing and publication rights remain pending; see [production history](demo-vid
 The reusable offline command is
 `node scripts/render-complete-demo.js --family-edit <edit.json> --sha256 <hash>`.
 
-Previous Debby-led technical cut: [60.56-second silent MP4](../browser-artifacts/demo/school-chapter-wDdirh/familycopilot-two-stories.mp4),
+Previous Parent B-led technical cut: [60.56-second silent MP4](../browser-artifacts/demo/school-chapter-wDdirh/familycopilot-two-stories.mp4),
 [English SRT](../browser-artifacts/demo/school-chapter-wDdirh/familycopilot-two-stories.en.srt),
 [manifest](../browser-artifacts/demo/school-chapter-wDdirh/manifest.json).
-The separate school story begins at 0:29.60. Debby initiates the review, her work
-calendar conflicts, and Mike is proposed only after separate confirmation.
+The separate school story begins at 0:29.60. Parent B initiates the review, her work
+calendar conflicts, and Parent A is proposed only after separate confirmation.
 Nine-scene isolated rehearsal and recording passed with zero forbidden I/O;
 21/21 production tests and final decode passed. The current
 [Builder handoff](chat-builder-handoff.md) provides the 196/196 offline product
@@ -304,7 +404,7 @@ The previous full-story subtitle preview remains available:
 [English SRT](../browser-artifacts/demo/chat-preview-pZPHYW/familycopilot-chat.en.srt),
 [delivery manifest](../browser-artifacts/demo/chat-preview-pZPHYW/delivery.json).
 It includes preference edit/Cancel, October suggestions, nearer-weekend coverage
-and school-meeting coordination with pending Debby proposal and Undo (from 0:51).
+and school-meeting coordination with pending Parent B proposal and Undo (from 0:51).
 All twelve scene assertions, complete decode, caption bounds and selected final
 frames passed. It is a product-only subtitle preview, not a narrated final edit;
 new Jenny speech remains unapproved. The capture approval is consumed.

@@ -92,9 +92,15 @@ function familyEditPlan(edit,capture){
     const duration=segment.kind==='capture'?(segment.sourceEnd-segment.sourceStart)/speed+holdSeconds:segment.duration;
     assert(Number.isFinite(duration) && duration>0 && duration<=120);
     assert(Math.abs(duration*25-Math.round(duration*25))<1e-6);
+    for(const key of ['fadeInSeconds','fadeOutSeconds'])if(segment[key]!==undefined){
+      assert(['capture','chapter'].includes(segment.kind));
+      assert(Number.isFinite(segment[key]) && segment[key]>=0 && segment[key]<=1.6 && segment[key]<duration);
+      assert(Math.abs(segment[key]*25-Math.round(segment[key]*25))<1e-6);
+    }
     if(segment.kind==='movie'){
       assert.equal(speed,1);assert(duration>=3 && duration<=6);
       const loadingSeconds=segment.loadingSeconds??0;
+      assert(['freeze','white'].includes(segment.loadingStyle??'freeze'));
       assert(Number.isFinite(loadingSeconds) && loadingSeconds>=0 && loadingSeconds<=2);
       assert(Math.abs(loadingSeconds*25-Math.round(loadingSeconds*25))<1e-6);
       assert(Number.isFinite(segment.clickStart) && segment.clickStart>=0);
@@ -231,7 +237,8 @@ function renderFamilyEdit(file,expectedHash){
   for(const [index,segment] of timeline.segments.entries()){
     if(segment.kind==='movie'){
       const movieInput=2+audioFiles.length,clickDuration=segment.clickEnd-segment.clickStart,loadingSeconds=segment.loadingSeconds??0;
-      filters.push(`[${movieInput}:v]trim=start=${segment.clickStart}:end=${segment.clickEnd},setpts=PTS-STARTPTS,pad=1440:1020:0:0:color=0x25291f,fps=25${loadingSeconds?`,tpad=stop_mode=clone:stop=${Math.round(loadingSeconds*25)}`:''},setsar=1,settb=AVTB[movieClick]`);
+      const loadingFilter=segment.loadingStyle==='white'?`tpad=stop_mode=add:color=white:stop=${Math.round(loadingSeconds*25)},drawbox=x=0:y=900:w=1440:h=120:color=0x25291f:t=fill`:`tpad=stop_mode=clone:stop=${Math.round(loadingSeconds*25)}`;
+      filters.push(`[${movieInput}:v]trim=start=${segment.clickStart}:end=${segment.clickEnd},setpts=PTS-STARTPTS,pad=1440:1020:0:0:color=0x25291f,fps=25${loadingSeconds?`,${loadingFilter}`:''},setsar=1,settb=AVTB[movieClick]`);
       filters.push(`[${movieInput+1}:v]crop=${movie.crop.width}:${movie.crop.height}:${movie.crop.x}:${movie.crop.y},scale=1440:900,pad=1440:1020:0:0:color=0x25291f,trim=duration=${segment.duration-clickDuration-loadingSeconds},setpts=PTS-STARTPTS,fps=25,setsar=1,settb=AVTB[movieStill]`);
       filters.push(`[movieClick][movieStill]concat=n=2:v=1:a=0[v${index}]`);continue;
     }
@@ -239,7 +246,8 @@ function renderFamilyEdit(file,expectedHash){
       segment.kind==='family'?`[family${familyIndex++}]${edit.illustration.kind==='video'?`trim=start=${segment.animationStart}:end=${segment.animationEnd},setpts=(PTS-STARTPTS)*${segment.duration/(segment.animationEnd-segment.animationStart)}`:`trim=duration=${segment.duration}`},drawbox=x=0:y=900:w=1440:h=120:color=0x25291f:t=fill`:
         `color=c=0xf4f6f2:s=1440x1020:r=25:d=${segment.duration},drawbox=x=0:y=900:w=1440:h=120:color=0x25291f:t=fill`;
     if(segment.kind==='family' && edit.illustration.kind==='video')assert(segment.animationStart!==undefined);
-    filters.push(`${filter},setpts=(PTS-STARTPTS)/${segment.speed},fps=25${segment.holdSeconds?`,tpad=stop_mode=clone:stop=${Math.round(segment.holdSeconds*25)}`:''},setsar=1,settb=AVTB[v${index}]`);
+    const fades=`${segment.fadeInSeconds?`,fade=t=in:d=${segment.fadeInSeconds}:color=0xf4f6f2`:''}${segment.fadeOutSeconds?`,fade=t=out:st=${segment.duration-segment.fadeOutSeconds}:d=${segment.fadeOutSeconds}:color=0xf4f6f2`:''}`;
+    filters.push(`${filter},setpts=(PTS-STARTPTS)/${segment.speed},fps=25${segment.holdSeconds?`,tpad=stop_mode=clone:stop=${Math.round(segment.holdSeconds*25)}`:''}${fades},setsar=1,settb=AVTB[v${index}]`);
   }
   filters.push(`${timeline.segments.map((_,index)=>`[v${index}]`).join('')}concat=n=${timeline.segments.length}:v=1:a=0,ass=captions.ass,fade=t=in:d=0.3,fade=t=out:st=${timeline.duration-.6}:d=0.6[video]`);
   if(speech){
@@ -282,7 +290,15 @@ function validateFamilySpeechRequest(request){
     subscription:'609bbde3-d152-4d7d-a12b-005e38ac4f27',endpoint:'https://eastus.tts.speech.microsoft.com/cognitiveservices/v1',
     voice:'en-US-JennyNeural',style:'friendly',rate:'-3%',format:'riff-48khz-16bit-mono-pcm',
     credentialReads:1,automaticRetries:0,alternateProviders:false,resourceChanges:false,
-    privateCalendarContentSent:false,namesSent:false}))assert.equal(request[key],value,key);
+    privateCalendarContentSent:false}))assert.equal(request[key],value,key);
+  if(request.namesSent===true){
+    assert.equal(request.namedClosingApproved,true);
+    assert(Array.isArray(request.narration) && request.narration.length===1 && typeof request.narration[0]==='string');
+    assert.equal(createHash('sha256').update(JSON.stringify(request.narration)).digest('hex'),
+      '4bc1eb7dc3ebb22f531fd51b41a7e0c01244e9027b3d92d209b618615f4d4479',
+      'Named narration must match the exact historical authorization');
+    assert.equal(request.maximumSynthesisRequests,1);assert.equal(request.maximumTextCharacters,150);
+  }else assert.equal(request.namesSent,false);
   assert(Number.isInteger(request.maximumSynthesisRequests) && request.maximumSynthesisRequests>=1 && request.maximumSynthesisRequests<=12);
   assert(Number.isInteger(request.maximumTextCharacters) && request.maximumTextCharacters>=1 && request.maximumTextCharacters<=1500);
   assert(Array.isArray(request.narration) && request.narration.length>0 && request.narration.length<=request.maximumSynthesisRequests);
@@ -324,7 +340,7 @@ async function synthesizeFamilySpeech(file,expectedHash){
     }
     assert.equal(hash(file),expectedHash);
     save('speech.json',{version:1,requestFile:file,requestSha256:expectedHash,voice:request.voice,style:request.style,rate:request.rate,
-      requests,textCharacters:request.narration.join('').length,audio,privateCalendarContentSent:false,resourceModified:false,humanAudition:'pending'});
+      requests,textCharacters:request.narration.join('').length,audio,privateCalendarContentSent:false,namesSent:request.namesSent,resourceModified:false,humanAudition:'pending'});
     console.log(JSON.stringify({output:path.relative(root,output),requests,seconds:audio.map(item=>item.seconds)}));
   }catch{
     save('failure.json',{stage,requests,automaticRetry:false});throw Error(`Speech stopped at ${stage}; requests=${requests}; no automatic retry`);

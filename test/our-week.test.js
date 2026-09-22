@@ -27,7 +27,7 @@ const namedData = () => ({ ...imported(), events: [
 const genericNode = h => {
   const n = h.document.createElement("div");
   n.textContent = "Event 1 · 09:07:30–10:12 · Scheduled event";
-  n.title = "2026-10-09 · Kimi · Event 1 · 09:07:30–10:12 · Not a Busy status";
+  n.title = "2026-10-09 · Child · Event 1 · 09:07:30–10:12 · Not a Busy status";
   n.setAttribute("aria-label", n.title); return n;
 };
 
@@ -438,7 +438,7 @@ test("details response cannot be reused as busy-only; strict receiver rejects in
 test("main markup has no child wizard or operations and keeps correct CSRF script order", () => {
   const html = fs.readFileSync(require.resolve("../owner/index.html"), "utf8");
   assert.doesNotMatch(html, /<dialog|id="child-calendar-section"|id="calendar-access"/);
-  assert.doesNotMatch(html, /id="child-events"|id="school-calendar|src="\/school-calendar|Kimi source &amp; access|Load Kimi/);
+  assert.doesNotMatch(html, /id="child-events"|id="school-calendar|src="\/school-calendar|Child source &amp; access|Load Child/);
   assert.doesNotMatch(html, /id="child-(?:source-select|person|disclosure|guardian|review|import|change|clear|skip|cancel)"/);
   assert.ok(html.indexOf('/availability-ui.js') < html.indexOf('/child-calendar-ui.js'));
   assert.ok(html.indexOf('/child-calendar-core.js') < html.indexOf('/child-calendar-ui.js'));

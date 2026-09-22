@@ -80,7 +80,7 @@ test("public cards show saved provenance and never invent a film time or reuse f
   assert.match(visible(host), /Online fee: NT\$20\/ticket/);
   assert.match(text(host), /Visitor information checked 2026-09-20/);
   assert.ok(tags(host, "a").some(link => link.href === "https://tix.ctbcsports.com/DEA/UTK0101_"));
-  assert.ok(tags(host, "a").filter(link => link.textContent === "Venue map").every(link => !/Kimi|Mike|Debby|origin=/.test(link.href)));
+  assert.ok(tags(host, "a").filter(link => link.textContent === "Venue map").every(link => !/Child|Parent A|Parent B|origin=/.test(link.href)));
   assert.equal(all(host).filter(element => element.className === "fc-activity-reason").length, 2);
   assert.equal(tags(host, "img").length, 3);
   assert.match(visible(host), /GAME 5.*10\/10 \/ 17:00 Taipei.*AWAY.*福爾摩沙夢想家.*17:00.*VS.*HOME.*新北中信特攻/);

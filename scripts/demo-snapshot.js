@@ -21,6 +21,13 @@ function validateScenario(scenario) {
   assert(Number.isFinite(Date.parse(scenario.referenceInstant)));
   assert(typeof scenario.name === "string" && scenario.name.length > 0);
   assert(Array.isArray(scenario.limitations) && scenario.limitations.every(item => typeof item === "string"));
+  if (scenario.missingImageAssets !== undefined) {
+    const optionalImages = ["ctbc-dea.png", "formosa-dreamers.webp", "forgotten-island.jpg", "chiikawa.jpg"]
+      .map(name => `/activity-preview/chat-assets/${name}`);
+    assert(Array.isArray(scenario.missingImageAssets) && scenario.missingImageAssets.length <= 4);
+    assert.equal(new Set(scenario.missingImageAssets).size, scenario.missingImageAssets.length);
+    assert(scenario.missingImageAssets.every(name => optionalImages.includes(name)));
+  }
   assert(Array.isArray(scenario.scenes) && scenario.scenes.length > 0 && scenario.scenes.length <= 12);
   for (const scene of scenario.scenes) {
     assert(typeof scene.text === "string" && scene.text.length > 0 && scene.text.length <= 500);
@@ -117,6 +124,7 @@ function loadSnapshot(manifestFile, expectedSha256) {
     assert.equal(digest(content), expected, `Snapshot changed: ${url}`);
     assets.set(url, content);
   }
+  assert((manifest.scenario.missingImageAssets || []).every(name => !assets.has(name)), "Missing image is bundled");
   return { manifest, manifestSha256, assets };
 }
 

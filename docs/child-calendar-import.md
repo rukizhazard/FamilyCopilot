@@ -1,4 +1,4 @@
-# Kimi shared Outlook calendar import
+# Child shared Outlook calendar import
 
 ## Diagnostics backend activated, 18 September 2026
 
@@ -100,17 +100,17 @@ then one deliberate failure can supply safe diagnostic evidence. Agent-run live
 Sync/list/import requires separate approval. Do not repeat enrollment or clear
 saved data merely to obtain diagnostics. No commit or push.
 
-## Kimi enrollment completed, 18 September 2026
+## Child enrollment completed, 18 September 2026
 
 With later explicit agent listing/event-read approval, the one-shot enrollment
-helper found a unique exact Kimi label, used the current session's reviewed handle,
+helper found a unique exact Child label, used the current session's reviewed handle,
 and successfully imported the fixed October week. Six projected events, partial
 false; source reference and permitted snapshot committed by the existing backend.
 Independent native cleanup verification and local idle passed. No event details
 or identifiers reached tool output, no parent refresh or private-file inspection.
 This supersedes the missing-source/setup gate below; no recurring setup UI added.
 Later fresh Sync is implemented but was not separately live-tested after enrollment.
-[Evidence and limits](our-week.md#kimi-source-enrolled-and-events-read-18-september-2026).
+[Evidence and limits](our-week.md#child-source-enrolled-and-events-read-18-september-2026).
 
 ## Sync backend activated, 18 September 2026
 
@@ -119,7 +119,7 @@ inspection confirmed live/disk safe idle and childSyncProtocol true, with the
 operation lock released. Native parent/child preflight and Activities static
 compatibility passed. No calendar read or private cache inspection occurred.
 This supersedes the activation-pending checkpoint below, not the missing legacy
-source reference: no source was enrolled and actual fresh Kimi Sync remains
+source reference: no source was enrolled and actual fresh Child Sync remains
 unverified. Do not ask the user to repeat prior consent/source instructions.
 [Activation evidence](our-week.md#explicit-activation-approval-18-september-2026).
 
@@ -139,7 +139,7 @@ restarted for this change. Activation and actual user/provider usability remain
 unverified, not completed by tests. No new cloud resources or provider permissions
 are needed by this implementation. [Current scope and evidence](our-week.md#remembered-source-sync-implemented-offline-18-september-2026).
 
-## Current UI: no Kimi-specific operations, 17 September 2026
+## Current UI: no Child-specific operations, 17 September 2026
 
 The user's later explicit removal request is implemented in static presentation:
 no child setup/select/guardian/disclosure/review/import controls or Calendar access
@@ -150,7 +150,7 @@ both snapshots. This is not persistent live-source selection; no new child impor
 is available from this UI. All backend/native consent and token protections remain
 unchanged. Previous user instructions below to open the removed controls are
 historical. No live/private-data operation or service restart was performed.
-[Exact scope, tests and browser evidence](our-week.md#kimi-specific-ui-operations-removed-17-september-2026).
+[Exact scope, tests and browser evidence](our-week.md#child-specific-ui-operations-removed-17-september-2026).
 
 ## Private saved view activated, 17 September 2026
 
@@ -178,7 +178,7 @@ this activation step. Prior **325-per-timezone** synthetic integration remains
 separate from actual user import and provider feasibility.
 
 **User next:** reload http://127.0.0.1:8002/, use common Confirm and explicitly
-review/import Kimi once to create the new saved view. Later reloads can use View
+review/import Child once to create the new saved view. Later reloads can use View
 saved only without repeating import. Previously loaded session-only results are
 not migrated or inspected. No automatic request occurs on reload; no agent live
 listing/import is authorized. This restart approval is now completed. No commit
@@ -211,8 +211,8 @@ activation/deployment approvals below are not reusable.
 
 ## Shared confirmation UI checkpoint, 17 September 2026
 
-The later approved bounded UI repair integrates optional Kimi setup into the
-shared **Confirm / Update**, replacing persistent **Kimi source & access** and
+The later approved bounded UI repair integrates optional Child setup into the
+shared **Confirm / Update**, replacing persistent **Child source & access** and
 the separate import action. Initial opening requests nothing. The user explicitly
 continues to source listing, selects the source/person/disclosure and guardian
 authority, then confirms the visible summary. Parent processing finishes before
@@ -288,8 +288,8 @@ calendar queries**, no cloud changes and no private-cache access. Startup did no
 invoke authentication or calendars; preflight was the separate operator action.
 
 **Ready for the user's real test at http://127.0.0.1:8002/.** Reload to replace
-the old page/session, open **Kimi source & access**, explicitly Find and select a
-returned source, confirm Kimi/guardian/disclosure and the visible review, then
+the old page/session, open **Child source & access**, explicitly Find and select a
+returned source, confirm Child/guardian/disclosure and the visible review, then
 import. Dates remain 9–15 October Taipei. Results stay page/session-only in
 **Our week** alongside the parents; the week bridge omits all titles. No agent
 source listing/import was performed: `runtimeVerified: false` remains honest
@@ -352,14 +352,14 @@ in Builder's compact controls. No UI/event/session/cleanup change is requested.
 This checkpoint supersedes older **undeployed** statements below, not their
 privacy boundaries or the remaining user-only Find/select/import gate. Do not
 rerun the consumed deployment to recover output, and do not claim the UI is ready
-for a real Kimi test until local activation is independently verified.
+for a real Child test until local activation is independently verified.
 
 ## Shared Our week presentation: offline handoff, 17 September 2026
 
-The approved presentation milestone now integrates Kimi's minimized event times
-and reported statuses into the same calendar as Mike and Debby. Explicit Find,
+The approved presentation milestone now integrates Child's minimized event times
+and reported statuses into the same calendar as Parent A and Parent B. Explicit Find,
 source/person/guardian/disclosure review and confirmation remain in a closed
-**Kimi source & access** control. The standalone Kimi list and main School mount
+**Child source & access** control. The standalone Child list and main School mount
 are removed, without changing child core/provider/native protocols, parent
 two-person API/snapshot contracts or original private school files. All titles,
 including permitted normal titles, are omitted from the week display bridge;
@@ -374,14 +374,14 @@ fallback, not the existing provider/authorization gates or historical evidence.
 
 ## Parent authentication restored; child activation still pending
 
-**17 September 2026:** the separately requested Mike/Debby repair now uses the
+**17 September 2026:** the separately requested Parent A/Parent B repair now uses the
 supported Windows-native worker rather than the historical UNC PowerShell
 script launcher. Actual parent refresh through 8002 succeeded, non-cached,
 336 slots per person, followed by independent Disabled/SAS-disabled and
 preservation checks. No policy change, new OAuth or credential transfer was
 needed. [Parent repair evidence](owner-availability.md#windows-native-parent-update-repair-17-september-2026).
 
-This removes the demonstrated parent authentication blocker, not Kimi's remaining
+This removes the demonstrated parent authentication blocker, not Child's remaining
 integration work. The native parent protocol only permits fixed-window busy-only
 results; it does not carry child source identifiers, review tokens or titles.
 Next: adapt the approved child operations to the same native execution boundary,
@@ -389,7 +389,7 @@ verify actual connector capability, review the existing one-workflow deployment
 and independent readback, then enable the consent-gated child UI. Do not send
 raw provider IDs or broader payloads through the parent protocol. Actual shared
 visibility is established only by the user's explicit Find/select step, not by
-Debby's successful default-calendar availability. Agent-run child listing/import
+Parent B's successful default-calendar availability. Agent-run child listing/import
 remains outside validation approval. No child workflow has been deployed and the
 School fallback remains. The older blocked-launcher statements below are history,
 not evidence that current Windows-native parent authentication is still blocked.
@@ -488,8 +488,8 @@ calendar list or event validation request.
 
 ## Approved scope, not yet implemented
 
-- Replace the main School calendar section/scripts with **Kimi's calendar**, the
-  child of Mike and Debby. Retain the school converter, files and offline tests as
+- Replace the main School calendar section/scripts with **Child's calendar**, the
+  child of Parent A and Parent B. Retain the school converter, files and offline tests as
   legacy utilities; do not read/delete private local school inputs or exports.
 - Reuse the existing authorized `familycopilot-office365-dev` connection and
   frozen `familycopilot-calendar-list-dev` v2. No new login, OAuth app, PKCE,
@@ -505,7 +505,7 @@ calendar list or event validation request.
 - Startup does nothing. Only the user's **Find calendars** may list. Only the
   user's explicit selection of one returned source, guardian acknowledgement,
   disclosure choice and confirmation of a visible access summary may import.
-  Summary names Kimi, chosen source label, exact dates, audience and retention.
+  Summary names Child, chosen source label, exact dates, audience and retention.
   No automatic name matching, default-parent-calendar substitution or hidden
   dependency on the inaccessible old picker. Browser receives opaque random
   per-session handles, never provider calendar/event IDs.
@@ -542,9 +542,9 @@ connector cannot read bounded events or needs a new Graph app:
    behavior. The actual operation metadata must pass preflight before deployment.
 3. Shared-calendar dropdown visibility has limitations; Microsoft recommends
    Get calendars (V2) to inspect available sources. Per-user calendar IDs differ.
-   An Outlook screenshot is not evidence that the connector can retrieve Kimi's
-   source. Debby was also selected in the screenshot: no event title/time may be
-   attributed to Kimi, copied into a fixture or OCR-imported from it.
+   An Outlook screenshot is not evidence that the connector can retrieve Child's
+   source. Parent B was also selected in the screenshot: no event title/time may be
+   attributed to Child, copied into a fixture or OCR-imported from it.
 4. Missing source must offer actionable read-only sharing/acceptance guidance,
    not permission escalation or guesses. Do not modify the existing share.
 
@@ -587,5 +587,5 @@ Task list:
 5. Pending: safe-idle graceful restart under the existing lock, persistent 8002
    task, fresh empty live page/capability and zero-startup-API check. Leave public
    basketball untouched; no synthetic tab as handoff.
-6. User-only step after delivery: Find calendars → select Kimi's returned source
+6. User-only step after delivery: Find calendars → select Child's returned source
    → guardian/disclosure review → confirm import. No agent-run real query.

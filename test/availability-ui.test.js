@@ -108,7 +108,7 @@ test("routine cleanup is silent; only explicit Check status reports local app st
     silent(); assert.deepEqual(h.calls, []);
     await h.load(); silent();
     const originalSummary = h.get("availability-status").textContent;
-    assert.equal(originalSummary, `${mode === "synthetic" ? "Mike (sample) + Debby (sample)" : "Mike + Debby"} · Updated 15 Sept 2026, 09:08 · Saved view`);
+    assert.equal(originalSummary, `${mode === "synthetic" ? "Parent A (sample) + Parent B (sample)" : "Parent A + Parent B"} · Updated 15 Sept 2026, 09:08 · Saved view`);
     await h.get("availability-check").handlers.click();
     assert.equal(h.get("availability-cleanup").textContent, "No unfinished update reported by the app. Calendars and Outlook access were not checked.");
     assert.equal(h.get("availability-cleanup").hidden, false);
@@ -369,7 +369,7 @@ test("fresh and reused weeks keep original-date success in Details and focus the
     assert.deepEqual(h.calls, []);
     await h.load();
     const summary = h.get("availability-status").textContent;
-    assert.equal(summary, `Mike (sample) + Debby (sample) · Updated 15 Sept 2026, 09:${stale ? "00" : "08"} · Saved view${stale ? " · May be out of date" : ""}`);
+    assert.equal(summary, `Parent A (sample) + Parent B (sample) · Updated 15 Sept 2026, 09:${stale ? "00" : "08"} · Saved view${stale ? " · May be out of date" : ""}`);
     assert.equal(h.get("availability-status").dataset.urgent, "false");
     assert.equal(h.get("availability-context").hidden, true);
     assert.equal(h.get("availability-context").children.length, 0);
@@ -510,7 +510,7 @@ test("week UI renders three display tracks daily with two unchanged parent track
     const tracks=day.children[1].children;assert.equal(tracks.length,3);
     assert.equal(tracks[2].className, "child-track");
     tracks.slice(0,2).forEach((track,person)=>{
-      assert.match(track.attributes["aria-label"],new RegExp(person?"Debby \\(sample\\)":"Mike \\(sample\\)"));
+      assert.match(track.attributes["aria-label"],new RegExp(person?"Parent B \\(sample\\)":"Parent A \\(sample\\)"));
       const slots=track.children;assert.equal(slots.length,48);
       assert.match(slots[0].title,/00:00–00:30/);
       assert.match(slots[47].title,/23:30–24:00 Asia\/Taipei/);
@@ -533,7 +533,7 @@ test("initial calendar picker is hidden and inert, handlers retained, explicit w
   assert.match(html,/<section id="owner-calendar-section"[^>]* hidden inert>/);
   for(const id of ["owner-ack","owner-load","owner-check","owner-clear","owner-picker","owner-summary","fixture"])assert.ok(html.includes(`id="${id}"`));
   assert.ok(html.indexOf('id="synthetic-controls"')<html.indexOf('id="owner-calendar-section"'));
-  for(const text of ["Mike Lee","Debby","2026-10-09 00:00","2026-10-16 00:00 (end exclusive)","All 336","UTC+8","no availability or calendar selections are used"])assert.ok(html.includes(text));
+  for(const text of ["Parent A","Parent B","2026-10-09 00:00","2026-10-16 00:00 (end exclusive)","All 336","UTC+8","no availability or calendar selections are used"])assert.ok(html.includes(text));
   assert.doesNotMatch(html,/person 0|person 1|Today’s|[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
   const ui=readFileSync(require.resolve("../owner/ui.js"),"utf8");
   assert.match(ui,/if \(calendarUiHidden \|\| blocked \|\| clearPending\) return/);
@@ -552,18 +552,19 @@ test("oversized availability UI responses fail closed with no automatic retry", 
 });
 
 test("display aliases are exact, presentation-only and synthetic mapping never claims live identities", () => {
-  assert.deepEqual(A.displayPeople(),[{person:0,alias:"Mike",previous:"Mike Lee"},{person:1,alias:"Debby",previous:"Debby"}]);
-  assert.deepEqual(A.displayPeople(true),[{person:0,alias:"Mike (sample)",previous:"Alex (fictional)"},{person:1,alias:"Debby (sample)",previous:"Sam (fictional)"}]);
+  assert.deepEqual(A.displayPeople(),[{person:0,alias:"Parent A",previous:"Parent A"},{person:1,alias:"Parent B",previous:"Parent B"}]);
+  assert.deepEqual(A.displayPeople(true),[{person:0,alias:"Parent A (sample)",previous:"Alex (fictional)"},{person:1,alias:"Parent B (sample)",previous:"Sam (fictional)"}]);
   const live=harness(()=>{},"live"), sample=harness(()=>{});
-  assert.equal(live.get("availability-targets").textContent,"Mike + Debby · Default calendars · Busy-only");
+  assert.equal(live.get("availability-targets").textContent,"Parent A + Parent B · Default calendars · Busy-only");
+  assert.match(live.get("availability-identity").textContent,/^Neutral display labels: Parent A and Parent B\./);
   assert.match(live.get("availability-identity").textContent,/do not establish identity, parent relationships or guardian authority/);
-  assert.equal(sample.get("availability-targets").textContent,"Mike (sample) + Debby (sample) · Default calendars · Busy-only");
-  assert.match(sample.get("availability-identity").textContent,/Mike \(sample\) = fictional Alex; Debby \(sample\) = fictional Sam/);
-  assert.doesNotMatch(sample.get("availability-identity").textContent,/Mike Lee|@/);
-  for (const [h, names] of [[live, ["Mike", "Debby"]], [sample, ["Mike (sample)", "Debby (sample)"]]]) {
+  assert.equal(sample.get("availability-targets").textContent,"Parent A (sample) + Parent B (sample) · Default calendars · Busy-only");
+  assert.match(sample.get("availability-identity").textContent,/Parent A \(sample\) = fictional Alex; Parent B \(sample\) = fictional Sam/);
+  assert.doesNotMatch(sample.get("availability-identity").textContent,/@/);
+  for (const [h, names] of [[live, ["Parent A", "Parent B"]], [sample, ["Parent A (sample)", "Parent B (sample)"]]]) {
     assert.equal(h.get("availability-context").children.length, 0);
     assert.equal(h.get("availability-context").hidden, true);
-    assert.equal(h.get("availability-grid").attributes["aria-label"], `Weekly calendar, ${h === live ? "9–11 October 2026" : "20–22 September 2026"}, ${[...names, h === live ? "Kimi" : "Kimi (sample)"].join(" and ")}, Asia/Taipei`);
+    assert.equal(h.get("availability-grid").attributes["aria-label"], `Weekly calendar, ${h === live ? "9–11 October 2026" : "20–22 September 2026"}, ${[...names, h === live ? "Child" : "Child (sample)"].join(" and ")}, Asia/Taipei`);
   }
   assert.deepEqual(live.calls,[]);assert.deepEqual(sample.calls,[]);
   assert.ok(noWeekView(live));assert.ok(noWeekView(sample));
@@ -621,8 +622,8 @@ test("loading and date edits hide the grid while loaded stale partial context re
   assert.equal(h.get("availability-context").hidden, true);
   assert.equal(h.get("availability-status").textContent, "Loading sample week…");
   release(response);await load;
-  assert.match(h.get("availability-context").children[0].textContent,/Mike.*Some of this schedule is unknown/);
-  assert.match(h.get("availability-context").children[1].textContent,/Debby.*schedule isn’t available/);
+  assert.match(h.get("availability-context").children[0].textContent,/Parent A.*Some of this schedule is unknown/);
+  assert.match(h.get("availability-context").children[1].textContent,/Parent B.*schedule isn’t available/);
   assert.equal(h.get("availability-context").hidden, false);
   assert.match(h.get("availability-freshness").textContent,/Stale or unknown freshness/);
   assert.ok(blocks(h).some(n=>n.dataset.status==="busy"));
@@ -641,7 +642,7 @@ test("calendar scroll region is keyboard reachable, technical details closed, bl
   assert.match(html,/id="availability-grid" role="region" tabindex="0"/);
   assert.match(html,/<details class="availability-details"><summary>/);
   assert.doesNotMatch(html,/id="availability-deployment"|<details[^>]* open/);
-  assert.match(html,/Mike \+ Debby · Default calendars · Busy-only/);
+  assert.match(html,/Parent A \+ Parent B · Default calendars · Busy-only/);
   assert.doesNotMatch(ui,/innerHTML|outerHTML|insertAdjacentHTML|\.tabIndex/);
   assert.match(css,/overflow-x:auto/);assert.match(css,/repeat\(3,minmax\(264px,1fr\)\)/);
   assert.match(css,/position:sticky; left:0/);assert.match(css,/repeating-linear-gradient/);
@@ -709,7 +710,7 @@ test("disk UI accurately discloses restart retention while memory/old-server mod
   assert.match(disk.get("availability-storage").textContent, /Parent busy times, their dates and original last-updated time are saved privately on this device/);
   assert.match(disk.get("availability-storage").textContent, /No sign-in credentials or event details are saved/);
   assert.match(disk.get("availability-storage").textContent, /Clear deletes this saved view, not backups, other open pages or Azure history; it is not secure erase/);
-  assert.match(disk.get("availability-storage").textContent, /Kimi is never saved in this file/);
+  assert.match(disk.get("availability-storage").textContent, /Child is never saved in this file/);
   assert.doesNotMatch(disk.get("availability-storage").textContent, /0700|0600|fingerprint|digest/);
   assert.match(memory.get("availability-retention").textContent, /memory only/);
   assert.match(memory.get("availability-retention").textContent, /restarting the app removes it; reloading the page does not/);
@@ -758,15 +759,15 @@ test("sample source and aliases stay unmistakable beside the grid with no startu
   assert.deepEqual(h.calls, []);
   assert.equal(h.get("owner-source-badge").textContent, "SAMPLE DATA");
   assert.match(h.get("owner-source-notice").textContent, /Sample data—not real calendars/);
-  assert.match(h.get("availability-targets").textContent, /Mike \(sample\).*Debby \(sample\)/);
+  assert.match(h.get("availability-targets").textContent, /Parent A \(sample\).*Parent B \(sample\)/);
   assert.match(h.get("availability-grid-source").textContent, /Sample data—not real calendars/);
   assert.match(h.get("availability-grid").attributes["aria-label"], /sample/);
   await h.load();
   assert.equal(h.get("availability-context").children.length, 1);
-  assert.match(h.get("availability-context").children[0].textContent, /Debby \(sample\).*schedule isn’t available/);
+  assert.match(h.get("availability-context").children[0].textContent, /Parent B \(sample\).*schedule isn’t available/);
   const days = h.get("availability-grid").children[0].children.slice(1);
   for (const day of days) {
-    assert.deepEqual(day.children[0].children[1].children.map(n => n.textContent), ["Mike (sample)", "Debby (sample)", "Kimi (sample)"]);
+    assert.deepEqual(day.children[0].children[1].children.map(n => n.textContent), ["Parent A (sample)", "Parent B (sample)", "Child (sample)"]);
     assert.equal(day.children[1].children[1].children.length, 1);
     assert.equal(day.children[1].children[1].children[0].dataset.status, "unknown");
   }
@@ -846,7 +847,7 @@ for (const range of validRanges) test(`Confirm loads ${range.days} inclusive Tai
   assert.equal(h.get("availability-start").attributes["aria-invalid"], "false");
   assert.equal(h.get("availability-end").attributes["aria-invalid"], "false");
   assert.equal(h.get("availability-window").textContent,
-    `Calendar load window: ${range.start} 00:00 through ${range.exclusive} 00:00 (end exclusive) · Asia/Taipei (UTC+8). All ${expected.slots} half-hour slots per parent, ${expected.slots * 2} total across the two parent calendars only. Only returned statuses are checked; missing data is unknown. Kimi is saved-view only.`);
+    `Calendar load window: ${range.start} 00:00 through ${range.exclusive} 00:00 (end exclusive) · Asia/Taipei (UTC+8). All ${expected.slots} half-hour slots per parent, ${expected.slots * 2} total across the two parent calendars only. Only returned statuses are checked; missing data is unknown. Child is saved-view only.`);
   const labelBeforeLoad = h.get("availability-display-label").textContent;
   assert.ok(labelBeforeLoad.includes(range.start.slice(0, 4)));
   if (range.days <= 3 && range.start.slice(0, 4) !== range.end.slice(0, 4)) assert.ok(labelBeforeLoad.includes(range.end.slice(0, 4)));
@@ -860,7 +861,7 @@ for (const range of validRanges) test(`Confirm loads ${range.days} inclusive Tai
   assert.equal(h.requests[0].credentials, "omit");
   assert.equal(h.requests[0].redirect, "error");
   assert.equal(h.get("availability-display-label").textContent, labelBeforeLoad);
-  assert.equal(h.get("availability-grid").attributes["aria-label"], `Weekly calendar, ${labelBeforeLoad.slice(9).split(" · ")[0]}, Mike (sample) and Debby (sample) and Kimi (sample), Asia/Taipei`);
+  assert.equal(h.get("availability-grid").attributes["aria-label"], `Weekly calendar, ${labelBeforeLoad.slice(9).split(" · ")[0]}, Parent A (sample) and Parent B (sample) and Child (sample), Asia/Taipei`);
   const week = h.get("availability-grid").children[0];
   const displayedDays = Math.min(3, range.days);
   assert.equal(week.style.gridTemplateColumns, `56px repeat(${displayedDays},minmax(264px,1fr))`);
@@ -1111,7 +1112,7 @@ test("saved-only confirms exact dates without a provider fallback, preserving st
   assert.deepEqual(h.calls, []);
   await h.get("availability-saved").handlers.click();
   assert.match(h.get("availability-status").textContent, /Updated 15 Sept 2026, 09:00.*May be out of date/);
-  assert.match(h.get("availability-context").children[0].textContent, /Debby.*isn’t available/);
+  assert.match(h.get("availability-context").children[0].textContent, /Parent B.*isn’t available/);
   await h.range("2026-09-20", "2026-09-26");
   assert.ok(noWeekView(h));
   await h.load(); await h.get("availability-saved").handlers.click();

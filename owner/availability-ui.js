@@ -28,7 +28,7 @@
   let selectedWindow, dateSelection, visibleWindow, confirmed = false, rangeClearing = false;
   let dateRevision = 0, childGeneration = 0, child = null, childLifecycle = "idle", childBlocked = !configurable, childTimer;
   const childExpires = Date.now() + 30 * 60000;
-  const childName = synthetic && !$("chat-calendar-scope") ? "Kimi (sample)" : "Kimi";
+  const childName = synthetic && !$("chat-calendar-scope") ? "Child (sample)" : "Child";
   // Page-local DOM renderer only: the child owns names and returns no data.
   // Independent of action coordination and the strictly title-free event bridge.
   let childRenderer, gridPositioned = false, displayedMonth, selectedCandidate = null;
@@ -117,18 +117,18 @@
     ? "Confirm opens a matching saved view if one exists; otherwise it checks the calendars once. Update checks again, without falling back to older results if it fails. A saved view survives closing or restarting the app and changing dates. It stays until replaced by a successful update, deleted with Clear, or removed because access changed or an update could not finish safely. The app must be running to open it. Saved views do not recheck Outlook permissions."
     : "Confirm opens a matching saved view if one exists; otherwise it checks the calendars once. Update checks again. This view is kept in memory only: restarting the app removes it; reloading the page does not. Saved views do not recheck Outlook permissions.";
   $("availability-storage").textContent = disk
-    ? "Parent busy times, their dates and original last-updated time are saved privately on this device, with information that ties the saved view to this setup. No sign-in credentials or event details are saved. Clear deletes this saved view, not backups, other open pages or Azure history; it is not secure erase. Kimi is never saved in this file."
+    ? "Parent busy times, their dates and original last-updated time are saved privately on this device, with information that ties the saved view to this setup. No sign-in credentials or event details are saved. Clear deletes this saved view, not backups, other open pages or Azure history; it is not secure erase. Child is never saved in this file."
     : "Parent busy times, their dates and original last-updated time stay in memory only. No calendar file or browser storage is used. Restarting the app removes them. Sample calendars never use your saved calendar data.";
   $("availability-identity").textContent = synthetic
-    ? "SYNTHETIC ONLY · Mike (sample) = fictional Alex; Debby (sample) = fictional Sam. No real identities or Azure calls."
-    : "Display labels: Mike = Mike Lee; Debby = Debby. These labels do not establish identity, parent relationships or guardian authority. The protected targets and existing owner authorization are unchanged.";
+    ? "SYNTHETIC ONLY · Parent A (sample) = fictional Alex; Parent B (sample) = fictional Sam. No real identities or Azure calls."
+    : "Neutral display labels: Parent A and Parent B. These labels do not establish identity, parent relationships or guardian authority. The protected targets and existing owner authorization are unchanged.";
   $("availability-targets").textContent = names.join(" + ") + " · Default calendars · Busy-only";
   $("availability-source").textContent = synthetic
     ? "Sample data · Not real calendars"
     : "Outlook · Default calendars only";
-  if (!childCacheAvailable) $("availability-saved-help").textContent = "This backend supports parent-only controls: Mike + Debby, busy-only, for the load scope above. View saved only never queries on a miss. Kimi saved viewing and saved-data deletion need a safe backend update; Clear here confirms parent deletion only. Reload alone cannot update the backend.";
+  if (!childCacheAvailable) $("availability-saved-help").textContent = "This backend supports parent-only controls: Parent A + Parent B, busy-only, for the load scope above. View saved only never queries on a miss. Child saved viewing and saved-data deletion need a safe backend update; Clear here confirms parent deletion only. Reload alone cannot update the backend.";
   if (childSyncAvailable) {
-    $("availability-saved-help").textContent = "Sync first opens a matching Kimi saved view or checks its remembered source, then loads Mike + Debby busy times. Later Sync checks Kimi first, then parents again. A missing source stays unknown; no source is selected automatically. View saved only never queries Outlook, even on a miss. Clear deletes both saved views and the remembered source.";
+    $("availability-saved-help").textContent = "Sync first opens a matching Child saved view or checks its remembered source, then loads Parent A + Parent B busy times. Later Sync checks Child first, then parents again. A missing source stays unknown; no source is selected automatically. View saved only never queries Outlook, even on a miss. Clear deletes both saved views and the remembered source.";
     $("child-event-help").textContent = "Our week shows consented event names, times and reported status. Private and Busy-only events stay unnamed. Events are not verified Busy slots; gaps are unknown. Sync uses only the previously confirmed remembered source; no new source import or setup is available here.";
   }
   const node = (tag, className, text) => {
@@ -250,7 +250,7 @@
   // consent changes. The real status buttons keep their existing bindings.
   if ($("member-add")) {
     const removed = new Set(), extras = [];
-    const labels = ["Mike", "Debby", "Kimi"];
+    const labels = ["Parent A", "Parent B", "Child"];
     const key = value => value.toLocaleLowerCase("en-US");
     const message = value => {
       $("member-message").textContent = value;
@@ -385,7 +385,8 @@
     const focusedDate = document.activeElement?.dataset?.monthDate;
     let focusTarget;
     monthGrid.replaceChildren();
-    for (let index = 0; index < 42; index++) {
+    const cellCount = Math.ceil((first.getUTCDay() + new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate()) / 7) * 7;
+    for (let index = 0; index < cellCount; index++) {
       const day = new Date(Date.UTC(year, monthIndex, 1 - first.getUTCDay() + index));
       const date = day.toISOString().slice(0, 10);
       const parentDay = parentDays.get(date), childDay = childDays.get(date);
@@ -399,13 +400,23 @@
       const descriptions = [];
       for (const track of parentDay?.tracks || []) {
         if (!track.runs.some(run => ["busy", "tentative", "oof"].includes(run.status))) continue;
-        const marker = node("span", "calendar-month-marker", names[track.person].replace(" (sample)", ""));
+        const marker = node("span", "calendar-month-marker");
+        marker.append(node("strong", "", names[track.person].replace(" (sample)", "")), node("span", "", "Busy periods"));
         marker.dataset.person = String(track.person); cell.append(marker);
         descriptions.push(`${names[track.person]}: busy or tentative time reported`);
       }
-      if (childDay && [...childDay.timed, ...childDay.allDay].some(event => event.status !== "cancelled")) {
-        const marker = node("span", "calendar-month-marker", "Kimi");
-        marker.dataset.person = "2"; cell.append(marker); descriptions.push(`${childName}: events reported`);
+      for (const event of [...(childDay?.timed || []), ...(childDay?.allDay || [])]) {
+        const time = event.allDay === true ? "All-day" : `${event.startTime} - ${event.endTime}`;
+        const qualifier = `${A.childLabels[event.status]}${event.allDay === null ? " / All-day status unknown" : ""}`;
+        const detail = node("span", "calendar-month-event-name", `Event ${event.index + 1} · ${qualifier}`);
+        detail.title = `${date} · ${childName} · ${detail.textContent} · ${time} · Asia/Taipei · Not a Busy status`;
+        detail.setAttribute("aria-label", detail.title);
+        childRenderer?.(detail, event.index, child.generation, child.revision);
+        if (event.status === "scheduled" && event.allDay !== null) detail.textContent = detail.textContent.slice(0, -(` · ${qualifier}`).length);
+        const marker = node("span", "calendar-month-event");
+        marker.dataset.person = "2"; marker.dataset.status = event.status;
+        marker.append(node("strong", "", childName), detail, node("span", "calendar-month-event-time", time));
+        cell.append(marker); descriptions.push(`${childName}: ${detail.textContent}, ${time}`);
       }
       if (!descriptions.length) cell.append(node("span", "calendar-month-day-state", covered ? "Loaded" : "Unknown"));
       cell.setAttribute("aria-label", `${date}. ${descriptions.join(". ") || (covered ? "Loaded snapshot; no markers" : "Not loaded")}. Missing time is unknown, not free.`);
@@ -471,7 +482,7 @@
     }
     $("child-week-status").textContent = childLoaded()
       ? `${childName} · ${childSyncAvailable ? "Bounded snapshot" : "Saved view only"} · ${synthetic ? "Sample shared source" : "Selected Outlook source"} · Checked ${child.checkedAt} · ${childSyncAvailable ? "Sync uses remembered source · " : ""}${A.childFreshness(child)} · ${child.partial ? "Partial context" : child.events.length ? "Bounded view returned" : "Loaded; no events returned"}. Missing time is unknown, not free.${childSyncAvailable ? " Cached results keep their original check time." : " Update refreshes parents only."}`
-      : `${childName} · ${childLifecycle === "loading" ? childSyncAvailable ? "Loading" : "Opening saved view only" : childLifecycle === "expired" ? "Page expired" : childLifecycle === "unavailable" ? "Unavailable" : "Not loaded"}. Missing time is unknown. ${childSyncAvailable ? "Sync uses only a previously confirmed remembered source." : "No live Kimi refresh."}`;
+      : `${childName} · ${childLifecycle === "loading" ? childSyncAvailable ? "Loading" : "Opening saved view only" : childLifecycle === "expired" ? "Page expired" : childLifecycle === "unavailable" ? "Unavailable" : "Not loaded"}. Missing time is unknown. ${childSyncAvailable ? "Sync uses only a previously confirmed remembered source." : "No live Child refresh."}`;
     if (!selectedWindow) {
       $("availability-grid").replaceChildren();
       $("availability-grid").setAttribute("aria-label", "Calendar · Choose valid dates; nothing checked");
@@ -490,9 +501,9 @@
     $("availability-display-label").textContent = `Display: ${weekLabel} · ${visibleWindow.slots / 48} ${visibleWindow.slots === 48 ? "day" : "days"} · Taipei (UTC+8). This is a view, not a shorter calendar query.`;
     $("availability-load-scope").textContent = unsupported()
       ? "Calendar load unavailable for this selection. Supported load scope: 9–15 October 2026 inclusive · Taipei (UTC+8), ending 16 October 00:00 exclusive · 336 half-hours per parent. Nothing checked."
-      : `Calendar load scope: ${label(selectedWindow)} inclusive · Taipei (UTC+8), ending ${A.slotTime(selectedWindow.slots, selectedWindow).date} 00:00 exclusive · ${selectedWindow.slots} half-hours per parent. Confirm / Update / View saved only cover this entire scope, not just the displayed days. ${childSyncAvailable ? "Sync uses Kimi's remembered source before parents; View saved only never queries." : "Kimi is saved-view only; Update refreshes parents only."}`;
+      : `Calendar load scope: ${label(selectedWindow)} inclusive · Taipei (UTC+8), ending ${A.slotTime(selectedWindow.slots, selectedWindow).date} 00:00 exclusive · ${selectedWindow.slots} half-hours per parent. Confirm / Update / View saved only cover this entire scope, not just the displayed days. ${childSyncAvailable ? "Sync uses Child's remembered source before parents; View saved only never queries." : "Child is saved-view only; Update refreshes parents only."}`;
     $("availability-grid").setAttribute("aria-label", `Weekly calendar, ${weekLabel}, ${[...names, childName].join(" and ")}, ${selectedWindow.timezone}`);
-    $("availability-window").textContent = `Calendar load window: ${A.slotTime(0, selectedWindow).date} 00:00 through ${A.slotTime(selectedWindow.slots, selectedWindow).date} 00:00 (end exclusive) · Asia/Taipei (UTC+8). All ${selectedWindow.slots} half-hour slots per parent, ${selectedWindow.slots * 2} total across the two parent calendars only. Only returned statuses are checked; missing data is unknown. ${childSyncAvailable ? "Kimi uses its separate remembered-source or saved-only view, not parent Busy slots." : "Kimi is saved-view only."}`;
+    $("availability-window").textContent = `Calendar load window: ${A.slotTime(0, selectedWindow).date} 00:00 through ${A.slotTime(selectedWindow.slots, selectedWindow).date} 00:00 (end exclusive) · Asia/Taipei (UTC+8). All ${selectedWindow.slots} half-hour slots per parent, ${selectedWindow.slots * 2} total across the two parent calendars only. Only returned statuses are checked; missing data is unknown. ${childSyncAvailable ? "Child uses its separate remembered-source or saved-only view, not parent Busy slots." : "Child is saved-view only."}`;
     $("availability-context").replaceChildren();
     $("availability-parent-details").replaceChildren();
     for (const person of [0, 1]) {
@@ -622,7 +633,7 @@
     if (data.status === "cleanup_failed" || data.cleanup === "cleanup_failed") blocked = true;
     if (childStorageFailure(data)) {
       storageBlocked = true; childBlocked = true; hideChild("unavailable");
-      status("Kimi saved view or remembered source could not be read, saved or cleared. Calendar reuse is blocked until explicit Clear succeeds; reload cannot unblock storage.", true);
+      status("Child saved view or remembered source could not be read, saved or cleared. Calendar reuse is blocked until explicit Clear succeeds; reload cannot unblock storage.", true);
       safety();
     }
     const cacheStatus = data.cacheStatus || data.status;
@@ -688,8 +699,8 @@
         storageBlocked = false;
         if (blocked) failure(data);
         else status(childCacheAvailable
-          ? "Saved view cleared. Parent and Kimi snapshots and reviewed child access removed. Reload page to start again; nothing loads automatically."
-          : "Saved view cleared for Mike + Debby only. Kimi saved-data deletion is unconfirmed on this backend. A safe backend update is needed before clearing Kimi; reload alone cannot update it.", !childCacheAvailable, childCacheAvailable);
+          ? "Saved view cleared. Parent and Child snapshots and reviewed child access removed. Reload page to start again; nothing loads automatically."
+          : "Saved view cleared for Parent A + Parent B only. Child saved-data deletion is unconfirmed on this backend. A safe backend update is needed before clearing Child; reload alone cannot update it.", !childCacheAvailable, childCacheAvailable);
       } else if (!leaving && !blocked && !storageBlocked && !sessionRejected) {
         status("Couldn’t confirm the saved view was cleared. Get help in Details.", true);
       }

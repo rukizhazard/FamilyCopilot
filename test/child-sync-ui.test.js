@@ -112,7 +112,7 @@ test("common Sync sends exact child false then parent false, child true then par
 test("missing remembered source stays concise and unknown, allows parents without setup or name migration", async t => {
   const h = harness(t, { meta }); await h.fire("availability-load");
   assert.deepEqual(paths(h), ["/api/child/sync", "/api/availability"]);
-  assert.equal(h.get("child-status").textContent, "Kimi is not connected."); assert.equal(h.visible("child-status"), true);
+  assert.equal(h.get("child-status").textContent, "Child is not connected."); assert.equal(h.visible("child-status"), true);
   assert.match(h.get("child-status-details").textContent, /one-time exact source confirmation/i);
   assert.match(h.get("child-status-details").textContent, /not migrated from (a )?cached name/i);
   assert.match(h.get("child-status-details").textContent, /unknown/i);
@@ -258,7 +258,7 @@ test("names stay escaped/page-only, private events unnamed, original provenance 
   assert.match(h.get("child-imported-access").textContent, /Checked 2026-09-16T23:00:00Z · Sync uses remembered source/);
   assert.match(h.get("child-status-details").textContent, /Checked 2026-09-16T23:00:00Z · Sync uses remembered source/);
   for (const id of ["child-week-status", "availability-load-scope", "availability-window", "availability-saved-help", "child-retention", "child-event-help"])
-    assert.doesNotMatch(h.get(id).textContent, /Update refreshes parents only|No live Kimi refresh|Kimi is saved-view only/);
+    assert.doesNotMatch(h.get(id).textContent, /Update refreshes parents only|No live Child refresh|Child is saved-view only/);
   assert.match(text(h.get("availability-parent-details")), /Checked 2026-09-17T00:59:00Z/);
   const stamp = h.get("child-imported-access").textContent;
   await h.fire("availability-display-next"); await h.fire("availability-display-previous"); await h.advance(300001);
@@ -308,7 +308,7 @@ test("missing source on later Sync removes old child titles without cached-name 
   await h.fire("availability-load"); assert.ok(h.childBlocks().length); missing = true;
   await h.fire("availability-load");
   assert.equal(h.childBlocks().length, 0); assert.equal(h.get("child-imported-access").hidden, true);
-  assert.equal(h.get("child-status").textContent, "Kimi is not connected.");
+  assert.equal(h.get("child-status").textContent, "Child is not connected.");
   assert.deepEqual(h.savedSnapshot(), saved()); assert.equal(count(h, "/api/child/saved"), 0);
   assert.ok(h.parentBlocks().length); noSetup(h);
 });

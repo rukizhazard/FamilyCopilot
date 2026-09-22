@@ -30,7 +30,7 @@
       "actions": [
         { "kind": "click", "selector": "#chat-send" },
         { "kind": "count", "selector": "#activity-results article", "value": 2 },
-        { "kind": "text", "selector": "#chat-calendar-status", "text": "Mike: Loaded" },
+        { "kind": "text", "selector": "#chat-calendar-status", "text": "Parent A: Loaded" },
         { "kind": "scroll", "selector": "#calendar-conversation" }
       ]
     },

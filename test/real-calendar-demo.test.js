@@ -11,9 +11,17 @@ test('movie cut preserves explicit source times and shifts following captions',(
     {kind:'chapter',duration:3,cues:[{start:0.1,seconds:2,text:'The next step.'}]}
   ]};
   const result=familyEditPlan(edit,{durationSeconds:10});assert.equal(result.duration,15);
+  const softened=structuredClone(edit);softened.segments[1].fadeOutSeconds=.8;softened.segments[3].fadeInSeconds=.6;
+  assert.equal(familyEditPlan(softened,{durationSeconds:10}).duration,15);
+  for(const fadeOutSeconds of [-1,2,NaN,.01]){softened.segments[1].fadeOutSeconds=fadeOutSeconds;assert.throws(()=>familyEditPlan(softened,{durationSeconds:10}));}
   assert.equal(result.captions[0].start,8.4);assert.equal(result.captions[1].start,12.1);
   const waiting=structuredClone(edit);waiting.segments[2].duration=5;waiting.segments[2].loadingSeconds=1;
   assert.equal(familyEditPlan(waiting,{durationSeconds:10}).captions[1].start,13.1);
+  waiting.segments[2].loadingStyle='white';
+  assert.equal(familyEditPlan(waiting,{durationSeconds:10}).segments[2].loadingStyle,'white');
+  waiting.segments[2].loadingStyle='invalid';
+  assert.throws(()=>familyEditPlan(waiting,{durationSeconds:10}));
+  waiting.segments[2].loadingStyle='freeze';
   for(const loadingSeconds of [-1,2.1,0.01,NaN]){
     waiting.segments[2].loadingSeconds=loadingSeconds;assert.throws(()=>familyEditPlan(waiting,{durationSeconds:10}));
   }
@@ -39,6 +47,11 @@ test('family speech approval is bounded to the reviewed provider voice and reque
     maximumTextCharacters:1500,credentialReads:1,automaticRetries:0,alternateProviders:false,resourceChanges:false,
     privateCalendarContentSent:false,namesSent:false,narration:['A parent turns to Family Copilot.']};
   assert.equal(validateFamilySpeechRequest(request),request);
+  const named={...request,namesSent:true,namedClosingApproved:true,maximumSynthesisRequests:1,maximumTextCharacters:150,
+    narration:["Now they are waiting to hear from Parent A. Parent B does not have to figure it all out alone."]};
+  assert.throws(()=>validateFamilySpeechRequest(named),/exact historical authorization/);
+  for(const change of [{namedClosingApproved:false},{maximumSynthesisRequests:2},{narration:['Other named content.']},
+    {narration:[]},{narration:[null]},{narration:[named.narration[0],named.narration[0]]}])assert.throws(()=>validateFamilySpeechRequest({...named,...change}));
   assert.equal(validateFamilySpeechRequest({...request,maximumSynthesisRequests:1,maximumTextCharacters:100}).maximumSynthesisRequests,1);
   assert.throws(()=>validateFamilySpeechRequest({...request,maximumSynthesisRequests:1,narration:['First','Second']}));
   assert.throws(()=>validateFamilySpeechRequest({...request,maximumTextCharacters:5}));
@@ -99,10 +112,10 @@ test('paced family voices retain request and WAV provenance and bound every edit
 test('family editorial plan keeps consent but excludes reset and Undo footage',()=>{
   const {familyEditPlan}=require('../scripts/render-complete-demo');
   const edit={version:1,kind:'familycopilot.demo.family-edit',segments:[
-    {kind:'family',duration:9,cues:[{start:0,seconds:9,text:"Debby and Mike are Kimi's parents."}]},
+    {kind:'family',duration:9,cues:[{start:0,seconds:9,text:"Parent B and Parent A are Child's parents."}]},
     {kind:'capture',sourceStart:1.16,sourceEnd:29.6,cues:[]},
     {kind:'chapter',duration:3,cues:[]},
-    {kind:'capture',sourceStart:31.6,sourceEnd:53.2,cues:[{start:18,seconds:3.6,text:"Mike's confirmation is still needed."}]},
+    {kind:'capture',sourceStart:31.6,sourceEnd:53.2,cues:[{start:18,seconds:3.6,text:"Parent A's confirmation is still needed."}]},
     {kind:'family',duration:5,cues:[{start:0,seconds:5,text:'Less coordinating. More living.'}]}
   ]};
   const plan=familyEditPlan(edit,{durationSeconds:57.56});assert.equal(plan.duration,67.04);

@@ -3,9 +3,356 @@
 Current commands, ownership and delivery pointer: [two-agent workflow](demo-workflow.md).
 This file retains production history; historical approvals are not reusable.
 
+**Publication note, 22 September 2026:** role labels below are editorial
+anonymizations, not verbatim historical speech or authorization text. Original
+private requests, audio, captions, videos and snapshots remain unchanged and may
+contain real names. Their hashes still identify the original bytes. No new media
+was produced or validated in this redaction pass. See [the publication review](publication-redaction.md).
+
+## Jenny Narration For Animated Intro, 22 September 2026
+
+Current [118.64-second MP4](../browser-artifacts/demo/motion-jenny-BrfRBw/familycopilot-animated-jenny.mp4),
+[English SRT](../browser-artifacts/demo/motion-jenny-BrfRBw/familycopilot-animated-jenny.en.srt),
+[manifest](../browser-artifacts/demo/motion-jenny-BrfRBw/manifest.json),
+[preservation verification](../browser-artifacts/demo/motion-jenny-BrfRBw/preservation-verification.json),
+[review notes](../browser-artifacts/demo/motion-jenny-BrfRBw/review-notes.json).
+Owner accepted the animation and requested dubbing, then explicitly approved
+the existing nine-sentence English script through Azure Jenny/friendly/-3%,
+at most9requests/700characters, one key read, no retry/provider substitution.
+Existing `synthesizeFamilySpeech` executed exactly9requests/675characters.
+No private calendar data or names sent; no resource changes. One-time approval
+is consumed. [Request](../browser-artifacts/demo/animated-dubs-20260922/request.json)
+SHA `9c4c3f4e8be907506005f20caa4c47b42cd419d96aeb9aced24e31032504381d`;
+[speech](../browser-artifacts/demo/animated-dubs-20260922/jenny-approved/speech.json)
+SHA `61ff80b3bf1dbc65f257dfda7d2ab967b7032d0a259a45a5a7badf00350df467`.
+
+Raw audio57.552s did not fit the49s silent preview. Offline editing trims only
+measured silence, retaining60ms lead/120ms tail/320ms long sentence pauses and
+all spoken samples at native tempo. No resynthesis or accelerated media.
+Animation holds change, not animation speed; intro becomes50.28s. The original
+8.4-76.76s demo and narrated ending shift+41.88s, otherwise unchanged. Captions
+follow speech sentence timings, not word-level alignment. Product vision and
+existing synthetic/public-evidence qualifications remain intact.
+
+Extended existing `render-demo-intro.js` with `--plan-dubs`/`--render-dubs`:
+pin request, speech and reviewed preview manifest hashes; reject altered words,
+unmatched media or duration>=120; reuse existing FFmpeg/caption helpers. Source
+preview manifest SHA `408fa774931f8a81881da2da014b4e0529efcfb646c511999988ee765af98ba7`.
+No browser, new capture, shared-service operation, product edit, package install,
+private access, public search, delegation, upload, commit or push.
+
+First render `motion-jenny-9V4ylQ` retained: source-audio comparison detected a
+56.75ms early demo voice. Normalization/resampling left the intro WAV short.
+Fixed by resampling before padding and sample-exact trimming, then independently
+verified2413440 stereo frames at48kHz (50.28s) before joining the old voice.
+Final same-check rerun passes; never relaxed audio alignment thresholds.
+
+Final H.264/AAC1440x1020/25fps/48kHz stereo,118.64s/2966frames fully decoded.
+All nine new clips correlate>0.9984 with retained source speech; original demo
+and ending correlate>0.9998. Six source-frame differences<0.09; nine motion pairs
+nonzero; caption/source/output hashes pass.32/32production tests, editor checks
+passed. Final opening, weekly hero, brand, demo join and narrated ending inspected.
+The [existing preservation verifier](../browser-artifacts/demo/animated-intro-20260922/verify.cjs)
+now handles silent preview and dubbed outputs. Human continuous viewing/audition
+and public image reuse rights remain pending. All prior media preserved.
+
+## Animated Vision Intro Preview, 22 September 2026
+
+Latest [117.36-second MP4](../browser-artifacts/demo/motion-preview-vkQSin/familycopilot-animated-preview.mp4),
+[English SRT](../browser-artifacts/demo/motion-preview-vkQSin/familycopilot-animated-preview.en.srt),
+[manifest](../browser-artifacts/demo/motion-preview-vkQSin/manifest.json),
+[verification](../browser-artifacts/demo/motion-preview-vkQSin/verification.json),
+[preservation checks](../browser-artifacts/demo/motion-preview-vkQSin/preservation-verification.json),
+[review notes](../browser-artifacts/demo/motion-preview-vkQSin/review-notes.json).
+Owner liked the prior video, requested a nine-scene intro and total under two
+minutes, then explicitly allowed animation instead of images. Owner approved the
+condensed 103-word vision script and isolated offline production, but chose a
+preview without new narration. No synthesis or credential access was authorized
+or performed. Do not treat this script approval as paid-speech approval.
+
+New intro is 49 seconds of deterministic motion graphics, English captions and
+intentional silence. It replaces only the prior 8.4-second opening. The old
+8.4-76.76s body is preserved at native speed, shifted +40.6 seconds, including
+its existing Jenny audio and narrated brand ending. Final format remains
+1440x1020, 25fps, H.264/AAC, 48kHz stereo, measured117.36s/2934frames. Intro
+has a Product vision label; school inference, rescheduling, ticket reminders,
+registration monitoring, general weekly understanding and the agent architecture
+are concepts, not verified deployed behavior. Existing synthetic calendar and
+historical movie-page evidence limitations remain unchanged.
+
+Exact owned paths: the existing [intro renderer](../scripts/render-demo-intro.js),
+one regression in [production tests](../test/demo-production.test.js), these two
+production records, and fresh ignored `animated-intro-20260922`, `motion-review-*`
+and `motion-preview-*` outputs. Existing product, compositor and unrelated dirty
+changes preserved. No new dependencies, product recapture, shared services/tabs,
+private data, public requests, upload, delegation, commit or push.
+
+The renderer now supports `--review-animated` with a pinned brief and
+`--render-animated` with pinned brief and review hashes. Rehearsal and rendering
+both reject changed source hashes. The old `--render-offline` path remains intact.
+[Brief](../browser-artifacts/demo/animated-intro-20260922/brief.json) SHA
+`521bb6a7dbb3ca27f6648b8151e3425e83063a676d50f98a6e4e4f08adb2ce47`;
+[accepted rehearsal](../browser-artifacts/demo/motion-review-t78pny/review.json) SHA
+`24f68223a09dd128b8c7e7465d3f530344f835338fe518e06641cb86cca4e08f`.
+The earlier rehearsal is preserved: visual review found headline overlap and
+an awkward caption break; both were repaired and the same checks rerun.
+
+Executed: production31/31; complete decode; source/output hashes; ordered caption
+export; ten layout checks; six source-frame mappings (mean gray difference<0.09);
+six nonzero motion pairs; intro PCM peak0 through48.9s; retained speech and ending
+correlations>0.9998. All nine scene compositions inspected across rehearsals;
+final join-before/join-after/narrated-ending frames inspected. Reproducible
+[preservation verifier](../browser-artifacts/demo/animated-intro-20260922/verify.cjs)
+uses only local media. Human continuous viewing/audition remains pending for this
+new cut. Public image reuse rights are not cleared; all old media retained.
+
+## Restored Narrated Ending, 21 September 2026
+
+Current [76.76-second MP4](../browser-artifacts/demo/family-story-9snm0K/familycopilot-family-story.mp4),
+[English SRT](../browser-artifacts/demo/family-story-9snm0K/familycopilot-family-story.en.srt),
+[manifest](../browser-artifacts/demo/family-story-9snm0K/manifest.json),
+[verification](../browser-artifacts/demo/family-story-9snm0K/verification.json).
+Owner accepted the improved transition but found the silent title ending broken
+and preferred the previous ending. Restored the exact existing Jenny clips:
+"Now they're waiting for his response." and "Family Copilot. Less coordinating.
+More living." The previous title and tagline return; personal closing omitted.
+No new synthesis, credential read, capture, browser, network or product changes.
+
+The first five edit segments, first eleven voices and consent cue are unchanged
+from the readable-pacing version. Waiting-response narration is 66.22-68.35s;
+0.8s fade ends at 69.96s; title fades in over 0.6s. Brand narration starts70.61s,
+finishes76.13s before the final0.6s fade. All media1x. Reused movie click remains
+offline intercepted with separate historical official-page still, not live loading.
+Original25assets/four images and synthetic invitation limitations unchanged.
+
+Reproducible edit helper `--restore-ending`, verifier `--restored-ending`:
+[edit](../browser-artifacts/demo/readable-pacing-20260921/edit-restored-ending.json),
+SHA `8b5337fd10ac169fb49f7daae2e431ede9beee8f2c462b7a9ebbc0b32b223109`.
+Full decode, source/output hashes, caption bounds, 1.24s approach/1.205s hover,
+15 white frames, 2.202s question, 2.426s spinner, eight source mappings and two
+movie mappings passed. Ending-only audio mean-19.4/peak-4.5dB, non-silent;
+maximum internal silence4.009s. Waiting-response, fade and narrated title frames
+inspected; helper diagnostics passed. No shared production helper changes or
+application tests needed. Human continuous viewing/audition and public image
+rights still pending. Prior outputs and the unused personal voice are preserved.
+
+## Readable Pacing And Personal Closing, 21 September 2026
+
+Previous [76.28-second MP4](../browser-artifacts/demo/family-story-0q93Fh/familycopilot-family-story.mp4),
+[English SRT](../browser-artifacts/demo/family-story-0q93Fh/familycopilot-family-story.en.srt),
+[manifest](../browser-artifacts/demo/family-story-0q93Fh/manifest.json),
+[verification](../browser-artifacts/demo/family-story-0q93Fh/verification.json).
+Owner approved four pacing fixes and a personal closing. The exact named wording
+is omitted from public source; the private original is unchanged. SHA-256 of its
+JSON-serialized narration array is
+`4bc1eb7dc3ebb22f531fd51b41a7e0c01244e9027b3d92d209b618615f4d4479`.
+That original text was separately authorized for one Azure Jenny call, maximum150characters,
+one credential read, no retry/provider substitution/resource change. Actual
+90characters, one request, 6.277s source WAV; original parent names disclosed, no
+calendar payload. This one-time synthesis authorization is consumed.
+
+All25assets match Builder `c626ab54ed20895f53ea6b458e6e6a2fde904fdca0e9f7b37fe2830c939c0a61`.
+Production snapshot `f010d274206e578d8643bce8a0f243c69184562bb18513c01d2ef55688ca19c3`.
+No product edit: opt-in `--readable-pacing` wraps the existing cancellable
+prepareInvitation hook to 2500ms, preserving original callback and abort cleanup.
+After school processing settles, the sent question is framed at y180 and held2s.
+Two failed rehearsals exposed focus/edge framing; retained. Final rehearsal
+`chat-review-AGBjDR` and one formal `chat-preview-DSUx2J` passed with zero missing
+images/errors/forbidden requests. Main capture67.84s; the same raw recording
+also contains the separately staged offline movie click. Capture approval consumed.
+
+Click movement1.24s, hover1.205s; actual click prevented navigation, not a live
+successful load. Cursor indicator follows recorded mouse events. White content
+35.16-35.76 is an editorial0.6s wait, followed by the existing official-page still.
+No new public requests, booking, shared page/service or real calendar operations.
+School question visible46.819-49.021; invitation spinner visible60.03-62.456.
+New closing plays66.22-72.257 on pending response; soft0.8s fade starts73.08,
+silent brand at73.88. No new success/acceptance claim. All video/audio remains1x.
+
+[Preparation](../browser-artifacts/demo/readable-pacing-20260921/prepare.cjs),
+[edit helper](../browser-artifacts/demo/readable-pacing-20260921/edit.cjs),
+[verification helper](../browser-artifacts/demo/readable-pacing-20260921/verify.cjs),
+[approval](../browser-artifacts/demo/readable-pacing-20260921/approval.json).
+Final edit SHA `cd892260ad840e8c6afb0237507ff9a9e36a767539ae2182785e6fdf2f1f5ba8`.
+Initial render `family-story-nAtVKO` retained: internal silence6.496s failed gate.
+Only narration placement changed; no re-recording or resynthesis. Final longest
+internal silence3.996s; intentional silent brand separate. Audio-21.3mean/-4.4peak.
+Full H264/AAC decode1440x1020/25fps/48kHz stereo, caption bounds, all source/raw/
+output hashes, eight source-frame mappings, two movie mappings,15whiteframes,
+spinner pixel change and fade checks passed. Eight final frames inspected:
+opening, movie hover, school question, invitation end, personal closing, fade,
+brand and white. Production tests30/30, editor diagnostics passed. Human full
+viewing/audition and public image reuse rights remain pending. Older files retained.
+
+## Stable Typing, Whole Month And Invitation Animation, 21 September 2026
+
+Previous [69.76-second MP4](../browser-artifacts/demo/family-story-38u5Sm/familycopilot-family-story.mp4),
+[English SRT](../browser-artifacts/demo/family-story-38u5Sm/familycopilot-family-story.en.srt),
+[manifest](../browser-artifacts/demo/family-story-38u5Sm/manifest.json),
+[verification](../browser-artifacts/demo/family-story-38u5Sm/verification.json).
+Owner approved Builder delegation and video revision for the 00:10 jitter,
+discussed whole-month calendar, and short invitation-processing animation.
+Builder's [handoff](chat-builder-handoff.md) pins 25 assets at
+`c626ab54ed20895f53ea6b458e6e6a2fde904fdca0e9f7b37fe2830c939c0a61`.
+It reports 228/228 focused and 214/214 bounded product tests plus isolated desktop
+and mobile verification. The first-typing root cause was idle fixed-composer
+scroll padding: baseline 22px movement, corrected 0px. No private data or IO.
+
+First story now shows the whole October grid with parent Busy periods and Child's
+event names/times, then activities. No date is clicked and no candidate-time shot
+is scripted. The former schedules/shared-times narration clip was omitted, not
+resynthesized; thirteen existing Jenny clips remain at native tempo. All visuals
+stay 1x. Four original local logos/posters and their source qualifications remain.
+
+Nine-scene capture snapshot
+`aef7601febead8473ed794fd603f75987f5eaa90cbcec930d9946ee76e950452`
+matches all 25 Builder assets. Initial rehearsal failed an incorrect hidden-vs-closed
+details assertion; corrected to no open disclosure. A subsequent rehearsal was
+cancelled, left no completion report and had no running process on resumption.
+Final rehearsal `chat-review-wk8L9g` passed, followed by one formal recording
+`chat-preview-qIJm9M`, 55.8 seconds. Both prove zero first-typing scroll/composer
+change and visible changing native spinner transforms. No extra preparation
+delay was added: product 700ms timer remains. No delivery/acceptance is claimed.
+Existing capture-only calendar/search delays remain simulated, not provider latency.
+
+[Preparation/edit helper](../browser-artifacts/demo/month-invitation-video-20260921/produce.cjs),
+[scoped approval](../browser-artifacts/demo/month-invitation-video-20260921/prepared-o00PcS/approval.json),
+[verification helper](../browser-artifacts/demo/month-invitation-video-20260921/verify.cjs).
+Edit SHA-256 `8ad0a90caf7a9fb40e439e6e4e6895a90172868458a89463f5bea25ba2966043`.
+Full H.264/AAC decode, 1440x1020/25fps/48kHz stereo, source/raw/output hashes,
+captions and nine source-frame mappings passed. Upper-page difference around
+initial typing is 0.0224 grayscale units; invitation spinner changes by 17.39
+units between sampled frames in the final output near 57.38 seconds. WHITE at
+33.92-34.92 passes all25frames and boundaries. Historical movie click/separate
+official still remains an editorial insert, not newly accessed live evidence.
+Audio mean -20.8dB, peak -4.4dB; longest silence 3.850 seconds.
+
+Selected final typing, month, invitation preparation, ideas, opening, white,
+official-page and closing frames visually inspected. Production tests 29/29 and
+editor diagnostics passed. Human continuous review/audition and image publication
+rights remain pending. No new speech, public requests, shared pages/services,
+calendar writes, real invitations, installs, publication, commit or push.
+Previous attempts and outputs preserved; one formal capture approval consumed.
+
+## Original Images Restored, 21 September 2026
+
+Previous [74.64-second MP4](../browser-artifacts/demo/family-story-Jk0E21/familycopilot-family-story.mp4),
+[English SRT](../browser-artifacts/demo/family-story-Jk0E21/familycopilot-family-story.en.srt),
+[manifest](../browser-artifacts/demo/family-story-Jk0E21/manifest.json),
+[verification](../browser-artifacts/demo/family-story-Jk0E21/verification.json).
+Owner requested recovering missing images, then updating the video. All four
+original local logos/posters were still present; they had been excluded from the
+previous capture snapshot. Git ignore rules remain unchanged. No new artwork,
+download, product modification or public reuse permission is implied.
+
+Image recovery review `chat-review-sVwvlM` verified the original four hashes and
+loaded images. Full-story snapshot `a3a05e11af2effe001369ccfee7e95aa2e8c8dd4859dc505f5c8ef74e2727c88`
+has the same 25 assets as recovery snapshot `dbfa0a215f5a8a0766999d5dbc005021921b281f888af8cf2da39ecb286ff55d`:
+21 unchanged Builder assets plus four original reference images. Full rehearsal
+`chat-review-aeVP9p` passed eleven scenes, then one formal `chat-preview-7tWada`
+recording captured 60.76 seconds. Zero missing images, forbidden requests or
+browser errors. Capture scope consumed; no shared pages or services touched.
+
+[Preparation/edit helper](../browser-artifacts/demo/restored-images-video-20260921/produce.cjs)
+and [approval](../browser-artifacts/demo/restored-images-video-20260921/approval.json)
+preserve the bounded revision. Edit SHA-256:
+`5296d65dad435a1286e70cf4f8b1afefa7a7b4d52785c9a251a9e970502c582e`.
+All video/audio stays at 1x with fourteen existing Jenny clips, no new synthesis.
+Prior movie click and separate official-page still remain historical inserts;
+WHITE browser content at 39.40-40.40 is editorial, not measured navigation latency.
+
+Full H.264/AAC decode, 1440x1020/25fps/48kHz stereo, captions, all source/output
+hashes, thirteen source-frame mappings and 25 white frames passed. Audio mean
+-20.6dB, peak -4.4dB, longest silence 3.768 seconds. Selected final opening,
+ideas, weekend, white, official page, pending and closing frames visually reviewed.
+Focused helper syntax/editor checks passed; broad product tests were not rerun.
+Human continuous viewing/audition and public image reuse rights remain pending.
+
+The owner's first-story feedback remains a separate design decision: explain
+calendar consolidation, not availability, and do not focus on one day. The
+[monthly concept](../browser-artifacts/demo/month-overview-sample-20260921/review-vZCnY1/month-overview.png)
+is only a static proposal. Neither it nor a story rewrite is applied in this
+image-only revision. Older videos, snapshots and original media remain preserved.
+
+## Integrated Preferences In Video, 21 September 2026
+
+Previous [74.20-second MP4](../browser-artifacts/demo/family-story-8ecJla/familycopilot-family-story.mp4),
+[English SRT](../browser-artifacts/demo/family-story-8ecJla/familycopilot-family-story.en.srt),
+[manifest](../browser-artifacts/demo/family-story-8ecJla/manifest.json),
+[verification](../browser-artifacts/demo/family-story-8ecJla/verification.json).
+Owner requested Update video after approving the integrated preference design.
+New footage shows the actual family identity layout and seven equal-weight
+interests. Brief preference hold retained as accepted, no optional extra pause.
+All visuals and fourteen existing Jenny clips remain at 1x; no new synthesis.
+
+Builder snapshot `a74147a68b7db1cba4725c29ba30c69859e4823582a22626775e5fdec39df8f7`
+and capture snapshot `228f845e0f0319d05dc1ea9f36f69065173c5493427e637b60e0a72f3177011a`
+have identical 21 assets. Eleven-scene rehearsal `chat-review-hVTqaf` and one
+formal capture `chat-preview-nFDqgo` (60.32 seconds) passed with no unexpected
+requests or page errors. Four explicitly allowlisted missing image GETs return
+local 404s and display the existing product fallback, not substitute artwork.
+No external request, private data, provider call, shared-page/service operation,
+real invitation, calendar write, install or publication. Capture scope consumed.
+
+Source-continuous calendars/shared-times/activity scroll remains. Movie insert
+37.96-42.96 retains the historical 1.20-second actual click (including its original
+poster), then WHITE browser area 39.16-40.16 and the prior official-page still.
+It is a separate historical insert, not continuous current-UI navigation or a
+measured load. Newly recorded cards show missing images; this is not concealed.
+Capture-only two-second calendar/search delays retain prior documented scope.
+
+[Preparation/edit helper](../browser-artifacts/demo/preferences-video-20260921/produce.js),
+[edit](../browser-artifacts/demo/preferences-video-20260921/edit.json),
+[approval](../browser-artifacts/demo/preferences-video-20260921/approval.json) and
+[verification helper](../browser-artifacts/demo/preferences-video-20260921/verify.js)
+preserve reproducibility. First render `family-story-Nhk6ra` failed the pause gate
+at 4.175 seconds; retained. Moving only the weekend question voice 0.64 seconds
+later reduced final longest silence to 3.640 seconds. No recapture or acceleration.
+
+29/29 bounded production tests and editor diagnostics pass. Full H.264/AAC decode,
+1440x1020/25fps/48kHz stereo, raw/source/output hashes, current preference snapshot,
+source-frame mappings and caption bounds verified. All 25 white frames pass pixel
+checks with nonwhite frames immediately before/after. Audio mean -20.6dB, peak
+-4.4dB. Selected final opening, preferences, member calendar, weekend card, white
+wait, official page, pending and closing frames visually inspected. Human full
+continuous viewing/audition and publication review remain pending.
+
+## White-Screen Correction, 21 September 2026
+
+Previous [73.96-second MP4](../browser-artifacts/demo/family-story-CX1r7l/familycopilot-family-story.mp4),
+[English SRT](../browser-artifacts/demo/family-story-CX1r7l/familycopilot-family-story.en.srt),
+[manifest](../browser-artifacts/demo/family-story-CX1r7l/manifest.json) and
+[verification](../browser-artifacts/demo/family-story-CX1r7l/white-wait-verification.json).
+Owner clarified that the one-second movie wait must be white, not a frozen card,
+and approved offline correction plus a separate Builder preference static draft.
+This corrects the previous claim of fully meeting the transition request.
+
+The click remains at 37.80-39.00, followed by white browser content at 39.00-40.00,
+then the same separate-browser official still until 42.80. Caption band retained.
+The blank second is editorial simulation, not measured loading time. No new
+recording, website request, synthesis, private access or shared-page operation.
+Existing assets, raw sources and prior renders preserved. All actions/audio 1x.
+
+[Revision helper](../browser-artifacts/demo/white-wait-20260921/revise.js) pins the
+old edit and produces the new [edit](../browser-artifacts/demo/white-wait-20260921/edit.json).
+28/28 offline production tests, editor diagnostics, full H.264/AAC decode and
+source hashes passed. All 25 white frames checked, grayscale pixels at least 250;
+immediate before/after frames are not white. Eight other sampled frames match
+the previous output with mean difference below 0.06. SRT bytes and decoded audio
+match the prior version exactly. Click/white/official frames visually inspected;
+human continuous viewing and audition remain pending.
+
+Builder delivered [standalone preferences draft](designer/preferences-review.html),
+promoting family identities, shared interest icons and team typography while
+de-emphasizing location/settings. No replacement third-party images downloaded.
+1440x900 and 390x844 isolated offline static checks/screenshots passed, no external
+requests or page errors; browser closed. Draft permits local typing/read-only
+settings but Send is disabled. Not integrated into product or this video. User
+design review is the next gate, not another automatic capture or deployment.
+
 ## Natural Copy And Movie Wait, 21 September 2026
 
-Current [73.96-second Jenny MP4](../browser-artifacts/demo/family-story-Pjd8Et/familycopilot-family-story.mp4),
+Previous [73.96-second Jenny MP4](../browser-artifacts/demo/family-story-Pjd8Et/familycopilot-family-story.mp4),
 [English SRT](../browser-artifacts/demo/family-story-Pjd8Et/familycopilot-family-story.en.srt),
 [manifest](../browser-artifacts/demo/family-story-Pjd8Et/manifest.json) and
 [verification](../browser-artifacts/demo/family-story-Pjd8Et/verification.json).
@@ -58,8 +405,8 @@ calendars, possible shared times, then continuous native scroll to two ideas.
 Both stories, original opening animation and all voice clips play at 1x.
 Reset and a static school-offer hold are cut; no action footage is accelerated.
 Long independent simulation sentence is now Builder's `Demo invitation` status;
-existing Calendar demo/no-delivery details remain. Kimi ownership, consent and
-Mike awaiting response are unchanged. Parent tracks are busy-only, not unrestricted
+existing Calendar demo/no-delivery details remain. Child ownership, consent and
+Parent A awaiting response are unchanged. Parent tracks are busy-only, not unrestricted
 private event access. No real invitation or calendar write is demonstrated.
 
 Builder snapshot `d3c76cf2...` supplies all 25 identical assets in production
@@ -116,7 +463,7 @@ Owner approved an offline revision after finding the opening accelerated and
 calendar loading underemphasized. Original animation source 2-11.2 seconds now
 plays at 1x for 9.2 seconds; first question/calendar source 11.48-18.84 also plays
 at 1x. Calendar scene spans 15.2-26.4 in the final video, with a 3.84-second hold
-on the actual loaded result. Mike, Debby and Kimi Loaded labels and the October
+on the actual loaded result. Parent A, Parent B and Child Loaded labels and the October
 range remain visible through the dedicated calendar narration at 21-25.35.
 This is a result-reading hold, not real latency or sequential member loading.
 The source spinner represents saved activity search; calendar work is synchronous.
@@ -134,7 +481,7 @@ not deliveries. An isolated filter check showed time-based padding emitted only
 184 frames; explicit 96-frame padding after fps normalization produced the
 required 280 frames (11.2 seconds). Final calendar region differences at 25.2
 and 26.32 versus 21.4 seconds are both about 0.012 grayscale levels, and the held
-result was visually inspected. Movie page, Kimi pending response and ending
+result was visually inspected. Movie page, Child pending response and ending
 frames were also inspected. Full decode, source/raw/snapshot/output hashes and
 caption bounds passed. Audio mean -20.1dB, peak -4.4dB; maximum measured silence
 1.730 seconds. Human continuous viewing/audition and publication consent remain
@@ -166,11 +513,11 @@ this is not a certification of all website controls.
 [Movie source evidence](../browser-artifacts/demo/paced-animation-20260921/movie-evidence.json)
 pins the screenshot, raw click footage, exact URL and crop. The
 [separate edit](../browser-artifacts/demo/paced-animation-20260921/edit-movie.json)
-retains the prior animation, preference bridge, Kimi ownership and exact Jenny
+retains the prior animation, preference bridge, Child ownership and exact Jenny
 clips. No new synthesis. Full decode, source/snapshot/output hashes, caption
 bounds and audio checks passed; longest measured silence 1.730 seconds, mean
 -19.9dB, peak -4.4dB. 27/27 bounded production tests passed. Final frames for the
-click, official page, animation and Kimi pending-response state were inspected.
+click, official page, animation and Child pending-response state were inspected.
 Continuous human viewing/audition and publication consent remain pending.
 
 ## Animated And Paced Revision, 21 September 2026
@@ -181,7 +528,7 @@ Previous [48.92-second Jenny MP4](../browser-artifacts/demo/family-story-gyjx2k/
 [pacing evidence](../browser-artifacts/demo/family-story-gyjx2k/pacing-review.json).
 This restores actual original animation with a nameless opening, adds the brief
 interest-summary/calendar bridge before the October question, tightens pauses
-and uses the current Kimi-owned school event before and after the invitation.
+and uses the current Child-owned school event before and after the invitation.
 The first action loads calendars as implemented; no pre-query loaded state is
 fabricated. Existing twelve Jenny clips retain their exact words, with measured
 head/tail silence trims and 1.12x offline tempo. One approved generic bridge was
@@ -350,11 +697,11 @@ product message remains, as described below.
 The film retains the nine-second family opening, outing questions, actual UI
 loading and smooth scrolling. Movie framing now reaches title, venue, duration,
 admission, price and showtime navigation. The chapter at 37.00-40.00 introduces
-school responsibilities without narrating a conversation reset. Debby asks at
-40.00; Copilot immediately suggests inviting Mike with event details, then an
+school responsibilities without narrating a conversation reset. Parent B asks at
+40.00; Copilot immediately suggests inviting Parent A with event details, then an
 explicit invitation request produces a labelled demo invitation pending response.
 The family closing begins at 63.16. Technical verification narration, the earlier
-proposal/ask-Mike loop and Undo are absent. Actual source and uncertainty labels
+proposal/ask-Parent A loop and Undo are absent. Actual source and uncertainty labels
 are preserved; no real invitation, reminder or calendar write is implied.
 
 Producer's [nine-scene scenario](../browser-artifacts/demo/invitation-story-20260921/scenario.json)
@@ -405,10 +752,10 @@ delegated product changes to Builder as sole product writer and updated the
 [storyboard](demo-recommendation-storyboard.md). Builder's
 [handoff](chat-builder-handoff.md) records 203/203 passing hash-bound unit tests.
 
-The assistant now checks both parents on Debby's school question and immediately
-suggests inviting Mike, conditional on one-parent attendance. Recipient and event
-details precede Debby's explicit send request. The result is a clearly labelled
-page-local Demo invitation awaiting Mike's response, not real delivery or acceptance.
+The assistant now checks both parents on Parent B's school question and immediately
+suggests inviting Parent A, conditional on one-parent attendance. Recipient and event
+details precede Parent B's explicit send request. The result is a clearly labelled
+page-local Demo invitation awaiting Parent A's response, not real delivery or acceptance.
 No reminder was added. Duplicate submissions do not resend; context and consent
 checks remain fail-closed. Main outing dialogue is shorter; material showtime,
 calendar coverage and saved-source qualifications remain in the UI and details.
@@ -431,11 +778,11 @@ The owner approved the revised storyboard and offline continuation. Delivered:
 [production manifest](../browser-artifacts/demo/family-story-cpocKr/manifest.json),
 [selected-frame review](../browser-artifacts/demo/family-story-cpocKr/visual-review.json).
 
-The nine-second illustrated introduction names Debby and Mike as Kimi's parents.
+The nine-second illustrated introduction names Parent B and Parent A as Child's parents.
 Outings run from 9.00 to 37.44; a three-second chapter explicitly introduces a
 separate conversation about sharing school responsibilities. School coordination
 runs from 40.44 to 62.04, retaining the user question, conflict, alternate-parent
-question and separate consent. The final product state is pending Mike's
+question and separate consent. The final product state is pending Parent A's
 confirmation. A five-second illustrated Family Copilot closing ends the film.
 Reset/menu travel and Undo are omitted, not disabled or altered in the product.
 Outcome captions follow visible results instead of announcing them during typing.
@@ -458,7 +805,7 @@ services were untouched. Human continuous viewing remains pending.
 
 Synthetic calendars, saved public activity facts and two capture-only simulated
 loading waits remain explicit source limitations. Family relationships are the
-fictional premise, not authenticated identity. Mike is not contacted and no
+fictional premise, not authenticated identity. Parent A is not contacted and no
 calendar is changed. Some activity details remain below the captured viewport;
 the October preference reason and practical information are visible, while the
 September card remains poster-heavy. Image rights and narrated/public release
@@ -470,9 +817,9 @@ The owner identified five issues in the 60.56-second cut: no introduction,
 unclear family relationships, unnecessary Undo in the main story, script/design
 alignment, and no satisfying ending. That file remains a technical review cut,
 not an accepted final story. The [revised storyboard](demo-recommendation-storyboard.md)
-now establishes Debby and Mike as Kimi's parents, connects family leisure with
+now establishes Parent B and Parent A as Child's parents, connects family leisure with
 shared responsibilities, removes Undo from the main presentation, and ends on
-the pending-Mike next step followed by a family/brand closing. Undo remains a
+the pending-Parent A next step followed by a family/brand closing. Undo remains a
 product feature and regression test, not a required hero-demo beat.
 
 The review also found premature result captions and poster-heavy activity framing.
@@ -483,26 +830,25 @@ current scenario, contract, design reading and earlier family-opening source.
 This increment changes only script/production records. No new video, product
 edit, delegation, browser operation, recording or speech synthesis occurred.
 
-## Debby-led two-story video delivered, 20 September 2026
+## Parent B-led two-story video delivered, 20 September 2026
 
 The owner's latest "Go" approved isolated synthetic rehearsal and recording of
-the verified Debby-to-Mike product revision. Delivered:
+the verified Parent B-to-Parent A product revision. Delivered:
 [60.56-second silent MP4](../browser-artifacts/demo/school-chapter-wDdirh/familycopilot-two-stories.mp4),
 [English SRT](../browser-artifacts/demo/school-chapter-wDdirh/familycopilot-two-stories.en.srt),
 [production manifest](../browser-artifacts/demo/school-chapter-wDdirh/manifest.json).
 
 The outing story comes first, retaining both native UI loading waits and smooth
 scrolling. At 29.60-32.60 a full-screen editorial "Another user story" chapter
-introduces the school meeting. A new conversation follows: Debby asks about her
-schedule, the UI computes her 30-minute conflict, she asks about Mike, and a
-separate Yes creates a proposal awaiting Mike's confirmation. Undo withdraws it.
+introduces the school meeting. A new conversation follows: Parent B asks about her
+schedule, the UI computes her 30-minute conflict, she asks about Parent A, and a
+separate Yes creates a proposal awaiting Parent A's confirmation. Undo withdraws it.
 No proactive notification is fabricated. Preference editing is not demonstrated;
 the existing family summary remains visible in the background.
 
 Builder snapshot SHA is
 `2ecadd6c8d86c82e0a3ae2db9684b0e9d1267d8955f93dcad36a19d6939013fb`.
-The Producer nine-scene derivative at
-`browser-artifacts/demo/debby-story-RQ4Roa/snapshot/snapshot.json` has SHA
+The Producer nine-scene derivative retained privately (identifying path omitted) has SHA
 `d8adaad95718379af39d23f92ee4b614394f788d968df2a5159be482155fc9d2`;
 all 25 product asset hashes match. Only media order, assertions and pacing changed.
 Disposable rehearsal `chat-review-lN67Cg` and one formal capture
@@ -519,7 +865,7 @@ without scaling. Production regressions passed 21/21; diagnostics, scoped
 whitespace, complete decode, caption bounds, source/output hashes and ignored
 media were checked. Rehearsal images showed both loading states, activity images,
 conflict, separate consent, proposal and Undo. Final MP4 frames inspected: opening,
-chapter, Debby's input, computed conflict, consent question, pending proposal and
+chapter, Parent B's input, computed conflict, consent question, pending proposal and
 ending. This is scene-level browser evidence, not a complete product browser suite
 or human continuous viewing; those broader claims are not made.
 
@@ -529,22 +875,22 @@ installation, service operation or publication occurred. Source-image rights,
 saved-source uncertainty and human continuous review remain unresolved. Long
 activity cards still require scrolling. This delivery is an internal silent preview.
 
-## Debby's coordination story, unit-tested handoff received
+## Parent B's coordination story, unit-tested handoff received
 
 Builder delegation was explicitly approved and completed after an interrupted
 tool response. Producer independently verified the new 25-asset snapshot against
 SHA-256 `2ecadd6c8d86c82e0a3ae2db9684b0e9d1267d8955f93dcad36a19d6939013fb`.
 The [current Builder handoff](chat-builder-handoff.md) records 196/196 passing
-snapshot-bound offline tests, exact dialogue and evidence. Debby's actual synthetic
-busy interval now computes the conflict; Mike is assessed and proposed only after
+snapshot-bound offline tests, exact dialogue and evidence. Parent B's actual synthetic
+busy interval now computes the conflict; Parent A is assessed and proposed only after
 separate confirmation. The earlier product blockers below are resolved by this
 handoff, not by caption changes. Browser verification, Producer rehearsal and
 capture remain pending and require scoped approval. The old browser runner needs
 updated meeting assertions; old recordings still show the wrong roles. No new
 video, live access, notification, calendar write or speech was produced.
 
-20 September 2026: the owner approved Debby as the current user, with her work
-meeting conflicting with the school meeting and Mike as the proposed attendee.
+20 September 2026: the owner approved Parent B as the current user, with her work
+meeting conflicting with the school meeting and Parent A as the proposed attendee.
 The latest agreed opening is user-initiated, not a proactive notification.
 Retain "Another user story" as an editorial separator, not a chat message.
 Existing videos below show the reverse roles and do not satisfy this revision.
@@ -553,28 +899,28 @@ the earlier proposed proactive chapter as a substitute for product behavior.
 
 Approved dialogue intent, pending implementation and exact response verification:
 
-1. Debby: "Can you check my schedule for the school meeting?"
+1. Parent B: "Can you check my schedule for the school meeting?"
 2. Copilot: "Your work meeting overlaps with the school meeting by 30 minutes.
   Does only one parent need to attend?"
-3. Debby: "Yes. Could Mike go instead?"
-4. With complete, current authorized coverage and no known overlap for Mike,
-  Copilot: "Mike has no conflicting events in the loaded calendar. Shall I
+3. Parent B: "Yes. Could Parent A go instead?"
+4. With complete, current authorized coverage and no known overlap for Parent A,
+  Copilot: "Parent A has no conflicting events in the loaded calendar. Shall I
   propose that he attend?"
-5. Debby confirms; show a proposal awaiting Mike's confirmation, with Undo.
+5. Parent B confirms; show a proposal awaiting Parent A's confirmation, with Undo.
   No contact, notification or calendar write is implied.
 
 Pre-implementation blocker evidence: `chat/conversation-core.js` then recognized
-fixed school-meeting commands, reports Mike's overlap and proposes Debby after
-Yes. `owner/chat-calendar.js` explicitly requires Mike to conflict and Debby to
+fixed school-meeting commands, reports Parent A's overlap and proposes Parent B after
+Yes. `owner/chat-calendar.js` explicitly requires Parent A to conflict and Parent B to
 have no conflict, and renders that direction in its timeline and comparison.
 The latest conversational product revision is not in the old pinned handoff.
 Reproduction from code: review the meeting after an activity scene, then answer
-Yes; current messages and proposal target Debby, not Mike. No browser reproduction
+Yes; current messages and proposal target Parent B, not Parent A. No browser reproduction
 was executed for this request.
 
-Builder acceptance requested and now unit-verified: explicit synthetic current-user identity Debby;
+Builder acceptance requested and now unit-verified: explicit synthetic current-user identity Parent B;
 matching calendar data and computed overlap; the approved utterances accepted;
-one-parent and separate proposal consent; Mike pending confirmation; Undo;
+one-parent and separate proposal consent; Parent A pending confirmation; Undo;
 coverage/freshness/revision failures still block proposals; no activity search
 from meeting replies. Provide tested immutable assets and a scenario with exact
 wording before Producer rehearses and records. Product edits were delegated only
@@ -745,7 +1091,7 @@ unchanged for a separately approved full-story edit. Publication is not approved
 | 0:00 | Age, seven interests, two teams; deselect one team in the draft, then Cancel and retain the original selections |
 | 0:14 | Exact October prompt submitted with Enter; six candidate times, basketball/movie cards and preference reasons |
 | 0:31 | Exact nearer-weekend prompt; only the September movie remains, with unverified showtime and outside-October coverage |
-| 0:51 | School meeting; Mike's 30-minute overlap, one-parent condition, Debby proposal awaiting confirmation, then Undo |
+| 0:51 | School meeting; Parent A's 30-minute overlap, one-parent condition, Parent B proposal awaiting confirmation, then Undo |
 
 The twelve-scene scenario and all four local image references are preserved in
 `browser-artifacts/demo/full-story-OKNytb/`. Explicit assertions verified hidden
@@ -802,9 +1148,9 @@ Revised shot list and acceptance criteria (planning only):
    Show September movie ideas, unverified showtimes and the fact that these dates
    are outside loaded October calendar coverage. Do not present the October game
    as a nearer-weekend option. Capture the explanation, not only the movie body.
-4. Return to Calendar and click `Review a school meeting`. Show Mike's computed
+4. Return to Calendar and click `Review a school meeting`. Show Parent A's computed
    30-minute overlap. Select `Only one parent needs to attend`, then
-   `Propose Debby attending`. Show the pending-confirmation proposal, then Undo
+   `Propose Parent B attending`. Show the pending-confirmation proposal, then Undo
    and the withdrawn proposal. This is an independent Calendar-local action,
    not a third activity query, notification or calendar write.
 
@@ -824,9 +1170,9 @@ Proposed new English Jenny lines, NOT approved for synthesis:
 - Nearer request: "Could we do something sooner, like this weekend?"
 - Nearer result: "Here's a movie idea for this weekend. Showtimes still need
   checking, and these dates fall outside our loaded October calendars."
-- Meeting: "Mike has a thirty-minute overlap with the school meeting. Let's see
+- Meeting: "Parent A has a thirty-minute overlap with the school meeting. Let's see
   whether one parent could attend."
-- Proposal and Undo: "If only one parent needs to attend, we can propose Debby.
+- Proposal and Undo: "If only one parent needs to attend, we can propose Parent B.
   It's still waiting for her confirmation, and Undo takes the proposal back."
 
 Reuse the existing animated opening and matching Jenny clips where applicable.
@@ -1149,7 +1495,7 @@ cache-only request and one child saved-view request were permitted; provider Syn
 imports, destructive Clear, public searches and external requests were blocked.
 There were zero blocked attempts. No shared tab, app source or service changed.
 
-The captured UI showed Mike, Debby and Kimi **Loaded**, with real saved statuses
+The captured UI showed Parent A, Parent B and Child **Loaded**, with real saved statuses
 and child event times. Child event names and their tooltips were masked in the
 disposable browser before capture. Unknown gaps and the actual UI notices remain.
 This is saved-data viewing, not proof of fresh provider verification or full
@@ -1215,7 +1561,7 @@ consider a possible opening, explore shared interests, choose Basketball and a
 favorite team, consider a game, then open its official page. Narration no longer
 reads out fixture, storage or source implementation details. Visible sample and
 source labels remain. It does not claim automatic free-slot discovery or a
-verified calendar match; Kimi's plans still need checking.
+verified calendar match; Child's plans still need checking.
 
 - Reuses the completed integrated raw capture below. **No new recording, public
   search, calendar query or service change.** Earlier videos remain unchanged.

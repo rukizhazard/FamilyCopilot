@@ -7,7 +7,7 @@ This document is a proposal for review, not authorization to implement. Product 
 ### Approved child saved-view exception, 17 September 2026
 
 **Later narrow approval, 18 September:** the user approved remembering the exact
-confirmed Kimi source for the common on-demand Sync action, without repeated
+confirmed Child source for the common on-demand Sync action, without repeated
 confirmation controls. Implemented offline: native caller-bound SHA256 reference
 plus minimal reviewed access/window in a separate private local file until Clear.
 This supersedes the prohibition on retaining a source reference only for this
@@ -17,7 +17,7 @@ reviewed import enrolls it; cached source names cannot establish identity. No li
 query, migration, shared restart or deployment occurred. One-time enrollment/setup
 and coordinated activation remain open. [Implementation evidence](our-week.md#remembered-source-sync-implemented-offline-18-september-2026).
 
-The user explicitly approved saving permitted Kimi event names/times and minimal
+The user explicitly approved saving permitted Child event names/times and minimal
 reviewed access privately on this device **until Clear**, separate from the parent
 busy-only cache. This narrowly supersedes child nonpersistence below for the
 existing fixed October local-owner view. Source IDs, credentials, handles and
@@ -37,7 +37,7 @@ marker, with metadata-only preflight and no calendar query, cloud mutation or
 private saved-file access. User-reviewed import remains separate; old session-only
 results are not migrated. [Implementation and acceptance record](our-week.md#saved-view-activation-completed-17-september-2026).
 
-### Kimi native deployment and coordinated local activation, 17 September 2026
+### Child native deployment and coordinated local activation, 17 September 2026
 
 The later narrow child approval has now been used: one protected bounded workflow
 was deployed Disabled and independently verified, consuming that one-shot
@@ -53,12 +53,12 @@ Find/select/guardian/disclosure/review/import, exact October week, cloud redacti
 and child nonpersistence remain required. Native authentication and deployed
 metadata do not establish shared-source visibility. This checkpoint supersedes
 older undeployed/unused-approval/launcher-blocked statements below, not broader
-privacy or production gates. [Evidence and user test](kimi-calendar-import.md#shared-local-service-activated-17-september-2026).
+privacy or production gates. [Evidence and user test](child-calendar-import.md#shared-local-service-activated-17-september-2026).
 
 ### Approved parent authentication repair and live refresh, 17 September 2026
 
 The owner subsequently requested verification and repair of the existing
-Mike/Debby Update path. The local 8002 service now uses existing Windows-native
+Parent A/Parent B Update path. The local 8002 service now uses existing Windows-native
 Azure CLI authentication with bounded native IPC; no new OAuth, permission,
 policy, connector, target or deployment change. A single repaired October
 refresh returned HTTP 200, non-cached, both people checked/336 slots each,
@@ -68,13 +68,13 @@ WSL busy-only snapshot location; no diagnostic file read or Clear occurred.
 Full offline suite passed 642/642. Fresh browser/parent usability is separate.
 This is a narrow later query authorization, not arbitrary dates or child access.
 [Evidence and verification contract](owner-availability.md#windows-native-parent-update-repair-17-september-2026).
-Kimi is still not deployed/activated; the older native script-launcher failure
+Child is still not deployed/activated; the older native script-launcher failure
 below is historical. Parent success does not establish shared-source visibility.
 
-### Approved Kimi shared-Outlook exception, 17 September 2026
+### Approved Child shared-Outlook exception, 17 September 2026
 
 The guardian explicitly approved replacing the School calendar UI with direct
-import of Kimi's shared Outlook calendar, using the existing authorized connection
+import of Child's shared Outlook calendar, using the existing authorized connection
 and **one new bounded read-only child workflow** in the existing Azure scope.
 This supersedes the broader integration gate only for this local-parent-only
 slice, not Google feasibility, production sharing or other integrations.
@@ -97,14 +97,14 @@ performed. The one new-workflow deployment approval remains unused; no real list
 is approved for agent validation. Official connector V3 does support calendarView
 and sensitivity; previous contrary research is incorrect. Shared visibility still
 needs the user's eventual explicit listing, not screenshot-based inference.
-See [scope, evidence and checkpoint](kimi-calendar-import.md). Parent usability
+See [scope, evidence and checkpoint](child-calendar-import.md). Parent usability
 and broader production-readiness reviews remain separate.
 
 ### Approved bounded October demo (supersedes September live bounds)
 
 The owner approved exactly one migration of the existing availability workflow
 from v4 to v5 for **9–15 October 2026**, matching local UI/cache changes and safe
-idle-only activation, using the same protected Mike/Debby targets and existing
+idle-only activation, using the same protected Parent A/Parent B targets and existing
 official basketball discovery. Approval is already granted for this narrow
 migration, not for arbitrary live ranges, additional resources, real validation
 queries or agent access to the private snapshot. Real calendar access remains
@@ -229,12 +229,12 @@ distinct gates; automated/browser testing does not establish parent approval.
 
 ### Approved current POC copy, 16 September 2026
 
-The owner approved **Our week** as the weekly heading and **Mike / Debby** as
+The owner approved **Our week** as the weekly heading and **Parent A / Parent B** as
 presentation labels, superseding the historical Dad/Mom copy only. The mapping
-remains **Mike → Mike Lee; Debby → Debby**, with unchanged protected targets,
+remains **Parent A → Parent A; Parent B → Parent B**, with unchanged protected targets,
 authorization, fixed **20–26 September 2026 Taipei** week, all 336 slots each,
 layout and snapshot/cache binding. No identity or family relationship is inferred.
-Synthetic review uses **Mike (sample) / Debby (sample)** for the existing fictional
+Synthetic review uses **Parent A (sample) / Parent B (sample)** for the existing fictional
 Alex/Sam fixtures, retaining prominent sample/source notices.
 
 This approval does not include optional nickname settings, Add someone, multiuser
@@ -298,7 +298,7 @@ See [the current implementation record](owner-availability.md#sunday-week-and-ra
 
 ### Historical approved presentation-only simplification, 15 September 2026
 
-The owner requested **Dad** instead of Mike Lee, **Mom** instead of Debby, and
+The owner requested **Dad** instead of Parent A, **Mom** instead of Parent B, and
 one seven-day calendar diagram rather than many daily lists. The local UI now
 uses these display aliases, explicitly preserving their prior-name mapping in
 the access summary. They establish no new identities, parent relationship,
@@ -317,8 +317,8 @@ See [the current UI record](owner-availability.md#presentation-only-weekly-diagr
 ### Latest approved fixed-week availability exception, 15 September 2026
 
 The owner explicitly approved hiding the initial calendar-selection UI (retaining
-its backend/cleanup capability), replacing the first protected target with **Mike Lee**,
-retaining **Debby**, and a fixed **2026-09-15 00:00 through 2026-09-22 00:00 exclusive
+its backend/cleanup capability), replacing the first protected target with **Parent A**,
+retaining **Parent B**, and a fixed **2026-09-15 00:00 through 2026-09-22 00:00 exclusive
 Asia/Taipei (UTC+8)** window. Seven full days at 30 minutes produce **336 slots per
 person**. Default calendars only; owner-only busy-status use through the existing
 connector. A named access summary confirms the window and all slots before a
@@ -326,7 +326,7 @@ request. One exact guarded Disabled v2 → v3 update and **one true live verific
 are approved, not mail, calendar writes, other queries, background sync or broader
 integration. Real addresses remain protected operator parameters, not repo/UI inputs.
 The exact update is deployed and the single approved true live verification passed:
-**Mike Lee true / 336 slots; Debby true / 336 slots**, followed by independent
+**Parent A true / 336 slots; Parent B true / 336 slots**, followed by independent
 Disabled/SAS-disabled contract, preserved-resource, cleared-session and idle checks.
 No further provider query was made; secure values cannot be read back from ARM.
 See [the current execution record](owner-availability.md). Parent usability, provider

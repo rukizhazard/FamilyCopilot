@@ -39,7 +39,7 @@
       ["availability-window", "Nothing checked."],
       ["availability-parent-details", "", "div"],
       ["availability-freshness", "Freshness unknown."],
-      ["child-week-status", "Kimi (sample) / Not loaded."],
+      ["child-week-status", "Child (sample) / Not loaded."],
       ["availability-status", "Schedules not loaded.", "p", { hidden: true, tabindex: "-1", role: "status" }],
       ["availability-status-details", "", "p", { hidden: true, role: "status" }],
       ["child-status", "", "p", { hidden: true, tabindex: "-1", role: "status" }],
@@ -52,7 +52,7 @@
     strip.append(details);
     const body = node("div", "chat-calendar-body");
     const people = node("div", "", "", { class: "calendar-people", role: "group", "aria-label": "Calendar loading status" });
-    for (const [index, name] of ["Mike", "Debby", "Kimi"].entries()) {
+    for (const [index, name] of ["Parent A", "Parent B", "Child"].entries()) {
       const chip = node("span", "member-row-" + index, "", { class: "member-chip" });
       chip.append(button("calendar-person-" + index, name + " (sample)", { disabled: true }),
         button("member-remove-" + index, "-", { "aria-label": "Remove " + name + " from sample member list" }));
@@ -86,7 +86,7 @@
       button("availability-display-next", "Later days", { disabled: true, "aria-describedby": "availability-display-help" }));
     details.append(navigation);
     for (const [id, text] of [
-      ["availability-targets", "Mike (sample) + Debby (sample) / Default calendars / Busy-only"],
+      ["availability-targets", "Parent A (sample) + Parent B (sample) / Default calendars / Busy-only"],
       ["availability-date-help", "Calendar coverage stays 9-15 October 2026. Browsing months does not load other dates."],
       ["availability-date-sharing", "Calendar dates stay in memory, separate from activity dates."],
       ["availability-range-support", "Sample dates only."],
@@ -120,9 +120,9 @@
     const weekdays = node("div", "", "", { class: "calendar-month-weekdays", "aria-hidden": "true" });
     for (const day of ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]) weekdays.append(node("span", "", day));
     month.append(monthHeading, weekdays, node("div", "calendar-month-days", "", { class: "calendar-month-days", role: "group", "aria-label": "Month dates" }),
-      paragraph("calendar-month-note", "Unloaded dates are unknown.", { class: "calendar-month-note" }));
+      paragraph("calendar-month-note", "Busy periods occupy part of a day, not necessarily all day. Child's entries are events, not verified Busy slots. Missing time and unloaded dates remain unknown. Times: Taipei.", { class: "calendar-month-note" }));
     const dayDetails = node("details", "calendar-day-details", "", { class: "availability-details" });
-    dayDetails.open = true;
+    dayDetails.open = false;
     dayDetails.append(node("summary", "calendar-day-title", "Schedule details"), legend,
       paragraph("calendar-candidate-selection", "", { hidden: true }),
       node("div", "availability-grid", "", { hidden: true, role: "region", tabindex: "0", "aria-label": "Weekly calendar", "aria-describedby": "week-help" }));
@@ -130,14 +130,14 @@
     details.append(paragraph("", "Candidate times: up to six distinct weekend windows across October, at least two consecutive hours between 09:00 and 20:00 Taipei. One per Monday-based week first, then additional dates; longest interval per day, earlier on ties. Weekends are not guaranteed days off. Public-holiday dates have not been verified. These are sample display rules, not saved family preferences. Activity suggestions use their separate October 9-11 sample window."),
       paragraph("calendar-invitation-source", "Invitations use sample data and stay on this page. No invitation is delivered and no calendars are changed."));
     const coordination = node("section", "calendar-coordination", "", { hidden: true, "aria-labelledby": "coordination-title" });
-    coordination.append(node("h3", "coordination-title", "Kimi's school meeting"),
+    coordination.append(node("h3", "coordination-title", "Child's school meeting"),
       paragraph("", "Parent-teacher meeting / Fri, Oct 16 / 15:30-16:30 Taipei"),
       button("coordination-review", "Review a school meeting", { "aria-expanded": "false", "aria-controls": "coordination-body" }));
     const coordinationBody = node("div", "coordination-body", "", { hidden: true });
     coordinationBody.append(paragraph("coordination-status", "", { role: "status", tabindex: "-1" }),
       node("div", "coordination-timeline", "", { "aria-label": "Meeting and parent busy times, 14:00 to 18:00 Taipei" }),
       paragraph("coordination-result", "", { role: "status", hidden: true }),
-      paragraph("", "Current user: Debby. Mike's response and travel are not confirmed.", { class: "coordination-note" }));
+      paragraph("", "Current user: Parent B. Parent A's response and travel are not confirmed.", { class: "coordination-note" }));
     coordination.append(coordinationBody);
     details.append(people, editor, memberHelp, paragraph("member-message", "", { hidden: true, role: "status" }), dates);
     body.append(

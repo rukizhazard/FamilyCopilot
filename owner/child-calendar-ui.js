@@ -25,7 +25,7 @@
   const syncAvailable = available && document.querySelector('meta[name="child-sync"]')?.content === "child-sync-v1";
   const cacheErrors = ["child_cache_invalid", "child_cache_unavailable", "child_cache_clear_failed"];
   const storageErrors = [...cacheErrors, "child_source_invalid", "child_source_unavailable", "child_source_clear_failed"];
-  const updateHelp = "Kimi saved viewing needs a safe backend update. Parent-only controls still work; reloading cannot fix a storage/cleanup block.";
+  const updateHelp = "Child saved viewing needs a safe backend update. Parent-only controls still work; reloading cannot fix a storage/cleanup block.";
   let generation = 0, pending = false, controller, used = false, blocked = false, expired = false;
   let bridgeGeneration = 0, revision = 0, sharedPending = false, cleanupPending = 0;
   let eventNames = [], namesGeneration = -1, namesRevision = -1;
@@ -141,8 +141,8 @@
     }).catch(e => {
       blocked = true; hide("unavailable");
       status(storageErrors.includes(e.message)
-        ? "Kimi saved view or remembered source could not be cleared or verified. Reuse is blocked until explicit Clear succeeds; reload cannot unblock storage."
-        : "Cleanup unconfirmed. Kimi data hidden; further calendar requests blocked. Get help in Details; no automatic retry.", true);
+        ? "Child saved view or remembered source could not be cleared or verified. Reuse is blocked until explicit Clear succeeds; reload cannot unblock storage."
+        : "Cleanup unconfirmed. Child data hidden; further calendar requests blocked. Get help in Details; no automatic retry.", true);
     }).finally(() => { cleanupPending--; controls(); });
     return clearing;
   }
@@ -156,14 +156,14 @@
     eventNames = result.events.map(e => disclosure === "details" && !e.redacted && e.title.trim() ? e.title : "");
     namesGeneration = bridgeGeneration + 1; namesRevision = revision;
     publish("loaded", result);
-    $("child-imported-access").textContent = `${useSync ? "Reviewed access" : "Saved access (view only, not live authorization)"} · Checked ${result.checkedAt} · ${syncAvailable ? "Sync uses remembered source · " : ""}${sourceName} · Kimi · ${disclosure === "details" ? "Permitted names and times" : "Busy-only"}. Our week shows consented event names, times and reported status. Private and Busy-only events stay unnamed.`;
+    $("child-imported-access").textContent = `${useSync ? "Reviewed access" : "Saved access (view only, not live authorization)"} · Checked ${result.checkedAt} · ${syncAvailable ? "Sync uses remembered source · " : ""}${sourceName} · Child · ${disclosure === "details" ? "Permitted names and times" : "Busy-only"}. Our week shows consented event names, times and reported status. Private and Busy-only events stay unnamed.`;
     $("child-imported-access").hidden = false;
     // Only provenance scalars are retained for the five-minute freshness redraw.
     const checkedAt = result.checkedAt;
     const coverage = new Intl.DateTimeFormat("en-GB", { timeZone: result.window.timezone, day: "numeric", month: "long", year: "numeric" })
       .formatRange(new Date(result.window.start), new Date(Date.parse(result.window.end) - 1)).replace(/ /g, "");
     const provenance = globalThis.calendarDisposed ? useSync && refresh ? "Fresh fixture result (synthetic) · " : "Saved fixture; original check time · " : "";
-    const message = () => status(`Kimi · ${synthetic ? "SAMPLE" : "Outlook"} · ${sourceName} · ${provenance}${syncAvailable ? `Checked ${checkedAt} · Sync uses remembered source` : `Saved only, checked ${checkedAt}`} · ${Date.now() - Date.parse(checkedAt) >= 300000 ? "Stale; may be out of date" : "Recent snapshot, not continuous verification"}. ${coverage} Taipei. ${syncAvailable ? "Cached results keep their original check time; no background refresh." : "Outlook not rechecked; Update refreshes parents only."}`, false, true);
+    const message = () => status(`Child · ${synthetic ? "SAMPLE" : "Outlook"} · ${sourceName} · ${provenance}${syncAvailable ? `Checked ${checkedAt} · Sync uses remembered source` : `Saved only, checked ${checkedAt}`} · ${Date.now() - Date.parse(checkedAt) >= 300000 ? "Stale; may be out of date" : "Recent snapshot, not continuous verification"}. ${coverage} Taipei. ${syncAvailable ? "Cached results keep their original check time; no background refresh." : "Outlook not rechecked; Update refreshes parents only."}`, false, true);
     message(); staleTimer = setTimeout(message, Math.max(1, 300000 - (Date.now() - Date.parse(checkedAt))));
   }
   const saved = () => loadInternal(false);
@@ -176,7 +176,7 @@
     hide(); const version = ++generation;
     const [startDate, endDate] = dates();
     pending = true; publish("loading"); controls();
-    status(useSync ? "" : "Opening Kimi's saved view only… No Outlook request.", false, useSync);
+    status(useSync ? "" : "Opening Child's saved view only… No Outlook request.", false, useSync);
     await clearing;
     if (version !== generation) return "cancel";
     if (Date.now() >= expires) { expire(); return "cancel"; }
@@ -186,8 +186,8 @@
       if (version !== generation) return "cancel";
       if (Date.now() >= expires) { expire(); return "cancel"; }
       if (useSync && C.exact(response, ["status"]) && response.status === "source_missing") {
-        publish("idle"); status("Kimi is not connected.");
-        $("child-status-details").textContent = "Sync needs a one-time exact source confirmation. It is not migrated from a cached name. No setup opens here; Kimi's schedule remains unknown. Parents can still load.";
+        publish("idle"); status("Child is not connected.");
+        $("child-status-details").textContent = "Sync needs a one-time exact source confirmation. It is not migrated from a cached name. No setup opens here; Child's schedule remains unknown. Parents can still load.";
         $("child-status-details").hidden = false;
         return "missing";
       }
@@ -197,7 +197,7 @@
         if (useSync && result.status !== "saved") throw new Error();
       } catch { throw new Error("child_cache_invalid"); }
       if (result.status === "cache_missing") {
-        publish("idle"); status("Kimi · No saved view for these dates. Schedule unknown; Outlook not queried.");
+        publish("idle"); status("Child · No saved view for these dates. Schedule unknown; Outlook not queried.");
         return "missing";
       }
       draw(result.data, result.access.disclosure, result.access.sourceName, useSync, refresh);
@@ -210,16 +210,16 @@
       blocked ||= lostAccess || e.message === "cleanup_failed" || storageErrors.includes(e.message);
       hide(expired ? "expired" : "unavailable");
       const messages = {
-        revoked: "Kimi access revoked. Saved results hidden; reuse blocked.",
-        expired: "Page session expired. Kimi page data hidden; reload does not load saved data.",
-        cleanup_failed: "Cleanup unconfirmed. Kimi data hidden; loading blocked. Get help in Details.",
-        busy: "Kimi saved view unavailable while another calendar operation is running. Schedule unknown."
+        revoked: "Child access revoked. Saved results hidden; reuse blocked.",
+        expired: "Page session expired. Child page data hidden; reload does not load saved data.",
+        cleanup_failed: "Cleanup unconfirmed. Child data hidden; loading blocked. Get help in Details.",
+        busy: "Child saved view unavailable while another calendar operation is running. Schedule unknown."
       };
       status(storageErrors.includes(e.message)
-        ? "Kimi saved view or remembered source is invalid, unavailable, or could not be saved/cleared. Reuse is blocked until explicit Clear succeeds; reload cannot unblock storage."
-        : messages[e.message] || (lostAccess ? "Kimi access is unconfirmed. Saved results hidden; reuse blocked." : useSync
-          ? "Kimi Sync unavailable. Schedule unknown; the Outlook request outcome is unconfirmed. No saved fallback."
-          : "Kimi saved view unavailable. Schedule unknown; no Outlook request."), true);
+        ? "Child saved view or remembered source is invalid, unavailable, or could not be saved/cleared. Reuse is blocked until explicit Clear succeeds; reload cannot unblock storage."
+        : messages[e.message] || (lostAccess ? "Child access is unconfirmed. Saved results hidden; reuse blocked." : useSync
+          ? "Child Sync unavailable. Schedule unknown; the Outlook request outcome is unconfirmed. No saved fallback."
+          : "Child saved view unavailable. Schedule unknown; no Outlook request."), true);
       if (useSync) {
         try {
           const diagnostic = C.syncDiagnostic(e.diagnostic);
@@ -234,14 +234,14 @@
   }
   function dateEdit() {
     const next = dates().join(); if (next === lastDates) return; lastDates = next;
-    reset("Dates changed. Kimi page data hidden; saved view kept.", "range");
+    reset("Dates changed. Child page data hidden; saved view kept.", "range");
   }
   for (const id of ["availability-start", "availability-end"]) for (const event of ["input", "change"]) listen($(id), event, dateEdit);
   if ($("availability-supported-dates")) listen($("availability-supported-dates"), "click", dateEdit);
   function release() {
     // Fence now, drain prior cleanup, then let common Clear send its sole deletion.
     released = true;
-    reset("Calendar view closed. Kimi page data hidden.", "leave", false, false);
+    reset("Calendar view closed. Child page data hidden.", "leave", false, false);
     return globalThis.calendarDisposed?.() ? clearing.then(() => {
       if (blocked || cleanupPending) throw new Error("calendar_cleanup_unconfirmed");
     }) : clearing;
@@ -256,25 +256,25 @@
     blocked ||= d.blocked; expired ||= d.expired;
     if (changed || blocked || expired) {
       lastDates = dates().join();
-      reset(expired ? "Page session expired. Kimi page data hidden; saved view kept." : blocked
-        ? "Shared cleanup or access is unconfirmed. Kimi data hidden; get help in Details."
-        : "Dates changed. Kimi page data hidden; saved view kept.", expired ? "leave" : "range", false, !d.blocked && !d.pending);
+      reset(expired ? "Page session expired. Child page data hidden; saved view kept." : blocked
+        ? "Shared cleanup or access is unconfirmed. Child data hidden; get help in Details."
+        : "Dates changed. Child page data hidden; saved view kept.", expired ? "leave" : "range", false, !d.blocked && !d.pending);
     }
     controls();
   });
   if (!globalThis.calendarDisposed) {
-    listen(window, "pagehide", () => reset("Page left. Kimi page data hidden; saved view kept.", "leave", true, !coordination));
+    listen(window, "pagehide", () => reset("Page left. Child page data hidden; saved view kept.", "leave", true, !coordination));
     listen(window, "pageshow", e => { if (e.persisted) reset("Restored page. Saved data has not been loaded.", "leave", false, !coordination); else dateEdit(); });
   }
   listen(window, "focus", () => { if (Date.now() >= expires) expire(); else dateEdit(); });
   function expire() {
     if (expired) return;
     expired = true;
-    reset("Page session expired. Kimi page data hidden; saved view kept. Reload does not load it.", "leave");
+    reset("Page session expired. Child page data hidden; saved view kept. Reload does not load it.", "leave");
   }
   setTimeout(expire, 30 * 60000);
-  status(available ? syncAvailable ? "Kimi · Not loaded. Sync uses only a previously confirmed remembered source." : "Kimi · Saved view not loaded. No Outlook request." : updateHelp, false, available);
-  $("child-retention").textContent = !retention ? updateHelp : `Kimi: permitted names/times and minimal reviewed settings ${retention === "disk" ? "are saved privately on this device until Clear, separate from parent busy times" : "stay in memory until Clear or server restart"}. ${syncAvailable ? "The remembered source stays server-side, separate from the saved view. Sync reuses that confirmed source and disclosure, never a cached name. No source references, provider IDs, handles or tokens reach browser storage. View saved only cannot detect Outlook revocation and never queries on a miss." : "No provider IDs, handles or tokens are saved. Saved viewing cannot detect Outlook revocation or authorize live refresh."} The page view expires after 30 minutes; saved retention is separate.`;
+  status(available ? syncAvailable ? "Child · Not loaded. Sync uses only a previously confirmed remembered source." : "Child · Saved view not loaded. No Outlook request." : updateHelp, false, available);
+  $("child-retention").textContent = !retention ? updateHelp : `Child: permitted names/times and minimal reviewed settings ${retention === "disk" ? "are saved privately on this device until Clear, separate from parent busy times" : "stay in memory until Clear or server restart"}. ${syncAvailable ? "The remembered source stays server-side, separate from the saved view. Sync reuses that confirmed source and disclosure, never a cached name. No source references, provider IDs, handles or tokens reach browser storage. View saved only cannot detect Outlook revocation and never queries on a miss." : "No provider IDs, handles or tokens are saved. Saved viewing cannot detect Outlook revocation or authorize live refresh."} The page view expires after 30 minutes; saved retention is separate.`;
   coordination = globalThis.FamilyWeekActions?.register({ saved, release, ...(syncAvailable ? { sync } : {}) });
   publish(available ? "idle" : "unavailable"); controls();
 });

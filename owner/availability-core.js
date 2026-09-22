@@ -128,8 +128,8 @@
   }
   // Presentation aliases only. Never used as provider identities or authorization.
   function displayPeople(synthetic = false) {
-    return ["Mike", "Debby"].map((alias, person) => ({ person, alias: synthetic ? `${alias} (sample)` : alias,
-      previous: (synthetic ? ["Alex (fictional)", "Sam (fictional)"] : ["Mike Lee", "Debby"])[person] }));
+    return ["Parent A", "Parent B"].map((alias, person) => ({ person, alias: synthetic ? `${alias} (sample)` : alias,
+      previous: (synthetic ? ["Alex (fictional)", "Sam (fictional)"] : ["Parent A", "Parent B"])[person] }));
   }
   const compactLabels = Object.freeze({ free_or_elsewhere: "No busy*", tentative: "Tent.", busy: "Busy", oof: "Away", unknown: "Unknown" });
   function dayTime(slot) {

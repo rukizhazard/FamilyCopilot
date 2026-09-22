@@ -1,5 +1,15 @@
 # Family Copilot design reference
 
+## Publication review, 22 September 2026
+
+Parent A, Parent B and Child below are editorial aliases for the original people,
+not their names or a claim that original approvals used those words. All nine
+reference PNGs were visually reviewed again: image 3 retains a real family name;
+the other eight did not visibly contain the three reviewed names. No image was
+modified or removed. Historical hashes remain historical. The neutral HTML draft
+and product text are not evidence that old media was anonymized. See the
+[publication blockers and validation](../publication-redaction.md).
+
 Reviewed visually: 19 September 2026. All nine PNGs currently in this directory
 were inspected, not inferred from filenames. There is no image 1 in this folder.
 This is a textual reading of the supplied designs plus subsequent owner decisions,
@@ -11,6 +21,119 @@ and [integration contract](../chat-integration-contract.md). Product permissions
 remain in the [product and privacy plan](../parent-schedule-activity-discovery.md).
 Newer explicit owner decisions below take precedence over older presentation ideas;
 neither screenshots nor this document grant new data access or live operations.
+
+## Whole-month calendar and invitation motion, 21 September 2026
+
+The owner approved integrating the read-only monthly concept into the product,
+repairing first-typing jitter and showing a short invitation-preparation animation.
+This supersedes the earlier open-day-track default, not its availability or privacy
+contract. October now uses five actual weeks. Parent markers say `Busy periods`,
+never all-day/unavailable; the note explains that only parts of a day are occupied.
+Child's loaded October 3, 4, 9 and 16 events show permitted names/times. All-day,
+cancelled and unknown states stay explicit, redacted events stay Busy-only, and
+names still use the private DOM renderer rather than crossing the title-free bridge.
+Day/member/candidate controls remain functional and explicitly open detail tracks.
+No user controls or conversation content automatically collapse.
+
+After Parent B's exact consent, the actual product displays the existing polite
+`Preparing Parent A's invitation...` status and spinner during a cancellable 700ms
+page-local preparation interval. Reduced-motion retains the status without motion.
+Calendar is synchronously revalidated afterward; the only successful result is
+`Parent A pending response`, never sent/delivered/accepted. Existing source Details
+retain the no-delivery qualification. No new source facts, fixture, network,
+persistence, private calendar access or provider behavior was introduced.
+
+The original 25-asset snapshot reproduced 22px desktop scroll at first typing,
+without composer resizing. Correct idle scroll padding eliminates that scroll;
+mobile still scrolls an offscreen input into view normally. Isolated 1440x900 and
+390x844 browser checks passed for month content, no page overflow/clipped cells,
+keyboard day details/focus, preference save/cancel, reset, animation and reduced
+motion. Mobile uses a horizontally scrollable month, not unreadably narrow cells.
+Final focused **228/228** and bounded chat **214/214** checks are bound to the
+[25-asset handoff](../chat-builder-handoff.md), SHA-256
+`c626ab54ed20895f53ea6b458e6e6a2fde904fdca0e9f7b37fe2830c939c0a61`.
+Four restored original images are unchanged, superseding earlier missing-image
+status. Producer owns the separately authorized video revision with existing
+narration; Builder did not touch media/shared services, install tools or delegate.
+Parent usability, physical-device/assistive-technology review and image rights
+remain separate limitations, not established by automated checks.
+
+## Preferences product integration, 21 September 2026
+
+After reviewing the equal-interest draft, the owner explicitly approved applying
+it to the actual chat product and isolated offline desktop/mobile verification.
+The family now has prominent initial avatars, names and Parent/Child roles.
+All seven default interests share one grid, 40px icons, the same 750 weight and
+17px desktop / 14px mobile labels. No primary/secondary tiers or automatic
+conversation collapse were added. Defaults remain editable; unknown interests
+use the existing neutral plus icon, and arbitrary team names stay literal text.
+Known team typography and bilingual names derive from current preference state,
+not the screenshot. Location is secondary. Existing edit buttons, editable form,
+Apply/Cancel, custom values, reset, explicit suggestion updates and real Send
+remain operational; the static draft's disabled controls were not copied.
+
+The bundled font and draft's existing vector paths are reused without downloads
+or dependencies. Four accepted missing third-party images remain missing and
+use existing product fallback. Calendar order, source facts, processing actions,
+Child ownership, consent, dates and domain fixtures are unchanged.
+
+Executed: 39/39 focused integration tests and 211/211 bounded chat checks, then
+211/211 bound to the final read-only snapshot. Isolated in-memory browser routes
+passed at 1440x900 and 390x844, with keyboard, preference save/cancel/custom/team,
+first query, update/reset/focus and scroll-end composer clearance checks. Exact
+default interest styles/geometry match at each viewport; no horizontal overflow,
+preference-item overlap, forbidden I/O or page errors. Final opening and result
+screenshots were visually inspected. No server, shared tab, private data,
+provider, recording, TTS or install was used. The [current Builder handoff](../chat-builder-handoff.md)
+pins source hashes, screenshots, reproducible checks and preserved failed attempts.
+Parent usability, physical-device/assistive-technology review and any media work
+remain separate gates. The static record below is historical, not current scope.
+
+## Preferences static review, 21 September 2026
+
+The owner approved a [standalone static draft](preferences-review.html) for review
+before any product integration. This supersedes only the earlier statement that
+no preference redesign was approved; chat behavior and its existing UI are unchanged.
+Owned deliverables are this entry and that self-contained HTML. Producer files,
+product code, fixtures, tests, contracts and ignored third-party images are untouched.
+
+The draft promotes Parent A and Parent B as parents and Child as their child, age 7,
+consistent with the current integration contract and existing preference markup.
+These are real people, not invented identities; no private schedules are included.
+Shared interests are not assigned to individual people. The owner's later decision
+keeps the page hierarchy but removes within-interest size tiers: all seven interests
+share one responsive, equal-weight list with matching icon dimensions, font size,
+weight, alignment and spacing. No favorite ranking is implied. Team initials are
+typographic fallbacks, not official logos; no replacement images were sought.
+Existing brand colors, Nunito Sans and bundled Lucide paths are reused offline,
+with bundled notices embedded in the HTML. Sport/activity symbols are inline
+vectors, avoiding missing emoji glyphs without downloading replacement assets.
+
+This is a static visual proposal, not an operational chat: Preferences expands
+read-only values, the textarea permits local typing, and Send is disabled.
+There is no script, search, calendar access, saving, persistence or message delivery.
+Reload discards typed text. Optional automatic post-conversation collapse is not
+approved or implemented. Review the family hierarchy, shared interests, team
+recognition, secondary location/settings and composer before authorizing integration.
+Desktop/mobile static screenshots are separately permitted for this draft only;
+they do not approve product browser scenarios, recording or parent usability.
+
+Executed for this revision: isolated offline Chromium at 1440x900 and 390x844;
+all seven computed styles and item geometry matched at each viewport. Icons are
+40x40px, weight 750; desktop labels are 17px and mobile labels 14px. Page overflow,
+text clipping, overlaps, expanded settings, keyboard expansion, local typing,
+disabled Send and reload checks passed. Both final screenshots were visually
+reviewed; mobile scrolls to the composer. No listening server was used: each
+viewport fulfilled two fixed in-memory document requests (load and reload), with
+zero external requests, resource-timing entries, scripts, linked stylesheets or
+page errors; the bundled font loaded and all seven inline icons resolved.
+The browser closed. Source SHA-256:
+`c73b3096a59362228590b22378fc7c1d0d85aafe15c1535926bff91171debe74`.
+Fresh source-bound results, four screenshots and the adapted helper are in the
+ignored `browser-artifacts/preferences-equal-interest-review-20260921-9BWcld/`
+directory. Earlier evidence is preserved, including two failed helper checks
+for visible font/rotated-icon overhang, corrected without changing those surfaces.
+This consumes only the static-preview browser scope, not integration approval.
 
 ## Latest source-label decision
 
@@ -29,9 +152,9 @@ to activities and when the Calendar body is collapsed. Do not remove this truth
 or frame the pending exchange as real delivery. No overlay, cropping or fixture
 substitution is an acceptable presentation fix.
 
-Progress is `Preparing Mike's invitation...`; the pending Calendar status is
-`Mike pending response`. Its result awaits his response without a sent/accepted
-claim. Keep the note that Mike's response and travel are not confirmed. Kimi
+Progress is `Preparing Parent A's invitation...`; the pending Calendar status is
+`Parent A pending response`. Its result awaits his response without a sent/accepted
+claim. Keep the note that Parent A's response and travel are not confirmed. Child
 remains event owner, parents remain busy-only and explicit consent is unchanged.
 Names refer to real people; their schedules here are sample data, not verified
 real calendar access. No preference redesign or new operation was approved.
@@ -49,7 +172,7 @@ first, then shared candidate times. Reuse the existing expanded month overview
 and expanded day tracks in that order under `Family calendars`, followed by the
 candidate summary. This is a small UI presentation change, not new calendar
 access or three unrestricted detailed calendar views. Parents remain busy-only;
-Kimi's permitted sample event titles stay inside Calendar. Missing time remains
+Child's permitted sample event titles stay inside Calendar. Missing time remains
 unknown and candidate windows are not guaranteed availability.
 
 Progress is `Loading family members' calendars...` followed by
@@ -61,7 +184,7 @@ Replace the long independent simulation sentence with the concise visible
 `Demo invitation` label in `#meeting-disclosure`. Keep it with the invitation
 exchange and pending response, including cancellation/stale history until reset
 or disposal. Calendar DEMO context and existing no-delivery details remain.
-Do not alter exact consent, Kimi ownership, Debby's overlap or Mike pending status.
+Do not alter exact consent, Child ownership, Parent B's overlap or Parent A pending status.
 This supersedes the older long-disclosure copy below, not its safety lifecycle.
 
 The [current Builder handoff](../chat-builder-handoff.md) records the fresh
@@ -96,21 +219,21 @@ The [current Builder handoff](../chat-builder-handoff.md) provides the fresh
 ## Latest meeting decision
 
 The owner's later 21 September 2026 correction places the school meeting in a
-shared or Kimi calendar, not Debby's. The implementation uses Kimi's sample event
+shared or Child calendar, not Parent B's. The implementation uses Child's sample event
 as the comparison source, including its October 16 month marker and day details.
-Use `Kimi's school meeting` as the heading and `Kimi / School meeting` as its
+Use `Child's school meeting` as the heading and `Child / School meeting` as its
 stable timeline row. Parents remain separate busy-only rows and attendance
 candidates; proposals/invitations must not change event ownership. The existing
-15:30-16:30 Taipei interval, Debby's 30-minute overlap and Mike pending response
+15:30-16:30 Taipei interval, Parent B's 30-minute overlap and Parent A pending response
 are unchanged. The [current handoff](../chat-builder-handoff.md) has 209/209 pinned
 tests and a new immutable snapshot; browser/visual review remains pending.
 
 On 21 September 2026 the owner approved natural invitation dialogue without
 technical `Demo invitation` or no-real-send statements inside messages. The
-question explicitly names Mike, Kimi's school meeting, Friday, October 16, 2026,
+question explicitly names Parent A, Child's school meeting, Friday, October 16, 2026,
 3:30-4:30 PM (Asia/Taipei), and the one-parent condition before asking permission.
 The exact explicit-consent replies below remain unchanged; bare Yes never sends.
-The response remains awaiting Mike, not accepted or confirmed attendance.
+The response remains awaiting Parent A, not accepted or confirmed attendance.
 Simulation/no-real-send facts are continuously visible in the independent
 `#meeting-disclosure` status above the composer while meeting context/messages
 remain, including cancelled or stale exchanges. Producer must keep it visible
@@ -120,13 +243,13 @@ records that snapshot, updated scenario and 208/208 pinned tests. New visual fra
 This supersedes the older inline demo-disclosure copy below, not consent/privacy.
 
 The owner's latest 20 September 2026 approval replaces the separate one-parent,
-Mike-check and proposal-confirmation turns. The school question now checks both
-parents immediately and offers a **Demo invitation** to Mike, displaying Kimi's
+Parent A-check and proposal-confirmation turns. The school question now checks both
+parents immediately and offers a **Demo invitation** to Parent A, displaying Child's
 school meeting on Friday, October 16, 2026, 15:30-16:30 Asia/Taipei before consent.
-`Yes, one parent is enough. Please send Mike an invitation.` or the contextual
-`Yes, please send Mike an invitation.` performs a page-local simulated send.
-Bare Yes does not send. Mike remains pending response, not an accepted attendee;
-the timeline keeps Debby's overlap. Both calendars are revalidated on send;
+`Yes, one parent is enough. Please send Parent A an invitation.` or the contextual
+`Yes, please send Parent A an invitation.` performs a page-local simulated send.
+Bare Yes does not send. Parent A remains pending response, not an accepted attendee;
+the timeline keeps Parent B's overlap. Both calendars are revalidated on send;
 cancel/reset/pause/expiry/context changes clear only the demo state. No real
 contact, calendar write, reminder or persistence was added.
 
@@ -143,11 +266,11 @@ earlier browser/media records do not verify this revision.
 Historical, superseded three-turn implementation:
 
 The newer bounded implementation on 20 September 2026 supersedes the role direction
-below: Debby is the synthetic current user, her 15:00-16:00 work interval overlaps
-the 15:30-16:30 school meeting by 30 minutes, and Mike is the alternate. The exact
+below: Parent B is the synthetic current user, her 15:00-16:00 work interval overlaps
+the 15:30-16:30 school meeting by 30 minutes, and Parent A is the alternate. The exact
 opening `Can you check my schedule for the school meeting?` works in a fresh chat.
-`Yes. Could Mike go instead?` establishes the one-parent condition and assesses
-Mike, but does not propose him. A separate `Yes` creates a proposal pending Mike's
+`Yes. Could Parent A go instead?` establishes the one-parent condition and assesses
+Parent A, but does not propose him. A separate `Yes` creates a proposal pending Parent A's
 confirmation; willingness and travel stay unknown. Undo/Cancel/reset/context changes
 withdraw it. Meeting replies do not search activities or change dates or budgets.
 This increment has offline unit evidence only, not new browser or parent approval.
@@ -158,7 +281,7 @@ Historical conversation decision, with superseded attendee direction:
 On 20 September 2026 the owner explicitly rejected the one-parent checkbox and
 proposal/Undo buttons as inconsistent with a conversation. The existing composer
 now carries the question, explicit Yes/No decision and Cancel/Undo withdrawal.
-The busy-only timeline remains supporting evidence inside Calendar. Debby is only
+The busy-only timeline remains supporting evidence inside Calendar. Parent B is only
 a proposed attendee, pending her confirmation, willingness and travel checks;
 there is no contact or calendar write. Unknown replies must not imply consent.
 Continue activities explicitly leaves this bounded scripted exchange without
@@ -202,7 +325,7 @@ Source: [Designer (2).png](Designer%20%282%29.png).
 Source: [Designer (3).png](Designer%20%283%29.png).
 
 - Left navigation: Home, Calendar, Events, Inbox, Interests, Family, Settings.
-- Main greeting addresses Debby and introduces three things needing attention.
+- Main greeting addresses Parent B and introduces three things needing attention.
 - Three broad rows show a meeting conflict, an approaching Science Camp deadline
   and an upcoming baseball ticket sale. Each has a category/status icon and chevron.
 - Red/peach conveys conflict, yellow deadline urgency, lilac an opportunity.
@@ -350,13 +473,13 @@ These decisions come from the September 19 conversation, not inferred image cont
   Outdoor play and Science & discovery, with other suggestions welcome.
   Ping-pong remains an editable option, not a selected default. The
    internal movie interest remains `movies`; no fake `any` category is added.
-7. Show the editable age directly beside Kimi as Kimi (7), as explicitly requested
+7. Show the editable age directly beside Child as Child (7), as explicitly requested
   by the owner. Remove the separate Children block and numbered child marker.
   This is a page-local presentation association only, not a Calendar identity
   lookup, consent decision or new name field in activity requests.
   The owner corrected the default age from 8 to 7 on September 19; initial display,
   activity preference and conversation reset all use 7. Calendar data is unchanged.
-8. Family names precede the calendar experience. Mike/Debby/Kimi in the current
+8. Family names precede the calendar experience. Parent A/Parent B/Child in the current
    demo are synthetic presentation, not verified permissions or identity mappings.
   Place the family-preferences pencil beside the Our family heading on desktop
   and mobile, not at the far edge of the location/interests row. Its tooltip and
@@ -406,7 +529,7 @@ reviewed or expanded in this pass. The latest choices supersede the earlier
 separate family/location/interests rows and always-docked initial composer:
 
 - Use "About our family" for one semantic section containing members, the
-  district-only location display and all seven default interests. Keep Kimi (7).
+  district-only location display and all seven default interests. Keep Child (7).
 - Remove internal dividing lines. Use a shared spacing rhythm, warm-white surface,
   teal text/actions, blue brand accent and restrained lilac/peach/green details.
 - Use locally bundled Nunito Sans and Lucide pencil, map-pin, plus and arrow-up

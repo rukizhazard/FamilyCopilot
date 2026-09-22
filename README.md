@@ -1,38 +1,41 @@
 # FamilyCopilot
+Publication is currently blocked by retained identity bindings and a reference image.
+See [the name-redaction review](docs/publication-redaction.md) before sharing this repository.
+
 Family Copilot is an AI Chief of Staff for families. It understands what matters across school, work, activities, and personal interests, then proactively coordinates schedules, resolves conflicts, and helps families make better decisions before important moments are missed.
 
-## Kimi remembered-source Sync activated and source enrolled
+## Child remembered-source Sync activated and source enrolled
 
-The common Sync button can now load/refresh Kimi through a remembered, explicitly
+The common Sync button can now load/refresh Child through a remembered, explicitly
 enrolled source and then load/refresh parents. Offline native/storage/server/UI
 tests and an isolated synthetic reload/Sync browser check passed. The explicitly
 approved shared restart completed on 18 September; independent local status
 confirmed childSyncProtocol, native execution and safe idle. The user's later
-explicit listing/event-read approval then allowed one successful Kimi enrollment
+explicit listing/event-read approval then allowed one successful Child enrollment
 and bounded import, with the source remembered and independent cleanup verified.
 No private cache inspection or parent refresh occurred. Common Sync can now load
 the saved child view and reuse its source; a separate live refresh after enrollment
 was not repeated. No recurring source-selection controls were added.
-[Enrollment evidence](docs/our-week.md#kimi-source-enrolled-and-events-read-18-september-2026).
+[Enrollment evidence](docs/our-week.md#child-source-enrolled-and-events-read-18-september-2026).
 [Current evidence and remaining gates](docs/our-week.md#remembered-source-sync-implemented-offline-18-september-2026).
 
-## Kimi-specific operations removed, 17 September 2026
+## Child-specific operations removed, 17 September 2026
 
-Reload Our week to remove all Kimi setup/selection/confirmation controls and the
-Calendar access dialog. Common Confirm displays any matching existing Kimi saved
+Reload Our week to remove all Child setup/selection/confirmation controls and the
+Calendar access dialog. Common Confirm displays any matching existing Child saved
 view alongside parents, without a wizard. Common Update refreshes **parents only**;
-Kimi retains its original saved timestamp. If no child snapshot exists, its schedule
-stays unknown. No live Kimi import/update UI is available in this version; remembered
+Child retains its original saved timestamp. If no child snapshot exists, its schedule
+stays unknown. No live Child import/update UI is available in this version; remembered
 provider-source authorization is not yet implemented. Existing saved files were
 not deleted. This static-only change needs no server restart.
-[Behavior and synthetic validation](docs/our-week.md#kimi-specific-ui-operations-removed-17-september-2026).
+[Behavior and synthetic validation](docs/our-week.md#child-specific-ui-operations-removed-17-september-2026).
 
 ## Unified calendar caching active, 17 September 2026
 
-Implemented with explicit owner approval: Kimi's permitted event names/times and
+Implemented with explicit owner approval: Child's permitted event names/times and
 reviewed access settings can be saved privately until Clear, separate from the
 parent busy-only snapshot. All calendars use common controls and a **Calendar
-access** dialog instead of a standalone Kimi section. Saved viewing never refreshes
+access** dialog instead of a standalone Child section. Saved viewing never refreshes
 Outlook automatically or restores authorization for a live source.
 
 Final focused tests: **325/325 in each of UTC, Taipei and Los Angeles**. Isolated
@@ -49,34 +52,34 @@ supersedes this milestone's former import instructions. Existing session-only re
 migrated. Older session-only descriptions below are historical.
 [Scope, exact validation and remaining gates](docs/our-week.md#unified-saved-calendars-verified-offline-17-september-2026).
 
-## Kimi ready for user testing, 17 September 2026
+## Child ready for user testing, 17 September 2026
 
-**Active: http://127.0.0.1:8002/.** The approved bounded Kimi workflow was deployed
+**Active: http://127.0.0.1:8002/.** The approved bounded Child workflow was deployed
 once and independently verified Disabled/SAS Disabled. After explicit shared
 service handoff, the existing Windows-auth task was activated with the separate
 child-native boundary. Live backend/page markers, safe idle and current Activities
 assets passed. No agent child listing/import, calendar query during activation,
 private snapshot read, permission/policy change or new OAuth occurred.
 
-Reload the page, open **Kimi source & access**, Find and explicitly select the
-returned source, review Kimi/guardian/disclosure and confirm import. Shared-source
+Reload the page, open **Child source & access**, Find and explicitly select the
+returned source, review Child/guardian/disclosure and confirm import. Shared-source
 visibility is still unverified until this user-run test. Parent saved snapshots
-remain unchanged; Kimi results are session-only in the shared **Our week**.
+remain unchanged; Child results are session-only in the shared **Our week**.
 The five Builder-frozen UI files and event/session/cleanup contracts were preserved.
 Full offline tests: **786/786 passed**. Browser/keyboard usability is not newly
-verified. [Activation evidence and remaining scope](docs/kimi-calendar-import.md#shared-local-service-activated-17-september-2026)
+verified. [Activation evidence and remaining scope](docs/child-calendar-import.md#shared-local-service-activated-17-september-2026)
 supersede older undeployed/unactivated checkpoints below.
 
-## Kimi in Our week: offline shared-calendar milestone, 17 September 2026
+## Child in Our week: offline shared-calendar milestone, 17 September 2026
 
-Implemented on disk: **Mike / Debby / Kimi** share one weekly calendar. Closed
-**Kimi source & access** keeps explicit source selection, guardian/disclosure
+Implemented on disk: **Parent A / Parent B / Child** share one weekly calendar. Closed
+**Child source & access** keeps explicit source selection, guardian/disclosure
 review and import confirmation accessible without a separate child card. The
 standalone School section and script mounts are removed; original school files
 and legacy modules/tests are preserved. The empty state remains when nothing is
 loaded. Parent Confirm/Update/saved snapshots still cover only two parent calendars.
 
-Kimi's page-only bridge contains times/status, never titles or source identifiers.
+Child's page-only bridge contains times/status, never titles or source identifiers.
 It adds exact event timing, overlap lanes and a compact all-day band, not inferred
 Busy/free time. Parent and child results/freshness remain independent; shared
 cleanup/date changes fence late results without a signalling snapshot deletion.
@@ -84,13 +87,13 @@ cleanup/date changes fence late results without a signalling snapshot deletion.
 Taipei; two non-server October tests also passed per timezone (five server tests
 deliberately skipped). Browser mounting was blocked; visual/physical-keyboard and
 parent review remain pending. No live query, private-file access, service change,
-deployment or activation was performed. Older School/standalone-Kimi UI descriptions
+deployment or activation was performed. Older School/standalone-Child UI descriptions
 below are historical. [Scope, validation and handoff](docs/our-week.md).
 
 ## Parent Update restored through Windows authentication, 17 September 2026
 
 **Active: http://127.0.0.1:8002/.** The owner requested repair and a real refresh
-of Mike/Debby's existing calendars. The local service now uses the existing
+of Parent A/Parent B's existing calendars. The local service now uses the existing
 Windows-native Azure CLI authentication through the bounded native worker, not
 the failing WSL credential path. No new OAuth, permission/policy change,
 credential copying or cloud deployment was needed. The existing WSL snapshot
@@ -106,7 +109,7 @@ No verification Clear was sent, and there was no automatic calendar retry.
 
 Full offline suite: **642/642 passed**. Fresh browser/parent usability was not
 revalidated. Activities retains the current `tpbl-teams-v2` assets and backend;
-no public search was repeated. **Kimi remains unactivated and undeployed**:
+no public search was repeated. **Child remains unactivated and undeployed**:
 parent authentication now works, but it does not establish shared-calendar
 visibility or authorize agent-run child listing/import. The older PowerShell
 launcher blocker below is historical, not the current parent execution path.
@@ -172,7 +175,7 @@ this backend fix, and the unchanged contract marker cannot detect that differenc
 Historical source-mode and dates-only API descriptions below are superseded by
 this increment, not evidence of current service activation or parent approval.
 
-## Kimi shared-calendar import: offline implementation, live activation blocked
+## Child shared-calendar import: offline implementation, live activation blocked
 
 **17 September 2026:** the guardian approved a separate, bounded read-only Azure
 import using the existing Outlook connection, replacing the School calendar UI.
@@ -185,7 +188,7 @@ CLI identity succeeded for the user; the native preflight launcher is blocked by
 PowerShell script-execution policy. No policy was weakened, credentials copied,
 real calendars/events or private school/snapshot data read, cloud write performed,
 or existing live/activities service restarted. [Approval, blocker, official documentation
-correction and implementation checkpoint](docs/kimi-calendar-import.md).
+correction and implementation checkpoint](docs/child-calendar-import.md).
 
 ## Approved October demo (supersedes September live bounds)
 
@@ -478,15 +481,15 @@ The separate **FamilyCopilot: synthetic owner browser review** task serves **htt
 
 ### Current owner POC: Sunday week and local-file snapshot
 
-The weekly heading is **Our week**, with **Mike / Debby** throughout the person
+The weekly heading is **Our week**, with **Parent A / Parent B** throughout the person
 labels, access summary and accessible calendar descriptions. This is presentation
-copy only: **Mike → Mike Lee; Debby → Debby**, with the same protected targets,
+copy only: **Parent A → Parent A; Parent B → Parent B**, with the same protected targets,
 authorization, dates, layout and cache binding. No family-role assertion, editable
 nickname controls, Add someone or multiuser flow is added. Earlier Dad/Mom records
 below are historical. [Current copy scope and validation](docs/owner-availability.md#our-week-presentation-copy).
 
 The parent-facing page now leads with the calendar: **Our week**, the fixed date,
-**Mike + Debby · Default calendars · Busy-only**, one unchecked owner confirmation,
+**Parent A + Parent B · Default calendars · Busy-only**, one unchecked owner confirmation,
 then **View week**, **Update**, and secondary **Clear**. One **Updated [date, time] ·
 Saved view** line retains the original time, with **May be out of date** when stale.
 Missing schedules and actionable errors stay visible; routine technical explanations
@@ -498,14 +501,14 @@ are in closed **Details** below the calendar. Synthetic pages keep a visible
 synthetic UX review server, not the owner's schedule. Its partial fixture repeats
 four statuses every half hour for the first sample and leaves the second unknown
 all week. Review pages now say **SAMPLE DATA** in the header and **SAMPLE calendars**
-in the tab, with **Mike (sample) / Debby (sample)** and a source notice beside the grid.
+in the tab, with **Parent A (sample) / Parent B (sample)** and a source notice beside the grid.
 These remain fictional Alex/Sam fixtures, not real schedules. The UX styling and
 protected targets are unchanged. Reload older
 pages for the labels; reload never loads availability. [Diagnosis and validation](docs/owner-availability.md#synthetic-review-source-label-repair).
 
 The approved current week is **20–26 September 2026**, Sunday leftmost, ending
 **27 September 00:00 exclusive, Asia/Taipei** (UTC 19 September 16:00 through
-26 September 16:00 exclusive). Mike/Debby retain the same protected targets and
+26 September 16:00 exclusive). Parent A/Parent B retain the same protected targets and
 336 half-hour slots each. The fictional demo is unchanged.
 
 After explicit acknowledgement, **View week** prefers one verified redacted local
@@ -548,7 +551,7 @@ retention above supersede their earlier date and reload-retention descriptions.
 ### Historical approved fixed-week two-person availability
 
 The next explicitly approved milestone replaces the first protected target with
-**Mike Lee**, retains **Debby**, and checks **2026-09-15 00:00 through 2026-09-22
+**Parent A**, retains **Parent B**, and checks **2026-09-15 00:00 through 2026-09-22
 00:00 exclusive, Asia/Taipei (UTC+8)**: seven full days, **336 half-hour slots per
 person**. Dates never roll. The owner page hides **Choose available calendars**
 without removing its backend or shared cleanup protections. The named access
@@ -557,7 +560,7 @@ are now superseded by the weekly diagram below. Default calendars only; missing
 data is never free. The fictional activities link remains separate, not integrated.
 
 The exact guarded **Disabled v2 → v3** update is deployed. The **single approved
-live verification succeeded: Mike Lee true / 336 slots; Debby true / 336 slots**.
+live verification succeeded: Parent A true / 336 slots; Parent B true / 336 slots**.
 Independent exact-contract readback confirms **Disabled / SAS Disabled**; preserved
 resource checks passed, verification session cleared and proxy idle. Real target
 addresses stay only in protected operator parameters, whose values ARM hides on
@@ -569,8 +572,8 @@ See [the fixed-week contract and execution record](docs/owner-availability.md).
 
 ### Presentation-only weekly calendar simplification
 
-The owner-approved display aliases are **Dad (previously Mike Lee)** and
-**Mom (previously Debby)**. These are labels only, not new identities, parent or
+The owner-approved display aliases are **Dad (previously Parent A)** and
+**Mom (previously Parent B)**. These are labels only, not new identities, parent or
 guardian claims, or changed authorization. The exact protected targets and fixed
 15–21 September 2026 Taipei window remain unchanged.
 

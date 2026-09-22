@@ -30,7 +30,7 @@ test("October fixtures cover all 31 days without relaxing real calendar contract
   }
 });
 
-test("school meeting belongs to Kimi's calendar and supplies the comparison without adding parent busy time", async () => {
+test("school meeting belongs to Child's calendar and supplies the comparison without adding parent busy time", async () => {
   const transport = fixtures.create({ syntheticOctober: true, scenario: () => "loaded" });
   const body = { ...request, startDate: "2026-10-01", endDate: "2026-10-31" };
   const parents = await (await transport.fetch("/api/availability", options({ ...body, requestId: "11111111-1111-4111-8111-111111111111" }))).json();
@@ -65,7 +65,7 @@ test("candidate times merge checked intervals, clip daytime bounds and withdraw 
   assert.deepEqual(candidates.items, [["03", "01:00", "04:00"], ["04", "06:00", "09:00"], ["10", "05:00", "11:00"],
     ["17", "02:00", "04:00"], ["24", "07:00", "10:00"], ["31", "02:30", "06:30"]].map(([day, start, end]) => ({
     startAt: `2026-10-${day}T${start}:00.000Z`, endAt: `2026-10-${day}T${end}:00.000Z`, timeZone: "Asia/Taipei" })));
-  assert.doesNotMatch(JSON.stringify(candidates), /Kimi|studio|events|slots|sourceName/);
+  assert.doesNotMatch(JSON.stringify(candidates), /Child|studio|events|slots|sourceName/);
   assert.equal(transport.assessOccurrences(candidates.items.map((item, index) => ({ id: String(index), ...item }))).items.every(item => item.status === "no_conflict"), true);
   now += 240000;
   assert.equal(transport.candidateTimes().status, "unknown");
@@ -110,7 +110,7 @@ test("local fixture assessment uses loaded intervals, exclusive boundaries and b
   const assessment = transport.assessOccurrences(items);
   assert.deepEqual(assessment.items.map(item => item.status), ["no_conflict", "conflict", "no_conflict", "unknown"]);
   assert.equal(assessment.items[3].reason, "outside_coverage");
-  assert.doesNotMatch(JSON.stringify(assessment), /Kimi|studio|events|slots|sourceName/);
+  assert.doesNotMatch(JSON.stringify(assessment), /Child|studio|events|slots|sourceName/);
   now += 300000;
   assert.equal(transport.assessOccurrences(items).items[0].reason, "stale");
   await transport.fetch("/api/clear", options({}));
@@ -209,7 +209,7 @@ test("conversation load hides Sync, coalesces once and keeps loading and failure
   for (const id of ["chat-calendar-status", "chat-calendar-toggle", "availability-empty", "calendar-month", "availability-clear"]) {
     assert.equal(page.visible(id), false, id);
   }
-  assert.doesNotMatch(page.visibleText(), /Mike: Not loaded|Debby: Not loaded|Kimi: Not loaded|snapshot/i);
+  assert.doesNotMatch(page.visibleText(), /Parent A: Not loaded|Parent B: Not loaded|Child: Not loaded|snapshot/i);
   assert.equal(page.calls.length, 0);
   const loading = controller.loadSynthetic();
   assert.equal(controller.loadSynthetic(), loading);
@@ -290,7 +290,7 @@ test("chat keeps routine source paragraphs in closed Details across Sync and col
     "availability-freshness", "child-week-status", "availability-status-details", "child-status-details"];
   assert.equal(details.open, false);
   assert.match(page.get("chat-calendar-scope").textContent, /Calendars.*2026-10-01.*2026-10-31.*Taipei/);
-  assert.equal(page.get("chat-calendar-person-0").textContent, "Mike: Not loaded");
+  assert.equal(page.get("chat-calendar-person-0").textContent, "Parent A: Not loaded");
   assert.equal(page.calls.length, 0);
   for (const id of routineIds) assert.equal(page.visible(id), false, id);
   for (const iteration of [0, 1]) {
@@ -298,7 +298,7 @@ test("chat keeps routine source paragraphs in closed Details across Sync and col
     controller.collapse();
     for (const id of routineIds) assert.equal(page.visible(id), false, id);
     assert.equal(page.visible("chat-calendar-person-1"), true);
-    assert.equal(page.get("chat-calendar-person-1").textContent, "Debby: Loaded · Partial");
+    assert.equal(page.get("chat-calendar-person-1").textContent, "Parent B: Loaded · Partial");
     assert.doesNotMatch(page.visibleText(), /Calendar load window:|Fresh fixture result|Checked 2026-|Snapshot \(not continuously/);
     const count = page.calls.length;
     details.open = true;
@@ -428,7 +428,7 @@ test("sample foreground retains source and pending facts with no-delivery qualif
   page.get("calendar-day-details").open = true;
   assert.doesNotMatch(page.visibleText(), /demo|fictional|No invitation is delivered/i);
   assert.match(page.visibleText(), /Parent-teacher meeting \/ Fri, Oct 16 \/ 15:30-16:30 Taipei/);
-  assert.match(page.visibleText(), /Mike's response and travel are not confirmed/);
+  assert.match(page.visibleText(), /Parent A's response and travel are not confirmed/);
   assert.match(text(page.get("chat-calendar-source-details")), /Fictional data only/);
   assert.match(text(page.get("chat-calendar-source-details")), /Invitations use sample data and stay on this page\. No invitation is delivered and no calendars are changed\./);
   page.get("chat-calendar-source-details").open = true;
@@ -442,8 +442,8 @@ test("coordination requires the one-parent condition, supports undo/reset, and n
   await controller.loadSynthetic();
   const calls = page.calls.length, dates = page.calendarDates();
   await page.fire("coordination-review");
-  assert.match(page.get("coordination-status").textContent, /Debby \(you\).*30 minutes.*Mike has no overlapping/);
-  assert.equal(page.get("coordination-timeline").children[0].children[0].textContent, "Kimi / School meeting");
+  assert.match(page.get("coordination-status").textContent, /Parent B \(you\).*30 minutes.*Parent A has no overlapping/);
+  assert.equal(page.get("coordination-timeline").children[0].children[0].textContent, "Child / School meeting");
   assert.deepEqual(structuredClone(controller.coordinateMeeting("confirm")), { state: "unavailable" });
   assert.equal(descendants(page.get("coordination-timeline")).filter(node => node.className === "coordination-overlap").length, 1);
   assert.equal(page.get("coordination-result").hidden, true);
@@ -453,11 +453,11 @@ test("coordination requires the one-parent condition, supports undo/reset, and n
   assert.equal(page.get("coordination-result").hidden, true);
   assert.deepEqual(structuredClone(controller.coordinateMeeting("confirm")), { state: "proposed" });
   assert.equal(page.get("coordination-result").hidden, false);
-  assert.match(page.get("coordination-result").textContent, /Before: Debby.*30 minutes.*Proposed: Mike.*Awaiting Mike's confirmation/);
+  assert.match(page.get("coordination-result").textContent, /Before: Parent B.*30 minutes.*Proposed: Parent A.*Awaiting Parent A's confirmation/);
   assert.match(page.get("coordination-status").textContent, /proposal avoids your conflict.*confirmation is still needed/);
   assert.equal(descendants(page.get("coordination-timeline")).filter(node => node.className === "coordination-overlap").length, 0);
-  assert.equal(page.get("coordination-timeline").children[0].children[0].textContent, "Kimi / School meeting");
-  assert.doesNotMatch(text(page.get("coordination-timeline")), /Meeting \/ Debby|Meeting \/ Mike|Mike proposed/);
+  assert.equal(page.get("coordination-timeline").children[0].children[0].textContent, "Child / School meeting");
+  assert.doesNotMatch(text(page.get("coordination-timeline")), /Meeting \/ Parent B|Meeting \/ Parent A|Parent A proposed/);
   controller.coordinateMeeting("cancel");
   assert.equal(page.get("coordination-result").hidden, true);
   controller.coordinateMeeting("review"); controller.coordinateMeeting("assess_alternate"); controller.coordinateMeeting("confirm");
@@ -481,10 +481,10 @@ test("demo invitation requires review, is idempotent and pending, and retires wi
   assert.equal(controller.coordinateMeeting("review").state, "ask");
   assert.equal(controller.coordinateMeeting("send_invitation").state, "invited");
   const id = page.get("coordination-result").dataset.invitationId;
-  assert.equal(page.get("coordination-timeline").children[0].children[0].textContent, "Kimi / School meeting");
-  assert.equal(id, "demo-school-meeting-mike-20261016");
-  assert.equal(page.get("coordination-status").textContent, "Mike pending response");
-  assert.match(page.get("coordination-result").textContent, /Mike's invitation.*October 16, 2026, 3:30-4:30 PM \(Asia\/Taipei\).*awaiting his response/);
+  assert.equal(page.get("coordination-timeline").children[0].children[0].textContent, "Child / School meeting");
+  assert.equal(id, "demo-school-meeting-parent-a-20261016");
+  assert.equal(page.get("coordination-status").textContent, "Parent A pending response");
+  assert.match(page.get("coordination-result").textContent, /Parent A's invitation.*October 16, 2026, 3:30-4:30 PM \(Asia\/Taipei\).*awaiting his response/);
   assert.doesNotMatch(page.get("coordination-result").textContent, /sent|delivered|accepted|\bdemo\b/i);
   assert.equal(controller.coordinateMeeting("send_invitation").state, "invited");
   assert.equal(controller.coordinateMeeting("review").state, "invited");
@@ -602,12 +602,12 @@ test("candidate shortlist selects the existing day timeline without requests and
   assert.equal(list.children.length, 6);
   assert.match(text(list), /Sat, Oct 3/);
   assert.equal(page.get("calendar-month-overview").open, true);
-  assert.equal(page.get("calendar-day-details").open, true);
+  assert.equal(page.get("calendar-day-details").open, false);
   const sections = Array.from(page.get("chat-calendar-body").children);
   assert.ok(sections.indexOf(page.get("calendar-month-overview")) < sections.indexOf(page.get("calendar-day-details")));
   assert.ok(sections.indexOf(page.get("calendar-day-details")) < sections.indexOf(page.get("calendar-candidates")));
-  assert.equal(page.visible("availability-grid"), true);
-  assert.match(text(page.get("availability-grid")), /Mike.*Debby.*Kimi/s);
+  assert.equal(page.visible("availability-grid"), false);
+  assert.match(text(page.get("availability-grid")), /Parent A.*Parent B.*Child/s);
   await list.dispatchEvent({ type: "click", target: list.children[0].children[0].children[0] });
   assert.equal(page.get("calendar-day-details").open, true);
   assert.equal(page.focus, page.get("availability-grid"));
@@ -663,9 +663,9 @@ test("month overview has no invented markers or editable date range", async cont
   const page = harness(context, { chat: true });
   const controller = page.mount();
   const month = page.get("calendar-month-days");
-  const markers = () => month.children.flatMap(cell => cell.children.filter(item => item.className === "calendar-month-marker"));
+  const markers = () => month.children.flatMap(cell => cell.children.filter(item => ["calendar-month-marker", "calendar-month-event"].includes(item.className)));
   assert.equal(page.get("calendar-month-title").textContent, "October 2026");
-  assert.equal(month.children.length, 42);
+  assert.equal(month.children.length, 35);
   assert.equal(markers().length, 0);
   assert.equal(month.children.every(cell => cell.disabled), true);
   assert.equal(page.calls.length, 0);
@@ -683,22 +683,48 @@ test("month overview has no invented markers or editable date range", async cont
   assert.equal(page.visible("calendar-month-days"), false);
   page.get("calendar-month-overview").open = true;
   assert.equal(page.visible("calendar-month-days"), true);
-  assert.equal(page.visible("availability-grid"), true);
-  assert.equal(page.get("calendar-day-details").open, true);
+  assert.equal(page.visible("availability-grid"), false);
+  assert.equal(page.get("calendar-day-details").open, false);
   assert.deepEqual(month.children.filter(cell => !cell.disabled).map(cell => cell.dataset.monthDate),
     Array.from({ length: 31 }, (_, index) => `2026-10-${String(index + 1).padStart(2, "0")}`));
   assert.equal(markers().length, 66);
   assert.equal(markers().filter(marker => marker.dataset.person === "2").length, 4);
   const meetingDay = month.children.find(cell => cell.dataset.monthDate === "2026-10-16");
-  assert.equal(meetingDay.children.filter(marker => marker.className === "calendar-month-marker" && marker.dataset.person === "2").length, 1);
+  assert.equal(meetingDay.children.filter(marker => marker.className === "calendar-month-event" && marker.dataset.person === "2").length, 1);
   assert.match(page.get("child-status-details").textContent, /1.*31 October 2026/);
-  assert.doesNotMatch(text(month), /studio visit|10:00|11:00/i);
+  assert.match(text(month), /Studio visit.*10:00 - 11:00/s);
+  assert.match(text(meetingDay), /Child.*School meeting.*15:30 - 16:30/s);
+  assert.ok(markers().filter(marker => marker.dataset.person !== "2").every(marker => text(marker).includes("Busy periods")));
   for (const cell of month.children) assert.match(cell.attributes["aria-label"], /Missing time is unknown, not free/);
   await month.dispatchEvent({ type: "click", target: meetingDay.children[0] });
   assert.match(text(page.get("availability-grid")), /School meeting/);
   await controller.dispose();
 });
 
+test("month events retain redaction, literal names, cancellation, all-day and unknown status", async context => {
+  const transport = fixtures.create({ syntheticOctober: true, scenario: () => "loaded", now: () => page.now });
+  const page = harness(context, { chat: true, override: async (path, body, requestOptions) => {
+    if (path !== "/api/child/sync") return;
+    const response = await transport.fetch(path, requestOptions), saved = await response.json();
+    saved.data.events[0].title = '<img src=x onerror="alert(1)">';
+    saved.data.events[1].title = "Busy"; saved.data.events[1].redacted = true;
+    Object.assign(saved.data.events[2], { status: "cancelled", allDay: true,
+      start: "2026-10-04T00:00:00+08:00", end: "2026-10-05T00:00:00+08:00" });
+    Object.assign(saved.data.events[3], { status: "unknown", allDay: null });
+    return new Response(JSON.stringify(saved));
+  } });
+  const controller = page.mount(); await controller.loadSynthetic();
+  const month = page.get("calendar-month-days"), content = text(month);
+  assert.match(content, /<img src=x onerror="alert\(1\)">/);
+  assert.equal(descendants(month).some(node => node.tag === "img"), false);
+  assert.match(content, /Busy/); assert.doesNotMatch(content, /Swimming lesson/);
+  assert.match(content, /Family lunch.*Cancelled event.*All-day/s);
+  assert.match(content, /School meeting.*Event status unknown.*All-day status unknown/s);
+  assert.equal(descendants(month).filter(node => node.className === "calendar-month-event").length, 4);
+  await page.fire("availability-clear"); await settle();
+  assert.equal(descendants(month).filter(node => node.className === "calendar-month-event").length, 0);
+  await controller.dispose();
+});
 test("month browsing and explicit day details do not query or change selected dates", async context => {
   const page = harness(context, { chat: true });
   const controller = page.mount();

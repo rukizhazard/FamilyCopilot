@@ -1,11 +1,48 @@
 # A family decision, not a feature tour
 
-Current [73.96-second MP4](../browser-artifacts/demo/family-story-Pjd8Et/familycopilot-family-story.mp4)
-implements the natural-copy revision and member-calendar decision below.
-All visuals/audio at 1x, continuous calendar-to-activity scroll, reused Jenny.
+Publication note: role labels in this history are editorial anonymizations, not
+verbatim approved narration. Existing media and private approval records were not
+changed. See [the publication review](publication-redaction.md).
+
+Current [76.76-second MP4](../browser-artifacts/demo/family-story-9snm0K/familycopilot-family-story.mp4)
+restores the previous voiced closing at the owner's request: "Now they're waiting
+for his response." then "Family Copilot. Less coordinating. More living."
+The improved soft transition and all readable-pacing fixes remain. Existing Jenny
+audio only, no new capture or synthesis; ending-only non-silence verified.
+Human audition remains pending. See [production evidence](demo-video.md).
+
+Previous [76.28-second MP4](../browser-artifacts/demo/family-story-0q93Fh/familycopilot-family-story.mp4)
+adds readable cursor movement and hover,0.6s white wait, a2.2s sent-question hold,
+capture-only2.5s invitation preparation and the approved personal Jenny closing.
+Narration finishes on the pending-response screen, then fades to a silent brand
+title. One explicitly approved named synthesis call; all product assets unchanged.
+See [current production evidence](demo-video.md) for timings and limitations.
+
+Previous [69.76-second MP4](../browser-artifacts/demo/family-story-38u5Sm/familycopilot-family-story.mp4)
+records corrected stable first typing, the approved whole-month calendar and native
+700ms invitation preparation animation. First story establishes calendar consolidation,
+then activities: no date click or shared-time narration. Second story retains
+school conflict, explicit consent and pending response. Four original reference
+images, equal-interest preferences and one-second white movie transition remain.
+Historical movie evidence is a separate insert. One approved offline capture,
+thirteen reused Jenny clips, all1x, no new speech or external requests.
 Human continuous review/audition pending; see [production evidence](demo-video.md).
 
-## Latest Decision: Natural Copy And Movie Wait
+The owner approved Builder integration of the monthly concept and the first-story
+change. Older decisions below are historical where superseded by this revision.
+
+## Latest Decision: White Wait And Preferences Draft
+
+Movie transition must be click, one second of white browser content, then the
+existing official page. The previous freeze-frame wait did not meet that request.
+Current output verifies white at 39.00-40.00 with captions retained, no new live
+navigation. Narration, duration and all other timing unchanged. Owner accepts
+the brief preference hold; the problem is visual hierarchy, not seconds.
+Builder's [static draft](designer/preferences-review.html) is ready for review,
+not integrated or recorded. Desktop/mobile offline screenshots were authorized
+for this draft only. Further product integration or recapture is a separate gate.
+
+## Previous Decision: Natural Copy And Movie Wait
 
 Owner approved removal of the opening production note and visible Demo wording.
 Builder's new `e7aaece55caf8a85555a8fdeff5383db45fa122af0252cf1ce7ce748e55fb33b`
@@ -23,7 +60,7 @@ Owner selected B and authorized Builder delegation on 21 September. This
 supersedes the accelerated shots and summary-only calendar presentation below.
 Builder completed a small presentation change, not new calendar access: expanded
 month overview, separate member day tracks, then shared candidate-time summary.
-Parents remain busy-only; Kimi retains permitted sample event names/times.
+Parents remain busy-only; Child retains permitted sample event names/times.
 The [Builder handoff](chat-builder-handoff.md) pins 25 assets at
 `d3c76cf2d2a43487a30c6c6a8a5ceae896ea8baaffb6a7c724b056dc0b5cad5d`.
 Only three product assets changed; 209/209 snapshot-bound tests passed. After
@@ -43,7 +80,7 @@ recording of these same bytes passed with zero forbidden requests/browser errors
   Native loading animation can accompany real pending states. Any capture-only
   delay must be separately approved, bounded and documented, not product latency.
 - Builder replaced the repetitive no-real-send sentence with `Demo invitation`.
-  Keep that concise visible context, explicit consent, Kimi ownership and Mike
+  Keep that concise visible context, explicit consent, Child ownership and Parent A
   pending. No real invitation or calendar write exists.
 - Say `Family Copilot suggests`, not `Copilot suggests`.
 - Finished video must be less than 120 seconds. Preserve the nameless animated
@@ -75,7 +112,7 @@ footage. Show the question, then all three member Loaded states with the calenda
 narration before moving to activities. Hold the actual result for 3.84 seconds,
 not a fabricated per-member loading animation. Later action speeds and existing
 1.12x Jenny tempo remain. No new capture, network or speech synthesis.
-Animation, brief preference/calendar bridge and Kimi ownership are included.
+Animation, brief preference/calendar bridge and Child ownership are included.
 The owner's subsequently approved workaround adds the actual card click followed
 by a held screenshot of the same official movie URL in a separate integrated
 browser. The original headless denial is preserved; this is not one continuous
@@ -116,7 +153,7 @@ its preserved evidence. New capture and changed paid speech need scoped approval
   Do not claim an edited sequence is an uninterrupted session or measured latency.
 - Consume Builder snapshot `4275e114a1b9c32e772e9d3a6bef5bf5d9cd8274b168a78ea99254c46d205056`,
   from `snapshot-5d543ab6-5a85-4f93-b6cb-6b9257113084`, with 209/209 pinned tests.
-  Assert and inspect `Kimi / School meeting` before and after the invitation.
+  Assert and inspect `Child / School meeting` before and after the invitation.
   Parents remain separate busy-only rows. Do not use the prior `d4edafb7...`
   capture, even though its no-Stop and natural invitation changes were correct.
 - Keep current/upcoming action labels, natural invitation dialogue, explicit
@@ -125,7 +162,7 @@ its preserved evidence. New capture and changed paid speech need scoped approval
 
 Acceptance: rendered opening frames demonstrate actual animation; preference
 summary and truthful calendar transition precede the narrated October question;
-final-video school frames show Kimi ownership; audio-gap report has no unexplained
+final-video school frames show Child ownership; audio-gap report has no unexplained
 multi-second pauses; full decode, audio levels and source hashes pass. Human
 continuous viewing and audition remain a separate review gate.
 
@@ -144,7 +181,7 @@ their speed. Capture/synthesis approvals are consumed; human audition pending.
 
 ## Opening Update, 21 September 2026
 
-Owner clarified that Debby, Mike and Kimi identify real people, and approved
+Owner clarified that Parent B, Parent A and Child identify real people, and approved
 replacing the named introduction in the actual video as well as its script.
 Use "Between work, school, and everything else, finding time together takes
 planning." followed by "A parent turns to Family Copilot." Keep a small
@@ -177,27 +214,27 @@ Neither an outing candidate nor a clear calendar establishes a confirmed plan.
 | Beat | Visible evidence | Spoken draft |
 | --- | --- | --- |
 | Family opening | Existing family illustration and illustrative scenario label, no named introduction | "Between work, school, and everything else, finding time together takes planning. A parent turns to Family Copilot." |
-| October question | Debby asks, native loading, then actual results | "What could we do together in October?" |
+| October question | Parent B asks, native loading, then actual results | "What could we do together in October?" |
 | Consider ideas | Basketball and movie cards with preference reason and practical detail | "Two ideas stand out: a basketball game and a movie." |
 | Bring it closer | Weekend question, then the actual movie candidate | "How about something closer, like this weekend?" After reveal: "This movie could be a fun weekend option." |
-| Responsibility chapter | "Sharing school responsibilities" with a small "Another user story" marker, no reset/menu footage | "There's also Kimi's school meeting to work out." |
-| Check and suggest | Debby's question; actual computed conflict and immediate Mike assessment, invitation recipient and time visible | "Debby's work meeting overlaps. Copilot suggests inviting Mike." |
-| Authorize the action | Debby's explicit invitation request, not bare Yes or automatic consent | "Yes, one parent is enough. Please send Mike an invitation." |
-| Useful outcome | Actual Demo invitation result with Mike pending response; no Undo beat | "The demo invitation is ready for Mike's response." |
+| Responsibility chapter | "Sharing school responsibilities" with a small "Another user story" marker, no reset/menu footage | "There's also Child's school meeting to work out." |
+| Check and suggest | Parent B's question; actual computed conflict and immediate Parent A assessment, invitation recipient and time visible | "Parent B's work meeting overlaps. Copilot suggests inviting Parent A." |
+| Authorize the action | Parent B's explicit invitation request, not bare Yes or automatic consent | "Yes, one parent is enough. Please send Parent A an invitation." |
+| Useful outcome | Actual Demo invitation result with Parent A pending response; no Undo beat | "The demo invitation is ready for Parent A's response." |
 | Family closing | Existing family visual and deliberate fade | "Family Copilot. Less coordinating. More living." |
 
 Exact supported school question: "Can you check my schedule for the school meeting?"
-The assistant checks both parents at that point, proposes inviting Mike if one
+The assistant checks both parents at that point, proposes inviting Parent A if one
 parent is sufficient, and presents October 16, 2026, 3:30-4:30 PM (Asia/Taipei).
-Only "Yes, one parent is enough. Please send Mike an invitation." (or the shorter
+Only "Yes, one parent is enough. Please send Parent A an invitation." (or the shorter
 explicit send request in this established context) creates the page-local demo
 invitation. The result is labelled Demo invitation, pending response, with no real
 invitation or calendar change. Do not describe it as real delivery, acceptance,
-a booked plan or a reminder. Do not substitute "I'll ask Mike" for the action.
+a booked plan or a reminder. Do not substitute "I'll ask Parent A" for the action.
 
 Do not narrate "availability still needs checking", "dated showtimes not verified",
 "These dates are outside the loaded October calendar", "Details still need
-checking", or "Debby starts another conversation". Relevant product status remains
+checking", or "Parent B starts another conversation". Relevant product status remains
 visible, with fuller coverage/source explanations in details. The chapter honestly
 marks the separate conversation without narrating application mechanics.
 
@@ -225,7 +262,7 @@ should follow one family's needs, not enumerate controls or reproduce QA steps.
 1. The opening goes straight to the composer. It does not establish who the
    family is or why the parent wants help. The earlier family introduction was
    omitted when the continuous silent capture became the whole deliverable.
-2. Mike and Debby are introduced as names and calendar rows, not as Kimi's
+2. Parent A and Parent B are introduced as names and calendar rows, not as Child's
    parents. Formal proposal language then reads like workplace delegation.
    Establish their relationship in the editorial introduction; do not claim
    that the application has verified a spouse relationship or family consent.
@@ -233,13 +270,13 @@ should follow one family's needs, not enumerate controls or reproduce QA steps.
    the decision. Showing it removes the useful outcome and makes the ending
    feel like a test reset. Retain the feature and tests, omit it from the hero cut.
 4. Captions reveal outcomes too early. The school caption announces the conflict
-   while Debby is still typing; the weekend caption announces missing coverage
+   while Parent B is still typing; the weekend caption announces missing coverage
    before the result appears. Time each statement to the corresponding evidence.
    Movie framing also spends more time on the poster than the practical details.
 5. The last frame is a withdrawn proposal and an empty composer, with no closing
    thought or brand finish. A successful decode is not a successful story ending.
 
-Evidence reviewed: [current scenario](../browser-artifacts/demo/debby-story-RQ4Roa/scenario.json),
+Evidence reviewed: the historical scenario retained privately (its identifying path is omitted),
 [current delivery manifest](../browser-artifacts/demo/school-chapter-wDdirh/manifest.json),
 [design reading](designer/README.md), the actual
 [coordination design](designer/Designer%20%285%29.png) and
@@ -258,15 +295,15 @@ Family roles are the fictional story premise, not authentication evidence.
 
 | Beat | Visual and pacing | Spoken draft | Truthful endpoint |
 | --- | --- | --- | --- |
-| Meet the family | About 8-10 seconds. Introduce Debby and Mike as Kimi's parents using the existing family illustration. Brand and demo-data disclosure remain readable. | "Meet Debby and Mike, Kimi's parents. Between work and school, they want more time together. Debby turns to Family Copilot." | Fictional family context, not verified relationships or live accounts. |
-| Make time together | Go directly to Debby's October question, with no preference editor. Let the question and real loading state precede the results. | "What could we do together in October?" | User-initiated activity discovery. |
+| Meet the family | About 8-10 seconds. Introduce Parent B and Parent A as Child's parents using the existing family illustration. Brand and demo-data disclosure remain readable. | "Meet Parent B and Parent A, Child's parents. Between work and school, they want more time together. Parent B turns to Family Copilot." | Fictional family context, not verified relationships or live accounts. |
+| Make time together | Go directly to Parent B's October question, with no preference editor. Let the question and real loading state precede the results. | "What could we do together in October?" | User-initiated activity discovery. |
 | Consider the ideas | Show the basketball and movie cards, then their preference reason and a practical detail. Do not dwell on only a poster. | "A game featuring their preferred team, or a movie to enjoy together. There are still details to check." | No booking, verified showtime or full calendar fit implied. |
-| Bring it closer | Debby asks the exact supported weekend question. Show the new result and coverage warning before narrating them. | "Could we do something sooner, like this weekend?" Then: "Here's a nearer movie idea. Showtimes and the family's availability still need checking." | A candidate to discuss, not a decided outing. |
+| Bring it closer | Parent B asks the exact supported weekend question. Show the new result and coverage warning before narrating them. | "Could we do something sooner, like this weekend?" Then: "Here's a nearer movie idea. Showtimes and the family's availability still need checking." | A candidate to discuss, not a decided outing. |
 | Share a responsibility | About 3 seconds. Keep "Another user story" as a small chapter marker; main title "Sharing school responsibilities". Cut across New conversation menu/reset footage rather than demonstrating setup. | "Family time also means sharing the responsibilities." | Clearly separate conversations, not an uninterrupted session claim. |
-| Debby asks | Show Debby's complete supported question before the assistant's response, then the actual conflict timeline. | "Can you check my schedule for the school meeting?" Only after the result: "Her work meeting overlaps by half an hour." | Computed Debby conflict; no proactive monitoring. |
-| Ask about Mike | Keep actual supported user reply and the separate consent question. Frame the messages as well as the timeline. | "Only one parent needs to attend. Could Mike go instead?" | Calendar evidence does not establish willingness. |
-| Keep the useful outcome | Show Debby's Yes and the real pending-Mike result. Hold for about 4 seconds; omit Undo and any subsequent blank composer ending. | "Debby has a next step: check with Mike about attending. His confirmation is still needed." | Proposal only. Nobody has been contacted; no calendar was changed. |
-| Close the story | About 4-5 seconds. Return to the family visual and Family Copilot identity, with a deliberate fade. | "Family Copilot. Less coordinating. More living." | A closing aspiration, not a claim that Mike accepted or an outing was booked. |
+| Parent B asks | Show Parent B's complete supported question before the assistant's response, then the actual conflict timeline. | "Can you check my schedule for the school meeting?" Only after the result: "Her work meeting overlaps by half an hour." | Computed Parent B conflict; no proactive monitoring. |
+| Ask about Parent A | Keep actual supported user reply and the separate consent question. Frame the messages as well as the timeline. | "Only one parent needs to attend. Could Parent A go instead?" | Calendar evidence does not establish willingness. |
+| Keep the useful outcome | Show Parent B's Yes and the real pending-Parent A result. Hold for about 4 seconds; omit Undo and any subsequent blank composer ending. | "Parent B has a next step: check with Parent A about attending. His confirmation is still needed." | Proposal only. Nobody has been contacted; no calendar was changed. |
+| Close the story | About 4-5 seconds. Return to the family visual and Family Copilot identity, with a deliberate fade. | "Family Copilot. Less coordinating. More living." | A closing aspiration, not a claim that Parent A accepted or an outing was booked. |
 
 Timing follows reading and the decision, not a 60-second target. Use consistent
 framing across the existing wide family opening and taller chat recording; do

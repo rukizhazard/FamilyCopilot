@@ -88,7 +88,7 @@ test("server handles are random, session scoped, not derived from calendar names
 });
 test("one selected source/person/guardian/disclosure/exact dates required before one-use import", async t => {
   const s = session(t), { calendars } = await s.find(providerList), body = reviewBody(calendars[0].handle); let calls = 0;
-  for (const changes of [{ person: "Debby" }, { guardian: false }, { disclosure: "all" }, { startDate: "2026-10-08" }, { endDate: "2026-10-16" }, { calendarId: "SYNTHETIC-ID" }, { handle: "a".repeat(64) }]) assert.throws(() => s.review({ ...body, ...changes }), /blocked/);
+  for (const changes of [{ person: "Parent B" }, { guardian: false }, { disclosure: "all" }, { startDate: "2026-10-08" }, { endDate: "2026-10-16" }, { calendarId: "SYNTHETIC-ID" }, { handle: "a".repeat(64) }]) assert.throws(() => s.review({ ...body, ...changes }), /blocked/);
   await assert.rejects(s.import({ token: "a".repeat(64), confirmed: true }, () => { calls++; }), /blocked/); assert.equal(calls, 0);
   const r = s.review(body); assert.match(r.summary, /Guardian authority acknowledged/);
   const fn = async options => { calls++; assert.equal(options.calendarId, "SYNTHETIC-ID"); assert.equal(options.disclosure, "details"); return sample("details"); };

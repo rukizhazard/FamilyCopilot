@@ -29,7 +29,7 @@ function requestLocal(path, body, csrf) {
 }
 async function verifyRefresh({ request = requestLocal, inspect = () => createNativeAdapter().status() } = {}) {
   const report = { status: "preflight_failed", refreshSubmitted: false, httpStatus: null,
-    cached: null, mikeChecked: false, debbyChecked: false, slotCounts: [],
+    cached: null, parentAChecked: false, parentBChecked: false, slotCounts: [],
     cleanup: "not_requested", localIdle: false, disabledVerified: false,
     preservedResourcesUnchanged: false, success: false, automaticRetry: false };
   let csrf;
@@ -54,10 +54,10 @@ async function verifyRefresh({ request = requestLocal, inspect = () => createNat
     } else {
       const data = busyOnly({ window: body.window, checkedAt: body.checkedAt, people: body.people });
       report.cached = false;
-      report.mikeChecked = data.people[0].status === "checked";
-      report.debbyChecked = data.people[1].status === "checked";
+      report.parentAChecked = data.people[0].status === "checked";
+      report.parentBChecked = data.people[1].status === "checked";
       report.slotCounts = data.people.map(person => person.slots.length);
-      report.status = report.mikeChecked && report.debbyChecked ? "checked" : "partial_or_unavailable";
+      report.status = report.parentAChecked && report.parentBChecked ? "checked" : "partial_or_unavailable";
     }
   } catch { report.status = report.refreshSubmitted ? "unavailable" : "preflight_failed"; }
   finally {

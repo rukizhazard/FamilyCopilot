@@ -53,7 +53,7 @@ test("visible date selection precedes Load, with access summary in Details and n
   assert.doesNotMatch(access, /<details|type="checkbox"|availability-ack/);
   const details = html.match(/<details class="availability-details">([\s\S]*?)<\/details>/)[1];
   assert.doesNotMatch(access, /id="availability-targets"/);
-  assert.match(details, /<p id="availability-targets">Mike \+ Debby · Default calendars · Busy-only<\/p>/);
+  assert.match(details, /<p id="availability-targets">Parent A \+ Parent B · Default calendars · Busy-only<\/p>/);
   assert.match(access, /role="group" aria-label="Selected dates for Activities and initial calendar display" aria-describedby="availability-date-help"/);
   for (const [id, label, value] of [["availability-start", "Start date", "2026-10-09"], ["availability-end", "End date", "2026-10-11"]]) {
     assert.match(access, new RegExp(`<label for="${id}">${label}<input`));
@@ -94,7 +94,7 @@ test("compact confirmation preserves exact scope and dynamic retention in closed
   const beforeGrid = html.slice(0, html.indexOf('id="availability-grid"'));
   assert.doesNotMatch(beforeGrid, /provider permissions|snapshot|cleanup|Graph/);
   assert.doesNotMatch(html, /id="calendar-access"|id="child-calendar-section"/);
-  assert.match(details, /Update refreshes parents only; Kimi stays saved-only/);
+  assert.match(details, /Update refreshes parents only; Child stays saved-only/);
   assert.match(details, /id="child-retention"/);
   assert.match(html, /Source not verified/);
   assert.match(html, /No availability established/);

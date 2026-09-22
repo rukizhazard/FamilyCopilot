@@ -59,7 +59,7 @@ const importBody = token => ({ token, confirmed: true });
 test("CLI child env permits only explicit live windows-native opt-in and defaults disabled", () => {
   for (const ownerExecution of ["wsl", "windows-native"]) assert.deepEqual(executionOptions({ ownerExecution }), { ownerExecution, childApproved: false });
   assert.deepEqual(executionOptions({ ownerExecution: "windows-native", childEnabled: C.contract }), { ownerExecution: "windows-native", childApproved: true });
-  for (const childEnabled of ["", "true", "1", "kimi-calendar-v2", " kimi-calendar-v1", null, true]) assert.throws(() => executionOptions({ ownerExecution: "windows-native", childEnabled }), /blocked/);
+  for (const childEnabled of ["", "true", "1", "child-calendar-v2", " kimi-calendar-v1", null, true]) assert.throws(() => executionOptions({ ownerExecution: "windows-native", childEnabled }), /blocked/);
   for (const options of [{ childEnabled: C.contract }, { synthetic: true, childEnabled: C.contract },
     { synthetic: true, ownerExecution: "windows-native", childEnabled: C.contract }, { ownerExecution: "typo" }]) assert.throws(() => executionOptions(options), /blocked/);
 });
@@ -153,7 +153,7 @@ test("native find rejects raw provider output and releases no source handle", as
 });
 test("native review/import preserves person/guardian/disclosure/bounds/one-use/cross-session consent", async t => {
   const h = await harness(t), found = await h.post("/api/child/find", findBody), body = reviewBody(found.data.calendars[0].handle);
-  for (const changes of [{ person: "Debby" }, { guardian: false }, { disclosure: "all" }, { startDate: "2026-10-08" },
+  for (const changes of [{ person: "Parent B" }, { guardian: false }, { disclosure: "all" }, { startDate: "2026-10-08" },
     { endDate: "2026-10-16" }, { calendarId: "SYNTHETIC-RAW-ID" }, { sessionId: "a".repeat(64) }]) assert.equal((await h.post("/api/child/review", { ...body, ...changes })).status, 400);
   const reviewed = await h.post("/api/child/review", body), token = reviewed.data.token;
   const page = await h.request("/"), other = /name="owner-csrf" content="([a-f0-9]+)"/.exec(page.text)[1];
@@ -264,6 +264,6 @@ test("actual native adapter accepts HTTP-generated context with mocked exchange 
   assert.deepEqual(exchanges.map(x => x.mode), ["find", "enroll"]); assert.equal(lockCalls, 2);
   assert.equal(exchanges[0].payload.sessionId, exchanges[1].payload.sessionId);
   assert.equal(exchanges[0].payload.key, exchanges[1].payload.key);
-  assert.equal(exchanges[1].payload.person, "Kimi"); assert.equal(exchanges[1].payload.guardian, true); assert.equal(exchanges[1].payload.confirmed, true);
+  assert.equal(exchanges[1].payload.person, "Child"); assert.equal(exchanges[1].payload.guardian, true); assert.equal(exchanges[1].payload.confirmed, true);
   assert.equal(h.counts.wsl, 0); assert.equal(h.counts.parent, 0);
 });

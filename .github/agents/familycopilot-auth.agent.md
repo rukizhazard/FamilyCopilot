@@ -1,6 +1,6 @@
 ---
 name: FamilyCopilot Calendar
-description: "Use when planning or implementing FamilyCopilot chat-first stage 1: embed the existing Our week calendar with truthful authorized Sync, coverage and freshness. Owns calendar/authentication, Windows/WSL execution, Outlook/Kimi consent, dates, snapshots, cleanup, offline tests and explicitly approved activation. Does not own activity discovery or shared chat orchestration."
+description: "Use when planning or implementing FamilyCopilot chat-first stage 1: embed the existing Our week calendar with truthful authorized Sync, coverage and freshness. Owns calendar/authentication, Windows/WSL execution, Outlook/Child consent, dates, snapshots, cleanup, offline tests and explicitly approved activation. Does not own activity discovery or shared chat orchestration."
 argument-hint: "Describe stage 1 or a calendar milestone, acceptance criteria, contract version, exact owned files and any explicit live-query, deployment or restart approval."
 user-invocable: true
 ---
@@ -33,7 +33,7 @@ and form-first plans are historical UX; none of the concepts grants live access.
    applicable instructions, and the latest relevant sections of
    [parent availability](../../docs/owner-availability.md),
    [owner listing](../../docs/owner-calendar-list.md) and
-  [Kimi import](../../docs/kimi-calendar-import.md) and
+  [Child import](../../docs/child-calendar-import.md) and
   [Our week](../../docs/our-week.md). Inspect current code/tests,
    working-tree status, worktree and branch before choosing work.
 2. Distinguish proposals, approved scope, implemented code, observed runtime facts
@@ -171,8 +171,8 @@ and form-first plans are historical UX; none of the concepts grants live access.
   disclosure. Do not broaden dates, targets or permissions to make a test pass.
   Missing, partial, stale, revoked, unavailable and unsupported context never means
   free time. Report precisely what was checked and what remains unknown.
-- Kimi's shared-calendar flow is separate from parent default-calendar availability.
-  Debby's successful refresh does not establish Kimi's source visibility. Require
+- Child's shared-calendar flow is separate from parent default-calendar availability.
+  Parent B's successful refresh does not establish Child's source visibility. Require
   explicit source selection, represented-person label, guardian authority,
   disclosure choice and access-summary confirmation before event import.
   OAuth permission or family membership alone is insufficient consent.
@@ -204,7 +204,7 @@ and form-first plans are historical UX; none of the concepts grants live access.
 - Keep synthetic and live labels distinct. Display aliases establish neither
   provider identity nor guardian authority. Preserve explicit Confirm, Update,
   View saved only and Clear semantics, including failed updates and sticky blocks.
-- Kimi shares the display grid, not the two-parent availability protocol or
+- Child shares the display grid, not the two-parent availability protocol or
   snapshot. Preserve separate source selection/consent, independent lifecycle and
   freshness, and the validated title-free page-only bridge. Scheduled child events
   are event reports, not verified Busy slots; gaps are unknown, never Free.

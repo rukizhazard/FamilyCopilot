@@ -33,7 +33,7 @@ for (const hit of [false, true]) test(`second Sync updates parents without any c
   wait.resolve(json(h.parentData())); await done;
   assert.deepEqual(h.childBlocks().map(n => n.title), names); assert.equal(h.get("child-imported-access").textContent, stamp);
   assert.equal(JSON.stringify(h.packets), packets); assert.equal(h.focus, h.get("availability-load")); noProvider(h);
-  assert.match(h.get("child-week-status").textContent, hit ? /Saved view only.*Update refreshes parents only/ : /No live Kimi refresh/);
+  assert.match(h.get("child-week-status").textContent, hit ? /Saved view only.*Update refreshes parents only/ : /No live Child refresh/);
 });
 
 test("generic child saved failure permits parents after independent preserve cleanup", async t => {

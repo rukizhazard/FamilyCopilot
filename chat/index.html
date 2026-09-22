@@ -25,20 +25,32 @@
   <script defer src="ui.js"></script>
 </head>
 <body>
+  <svg class="preference-symbols" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <symbol id="preference-icon-basketball" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3v18M6 5.3c5 3.2 5 10.2 0 13.4M18 5.3c-5 3.2-5 10.2 0 13.4"/></symbol>
+      <symbol id="preference-icon-baseball" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M6 5.3c4 3.2 4 10.2 0 13.4M18 5.3c-4 3.2-4 10.2 0 13.4M7 8l2-1M8 12h2M7 16l2 1M17 8l-2-1M16 12h-2M17 16l-2 1"/></symbol>
+      <symbol id="preference-icon-movies" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4M7 12h10"/></symbol>
+      <symbol id="preference-icon-concerts" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 9l12-2"/><ellipse cx="6" cy="18" rx="3" ry="3"/><ellipse cx="18" cy="16" rx="3" ry="3"/></symbol>
+      <symbol id="preference-icon-museums" viewBox="0 0 24 24"><path d="m3 8 9-5 9 5H3ZM5 11v7M10 11v7M14 11v7M19 11v7M3 21h18"/></symbol>
+      <symbol id="preference-icon-outdoor-play" viewBox="0 0 24 24"><path d="m12 3-6 8h3l-5 7h16l-5-7h3L12 3ZM12 18v4"/></symbol>
+      <symbol id="preference-icon-science-discovery" viewBox="0 0 24 24"><path d="m4 10 13-6 3 7-13 5-3-6ZM4 11l-2 1 1 3 3-1M17 4l-1-2M20 11l1 2M12 14v7M12 16l-5 5M12 16l5 5"/></symbol>
+      <symbol id="preference-icon-neutral" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+    </defs>
+  </svg>
   <main class="workspace">
     <section class="introduction" aria-labelledby="conversation-title">
       <div class="brand-heading"><span class="sun" aria-hidden="true">&#9728;</span><h1 id="conversation-title">Family <span>Copilot</span></h1></div>
       <p class="brand-tagline">Your AI Chief of Staff at Home</p>
       <section class="family-section" aria-labelledby="family-title">
         <div class="family-heading">
-          <h2 id="family-title">About our family</h2>
+          <h2 id="family-title">Our family</h2>
           <button id="preferences-edit" type="button" aria-label="Edit family preferences" title="Edit family preferences"
             aria-controls="preferences-editor" aria-expanded="false" disabled><svg class="icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg></button>
         </div>
         <ul class="family-members" aria-label="Family members">
-          <li><span class="member-initial" aria-hidden="true">M</span>Mike</li>
-          <li><span class="member-initial" aria-hidden="true">D</span>Debby</li>
-          <li><span class="member-initial" aria-hidden="true">K</span>Kimi <span id="preference-age-summary" class="member-age" aria-label="Age 7">(7)</span></li>
+          <li><span class="member-initial" aria-hidden="true">A</span><div><strong class="member-name">Parent A</strong><p class="member-role">Parent</p></div></li>
+          <li><span class="member-initial" aria-hidden="true">B</span><div><strong class="member-name">Parent B</strong><p class="member-role">Parent</p></div></li>
+          <li><span class="member-initial" aria-hidden="true">C</span><div><strong class="member-name">Child</strong><p class="member-role">Child <span id="preference-age-summary" class="member-age" aria-label="Age 7">(7)</span></p></div></li>
         </ul>
       <div class="context-heading">
         <dl class="context-strip">
@@ -49,7 +61,7 @@
       </div>
       <form id="preferences-editor" hidden>
         <div class="preference-fields">
-          <label for="preference-age">Kimi's age
+          <label for="preference-age">Child's age
             <input id="preference-age" type="number" min="0" max="120" step="1" required inputmode="numeric" autocomplete="off">
           </label>
           <label for="preference-area">Location (district or area)

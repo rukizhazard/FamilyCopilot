@@ -6,6 +6,18 @@ const { harness: calendarHarness, settle, deferred, text: calendarText } = requi
 const flush = () => new Promise(resolve => setImmediate(resolve));
 const descendants = element => [element, ...element.children.flatMap(descendants)];
 const tags = (element, tag) => descendants(element).filter(node => node.tag === tag);
+const preferenceValues = element => descendants(element).filter(node => ["interest-name", "team-domain"].includes(node.className)).map(node => node.textContent);
+
+test("published family markup uses neutral roles and initials without changing the age fixture", () => {
+  for (const file of ["../chat/index.html", "../docs/designer/preferences-review.html"]) {
+    const html = fs.readFileSync(require.resolve(file), "utf8");
+    for (const name of ["Parent A", "Parent B", "Child"]) assert.ok(html.includes(name), file);
+    if (file === "../chat/index.html") {
+      assert.deepEqual([...html.matchAll(/class="member-initial" aria-hidden="true">([^<]+)</g)].map(match => match[1]), ["A", "B", "C"]);
+      assert.match(html, /id="preference-age-summary"[^>]*aria-label="Age 7"/);
+    }
+  }
+});
 const text = element => descendants(element).map(node => node.textContent).join(" ");
 function sendGreeting(setup) {
   setup.get("chat-input").value = "Hello";
@@ -35,6 +47,7 @@ function harness({ components = true, failCleanup = false, browser = false, hold
   }
   const get = id => { if (!nodes.has(id)) nodes.set(id, new Element("div", document)); return nodes.get(id); };
   const document = { getElementById: get, createElement: tag => new Element(tag, document) }, lifecycle = new Element();
+  document.createElementNS = (namespace, tag) => { assert.equal(namespace, "http://www.w3.org/2000/svg"); return document.createElement(tag); };
   const properties = new Map(); let measure, disconnected = 0, composerHeight = 150;
   if (geometry) {
     get("chat-page").style = { setProperty: (key, value) => properties.set(key, value) };
@@ -163,6 +176,12 @@ test("composer exposes processing without Stop and clears it on reset, failure a
 });
 
 test("composer names actual background actions and lists only pending steps", async context => {
+  const schedule = globalThis.setTimeout;
+  let completeInvitation;
+  context.mock.method(globalThis, "setTimeout", (callback, delay, ...args) => {
+    if (delay === 700) { completeInvitation = callback; return null; }
+    return schedule(callback, delay, ...args);
+  });
   const pending = deferred();
   const setup = harness({ calendarMethods: {
     loadSynthetic: () => pending.promise,
@@ -174,7 +193,7 @@ test("composer names actual background actions and lists only pending steps", as
     coordinateMeeting(action) {
       if (action === "review" || action === "send_invitation") {
         assert.equal(setup.get("chat-status").textContent, action === "review" ?
-          "Checking both parents' calendars for the school meeting..." : "Preparing Mike's invitation...");
+          "Checking both parents' calendars for the school meeting..." : "Preparing Parent A's invitation...");
         assert.equal(setup.get("chat-page").attributes["data-processing"], "true");
         assert.equal(setup.get("chat-input").disabled, true);
         assert.equal(setup.get("chat-progress").hidden, true);
@@ -193,8 +212,13 @@ test("composer names actual background actions and lists only pending steps", as
   assert.equal(setup.get("chat-status").textContent, "Finding activities that match your family's interests...");
   assert.deepEqual(setup.get("chat-progress").children.map(item => item.textContent), ["Next: Compare activity times with calendars"]);
   setup.complete(0); await flush();
-  for (const message of ["Can you check my schedule for the school meeting?", "Yes, please send Mike an invitation."]) {
+  for (const message of ["Can you check my schedule for the school meeting?", "Yes, please send Parent A an invitation."]) {
     setup.get("chat-input").value = message; setup.get("chat-composer").fire("submit");
+    if (message.startsWith("Yes")) {
+      assert.equal(setup.get("chat-status").attributes["data-action"], "send_demo_invitation");
+      assert.equal(setup.get("chat-page").attributes["data-processing"], "true");
+      completeInvitation(); await flush();
+    }
     assert.equal(setup.get("chat-progress").hidden, true);
     assert.equal(setup.get("chat-progress").children.length, 0);
     assert.equal(setup.get("chat-page").attributes["data-processing"], "false");
@@ -245,7 +269,8 @@ function integratedHarness(context, { cleanup, beforeCalendarFetch } = {}) {
   }
   const shellDocument = {
     getElementById(id) { assert.ok(shellIds.has(id), "shell must not read Calendar internals"); return document.getElementById(id); },
-    createElement: document.createElement
+    createElement: document.createElement,
+    createElementNS(namespace, tag) { assert.equal(namespace, "http://www.w3.org/2000/svg"); return document.createElement(tag); }
   };
   for (const [, script] of html.matchAll(/<script defer src="([^"]+)"/g)) {
     if (script === "ui.js") {
@@ -278,11 +303,34 @@ function integratedHarness(context, { cleanup, beforeCalendarFetch } = {}) {
   context.after(() => controller.dispose().catch(() => {}));
   return { page, controller, calls, searches, timers, get mounted() { return mounted; },
     get calendar() { return calendarController; },
-    async submit(value) {
+    async submit(value, { finishInvitation = true } = {}) {
       page.get("chat-input").value = value;
       await page.get("chat-composer").dispatchEvent({ type: "submit", preventDefault() {} }); await settle();
+      if (finishInvitation) {
+        for (const [id, timer] of timers) if (timer.delay === 700) { timers.delete(id); timer.callback(); }
+        await settle();
+      }
     } };
 }
+test("invitation preparation stays visible without IO and reset aborts its pending completion", async context => {
+  const setup = integratedHarness(context), { page } = setup;
+  await setup.submit("Can you check my schedule for the school meeting?");
+  const before = setup.calls.length;
+  await setup.submit("Yes, please send Parent A an invitation.", { finishInvitation: false });
+  assert.equal(page.get("chat-status").textContent, "Preparing Parent A's invitation...");
+  assert.equal(page.get("chat-status").attributes["data-action"], "send_demo_invitation");
+  assert.equal(page.get("chat-input").disabled, true);
+  assert.equal(page.get("coordination-result").hidden, true);
+  assert.equal(setup.calls.length, before);
+  const timer = [...setup.timers.values()].find(timer => timer.delay === 700);
+  assert.ok(timer);
+  await page.fire("chat-reset"); timer.callback(); await settle();
+  assert.equal(page.get("coordination-result").hidden, true);
+  assert.equal(page.get("chat-messages").children.length, 0);
+  assert.equal(page.get("chat-input").disabled, false);
+  assert.equal([...setup.timers.values()].some(timer => timer.delay === 700), false);
+  assert.equal(setup.calls.length, before);
+});
 test("missing domain components fail closed and never fabricate Calendar or activity results", async () => {
   const setup = harness({ components: false });
   assert.equal(setup.get("chat-input").disabled, true); assert.equal(setup.get("chat-input").disabled, true);
@@ -387,7 +435,7 @@ test("preference draft and Cancel/Escape never search; Apply clears real cards a
   assert.equal(get("preference-age-summary").textContent, "(12)");
   assert.equal(get("preference-area-summary").textContent, "Zhongshan, Taipei");
   assert.equal(get("preference-place-summary").hidden, true);
-  assert.deepEqual(tags(get("preference-interests-summary"), "li").map(item => item.textContent), ["Movie"]);
+  assert.deepEqual(preferenceValues(get("preference-interests-summary")), ["Movie"]);
   assert.equal(get("activity-results").children.length, 0); assert.equal(setup.calls.length, 1);
   assert.match(get("chat-status").textContent, /Preferences applied/);
   assert.equal(get("chat-retry").hidden, false);
@@ -400,7 +448,7 @@ test("preference draft and Cancel/Escape never search; Apply clears real cards a
   assert.equal(setup.calls[1].request.range.startDate, "2026-10-09");
   get("chat-reset").fire("click"); assert.equal(get("preference-age-summary").textContent, "(7)");
   assert.equal(get("preference-place-summary").hidden, false);
-  assert.deepEqual(tags(get("preference-interests-summary"), "li").map(item => item.textContent), ["Basketball", "Baseball", "Movie", "Concerts", "Museums", "Outdoor play", "Science & discovery"]);
+  assert.deepEqual(preferenceValues(get("preference-interests-summary")), ["Basketball", "Baseball", "Movie", "Concerts", "Museums", "Outdoor play", "Science & discovery"]);
   assert.equal(setup.counts.mount, 1); assert.equal(setup.counts.dispose, 0);
 });
 
@@ -415,7 +463,7 @@ test("interest plus edits custom preferences without searching and restores focu
   get("preferences-editor").fire("submit");
   assert.equal(get("interests-edit").focused, true);
   assert.equal(setup.calls.length, 0);
-  assert.deepEqual(tags(get("preference-interests-summary"), "li").map(item => item.textContent),
+  assert.deepEqual(preferenceValues(get("preference-interests-summary")),
     ["Basketball", "Baseball", "Movie", "Concerts", "Museums", "Outdoor play", "Science & discovery", "hiking", "science"]);
   get("interests-edit").fire("click");
   get("preference-other-interests").value = "x".repeat(41);
@@ -425,13 +473,33 @@ test("interest plus edits custom preferences without searching and restores focu
   assert.equal(get("interests-edit").focused, true);
   sendGreeting(setup);
   assert.deepEqual(setup.calls[0].request.preferences.interests, ["basketball", "baseball", "movies", "concerts", "museums", "outdoor-play", "science-discovery", "hiking", "science"]);
-  assert.doesNotMatch(JSON.stringify(setup.calls[0].request), /Kimi/);
+  assert.doesNotMatch(JSON.stringify(setup.calls[0].request), /Child/);
   assert.equal(get("chat-status").hidden, false);
+});
+test("preference presentation keeps defaults equal and custom interests and teams neutral and literal", context => {
+  const setup = harness(); context.after(() => setup.controller.dispose());
+  const get = setup.get;
+  assert.equal(new Set(tags(get("preference-interests-summary"), "li").map(item => item.className)).size, 1);
+  assert.equal(tags(get("preference-interests-summary"), "svg").length, 7);
+  assert.deepEqual(tags(get("preference-interests-summary"), "use").map(icon => icon.attributes.href),
+    ["basketball", "baseball", "movies", "concerts", "museums", "outdoor-play", "science-discovery"].map(value => `#preference-icon-${value}`));
+  get("interests-edit").fire("click");
+  get("preference-other-interests").value = "__proto__, <img src=x onerror=alert(1)>";
+  get("team-dea").checked = false; get("team-brothers").checked = false;
+  get("preference-other-teams").value = "constructor, Formosa Dreamers";
+  get("preferences-editor").fire("submit");
+  assert.deepEqual(preferenceValues(get("preference-interests-summary")).slice(-2), ["__proto__", "<img src=x onerror=alert(1)>"]);
+  assert.deepEqual(tags(get("preference-interests-summary"), "use").slice(-2).map(icon => icon.attributes.href),
+    ["#preference-icon-neutral", "#preference-icon-neutral"]);
+  assert.equal(tags(get("preference-interests-summary"), "img").length, 0);
+  assert.deepEqual(preferenceValues(get("preference-teams-summary")), ["constructor", "Formosa Dreamers"]);
+  assert.equal(tags(get("preference-teams-summary"), "svg").length, 0);
+  assert.equal(setup.calls.length, 0); assert.equal(setup.counts.mount, 1);
 });
 test("team plus supports draft cancellation, validation, deduplication, empty preferences and reset", async context => {
   const setup = harness({ browser: true }); context.after(() => setup.controller.dispose());
   const get = setup.get;
-  const summary = () => tags(get("preference-teams-summary"), "li").map(item => item.textContent);
+  const summary = () => preferenceValues(get("preference-teams-summary"));
   assert.deepEqual(summary(), ["新北中信特攻", "中信兄弟"]);
   get("teams-edit").fire("click");
   assert.equal(get("team-dea").focused, true);
@@ -533,7 +601,7 @@ test("interest options preserve defaults, apply without searching and reach the 
   for (const option of options) setup.get(`interest-${option.id}`).checked = true;
   setup.get("preferences-editor").fire("submit");
   assert.equal(setup.calls.length, 0);
-  assert.deepEqual(tags(setup.get("preference-interests-summary"), "li").map(item => item.textContent), options.map(option => option.label));
+  assert.deepEqual(preferenceValues(setup.get("preference-interests-summary")), options.map(option => option.label));
   setup.get("preferences-edit").fire("click");
   for (const option of options) assert.equal(setup.get(`interest-${option.id}`).checked, true);
   setup.get("preferences-cancel").fire("click");
@@ -584,7 +652,7 @@ test("HTML bootstrap uses real Activities for October alternatives and distinct 
   assert.match(text(results), /新北中信特攻 vs 福爾摩沙夢想家/); assert.match(text(results), /Forgotten Island/);
   assert.match(text(results), /saved public data, not a live search/);
   assert.match(text(results), /preferred team: 新北中信特攻/);
-  assert.deepEqual(tags(setup.get("preference-teams-summary"), "li").map(item => item.textContent), ["新北中信特攻", "中信兄弟"]);
+  assert.deepEqual(preferenceValues(setup.get("preference-teams-summary")), ["新北中信特攻", "中信兄弟"]);
   assert.match(text(setup.get("chat-messages")), /age 7.*Xinyi District/);
   assert.match(text(results), /Calendar availability not checked/);
   assert.match(text(results), /Time and distance unknown/);
@@ -762,7 +830,7 @@ test("opening message precedes Calendar loading and suggestions wait for prepara
   assert.match(page.get("calendar-assessment").children[1].textContent, /Calendar fit not confirmed/);
   assert.equal(tags(page.get("calendar-assessment"), "details").length, 1);
   assert.ok(!tags(page.get("calendar-assessment"), "details")[0].open);
-  assert.doesNotMatch(JSON.stringify(setup.searches), /Mike|Debby|Kimi/);
+  assert.doesNotMatch(JSON.stringify(setup.searches), /Parent A|Parent B|Child/);
   await page.fire("chat-reset"); assert.equal(page.get("calendar-conversation").hidden, true);
   assert.equal(page.get("chat-opening").children.length, 0);
   await sendPageGreeting(page); await settle(); await settle();
@@ -801,7 +869,7 @@ test("arbitrary messages run October then weekend scenes, preserve Calendar and 
   assert.doesNotMatch(text(page.get("activity-results")), /中信特攻 vs 福爾摩沙夢想家|Forgotten Island/);
   assert.match(calendarText(page.get("chat-calendar-scope")), /2026-10-01 - 2026-10-31/);
   assert.equal(setup.calls.length, calendarCalls);
-  assert.doesNotMatch(JSON.stringify(setup.searches), /Family outing|Maybe a little|Mike|Debby|Kimi/);
+  assert.doesNotMatch(JSON.stringify(setup.searches), /Family outing|Maybe a little|Parent A|Parent B|Child/);
   await setup.submit("What about another month?"); await settle();
   assert.equal(setup.searches.length, 2); assert.match(page.get("chat-status").textContent, /supported requests are complete/);
   assert.equal(page.get("chat-input").placeholder, "Message Family Copilot...");
@@ -830,7 +898,7 @@ test("real Calendar failure stays inside Calendar and does not block independent
   assert.equal(setup.searches.length, 1);
   assert.equal(tags(setup.page.get("activity-results"), "article").length, 2);
   assert.match(calendarText(setup.page.get("chat-calendar-status")), /Unavailable|couldn|Couldn/);
-  assert.doesNotMatch(text(setup.page.get("chat-messages")), /private fixture failure|Mike|Debby|Kimi/);
+  assert.doesNotMatch(text(setup.page.get("chat-messages")), /private fixture failure|Parent A|Parent B|Child/);
   assert.match(text(setup.page.get("calendar-assessment")), /activity time is incomplete/);
 });
 for (const action of ["clear", "expire"]) {
@@ -882,7 +950,7 @@ test("full HTML mounts real Calendar once and refines real Activities without ch
   assert.match(text(page.get("calendar-assessment")), /outside the loaded October calendar/);
   assert.deepEqual(setup.searches[1].preferences, setup.searches[0].preferences);
   assert.equal(setup.searches[1].range.startDate, "2026-09-19");
-  assert.doesNotMatch(JSON.stringify(setup.searches), /Mike|Debby|Kimi/);
+  assert.doesNotMatch(JSON.stringify(setup.searches), /Parent A|Parent B|Child/);
   await page.fire("chat-reset");
   assert.equal(page.get("activity-results").children.length, 0);
   assert.equal(setup.calls.length, 2); assert.equal(setup.mounted, 1);
@@ -897,7 +965,7 @@ test("full HTML mounts real Calendar once and refines real Activities without ch
   assert.deepEqual(setup.calls.filter(call => call.path === "/api/clear").map(call => call.body), [{ reason: "leave" }]);
   assert.equal(setup.timers.size, 0);
 });
-test("fresh Debby school question checks both parents and sends only an explicit demo invitation without an outing", async context => {
+test("fresh Parent B school question checks both parents and sends only an explicit demo invitation without an outing", async context => {
   const setup = integratedHarness(context), { page } = setup;
   const assertDisclosure = () => {
     assert.match(text(page.get("chat-calendar-heading")), /Sample calendars/);
@@ -912,29 +980,29 @@ test("fresh Debby school question checks both parents and sends only an explicit
   assert.equal(setup.calls.length, 0); assert.equal(setup.searches.length, 0);
   await setup.submit("Can you check my schedule for the school meeting?"); await settle();
   assert.match(text(page.get("chat-opening")), /Can you check my schedule for the school meeting\?/);
-  assert.match(text(page.get("chat-messages")), /Your work meeting overlaps by half an hour\. Mike's calendar looks clear then\. If only one parent needs to attend, shall I invite Mike to Kimi's school meeting/);
-  assert.match(text(page.get("chat-messages")), /If only one parent needs to attend, shall I invite Mike to Kimi's school meeting on Friday, October 16, 2026, 3:30-4:30 PM \(Asia\/Taipei\)\?/);
+  assert.match(text(page.get("chat-messages")), /Your work meeting overlaps by half an hour\. Parent A's calendar looks clear then\. If only one parent needs to attend, shall I invite Parent A to Child's school meeting/);
+  assert.match(text(page.get("chat-messages")), /If only one parent needs to attend, shall I invite Parent A to Child's school meeting on Friday, October 16, 2026, 3:30-4:30 PM \(Asia\/Taipei\)\?/);
   assertDisclosure();
-  assert.match(page.get("calendar-introduction").textContent, /Debby/);
-  assert.equal(page.get("coordination-title").textContent, "Kimi's school meeting");
-  assert.equal(page.get("coordination-timeline").children[0].children[0].textContent, "Kimi / School meeting");
-  assert.match(text(page.get("coordination-timeline")), /Debby \(you\) \/ Busy only.*15:00-16:00.*Mike \/ Busy only.*17:00-18:00/);
+  assert.match(page.get("calendar-introduction").textContent, /Parent B/);
+  assert.equal(page.get("coordination-title").textContent, "Child's school meeting");
+  assert.equal(page.get("coordination-timeline").children[0].children[0].textContent, "Child / School meeting");
+  assert.match(text(page.get("coordination-timeline")), /Parent B \(you\) \/ Busy only.*15:00-16:00.*Parent A \/ Busy only.*17:00-18:00/);
   assert.equal(descendants(page.get("coordination-timeline")).filter(node => node.className === "coordination-overlap").length, 1);
-  await setup.submit("Yes. Could Mike go instead?");
+  await setup.submit("Yes. Could Parent A go instead?");
   assert.equal(page.get("coordination-result").hidden, true);
   assert.equal(page.get("chat-input").placeholder, "Message Family Copilot...");
   await setup.submit("Maybe");
   assert.equal(page.get("coordination-result").hidden, true);
   assertDisclosure();
-  await setup.submit("Yes, one parent is enough. Please send Mike an invitation.");
+  await setup.submit("Yes, one parent is enough. Please send Parent A an invitation.");
   assert.equal(page.get("coordination-result").hidden, false);
   assert.equal(page.get("chat-input").placeholder, "Message Family Copilot...");
-  assert.match(text(page.get("coordination-result")), /Mike's invitation.*October 16, 2026, 3:30-4:30 PM \(Asia\/Taipei\).*awaiting his response/);
-  assert.match(text(page.get("chat-messages")), /Mike's invitation for Kimi's school meeting.*awaiting his response/);
+  assert.match(text(page.get("coordination-result")), /Parent A's invitation.*October 16, 2026, 3:30-4:30 PM \(Asia\/Taipei\).*awaiting his response/);
+  assert.match(text(page.get("chat-messages")), /Parent A's invitation for Child's school meeting.*awaiting his response/);
   assertDisclosure();
   const invitationId = page.get("coordination-result").dataset.invitationId;
-  assert.equal(page.get("coordination-timeline").children[0].children[0].textContent, "Kimi / School meeting");
-  await setup.submit("Yes, please send Mike an invitation.");
+  assert.equal(page.get("coordination-timeline").children[0].children[0].textContent, "Child / School meeting");
+  await setup.submit("Yes, please send Parent A an invitation.");
   assert.equal(page.get("coordination-result").dataset.invitationId, invitationId);
   assert.match(text(page.get("chat-messages")), /already awaiting his response/);
   assertDisclosure();
@@ -946,8 +1014,8 @@ test("fresh Debby school question checks both parents and sends only an explicit
   await setup.submit("Review school meeting");
   await page.fire("availability-clear"); await settle();
   assert.equal(page.get("chat-retry").hidden, true);
-  await setup.submit("Yes, please send Mike an invitation."); assert.equal(page.get("coordination-result").hidden, true);
-  assert.doesNotMatch(text(page.get("chat-messages")), /awaiting his response|Mike's calendar looks clear/);
+  await setup.submit("Yes, please send Parent A an invitation."); assert.equal(page.get("coordination-result").hidden, true);
+  assert.doesNotMatch(text(page.get("chat-messages")), /awaiting his response|Parent A's calendar looks clear/);
   assertDisclosure();
   assert.equal(setup.searches.length, 0);
   await page.fire("chat-reset");
@@ -999,16 +1067,16 @@ test("member-calendar capture flow uses natural copy while preserving source, un
   await page.fire("chat-reset");
   assert.equal(page.get("chat-messages").children.length, 0);
   await setup.submit("Can you check my schedule for the school meeting?");
-  assert.match(text(page.get("coordination-status")), /Debby \(you\) has 30 minutes of overlap/);
-  assert.equal(page.get("coordination-timeline").children[0].children[0].textContent, "Kimi / School meeting");
+  assert.match(text(page.get("coordination-status")), /Parent B \(you\) has 30 minutes of overlap/);
+  assert.equal(page.get("coordination-timeline").children[0].children[0].textContent, "Child / School meeting");
   assertNaturalCopy();
   const calls = setup.calls.length;
-  await setup.submit("Yes, one parent is enough. Please send Mike an invitation.");
+  await setup.submit("Yes, one parent is enough. Please send Parent A an invitation.");
   assert.match(text(page.get("chat-messages")), /is awaiting his response/);
-  assert.equal(page.get("coordination-status").textContent, "Mike pending response");
+  assert.equal(page.get("coordination-status").textContent, "Parent A pending response");
   assert.doesNotMatch(text(page.get("coordination-result")), /sent|delivered|accepted/i);
-  assert.equal(page.get("coordination-timeline").children[0].children[0].textContent, "Kimi / School meeting");
-  assert.match(text(page.get("coordination-timeline")), /Debby \(you\) \/ Busy only.*Mike \/ Busy only/);
+  assert.equal(page.get("coordination-timeline").children[0].children[0].textContent, "Child / School meeting");
+  assert.match(text(page.get("coordination-timeline")), /Parent B \(you\) \/ Busy only.*Parent A \/ Busy only/);
   assert.equal(setup.calls.length, calls);
   assertNaturalCopy();
 });
@@ -1051,9 +1119,9 @@ test("school meeting is a conversation, fences stale confirmation and never adva
   assert.equal(page.get("coordination-result").hidden, true);
   await setup.submit("Yes");
   assert.equal(page.get("coordination-result").hidden, true);
-  await setup.submit("Yes, please send Mike an invitation.");
+  await setup.submit("Yes, please send Parent A an invitation.");
   assert.equal(page.get("coordination-result").hidden, false);
-  assert.match(text(page.get("chat-messages")), /Mike's invitation for Kimi's school meeting.*awaiting his response/);
+  assert.match(text(page.get("chat-messages")), /Parent A's invitation for Child's school meeting.*awaiting his response/);
   for (let index = 0; index < 10; index++) await setup.submit("Tell me more");
   assert.equal(page.get("chat-input").disabled, false);
   assert.ok(page.get("chat-messages").children.length <= 19);
@@ -1071,7 +1139,7 @@ test("school meeting is a conversation, fences stale confirmation and never adva
   await page.fire("chat-reset"); await setup.submit("October again");
   await page.fire("coordination-review");
   await page.fire("availability-clear"); await settle();
-  await setup.submit("Yes, please send Mike an invitation.");
+  await setup.submit("Yes, please send Parent A an invitation.");
   assert.equal(page.get("coordination-result").hidden, true);
   assert.doesNotMatch(text(page.get("chat-messages")), /she could attend instead/);
   assert.equal(setup.searches.length, 3);
@@ -1139,14 +1207,15 @@ test("static host loads both domain dependencies before shell startup and forbid
   const html = fs.readFileSync(require.resolve("../chat/index.html"), "utf8");
   const family = html.match(/<section class="family-section"[\s\S]*?<\/section>/)?.[0];
   assert.ok(family);
-  assert.match(family, /<div class="family-heading">\s*<h2 id="family-title">About our family<\/h2>\s*<button id="preferences-edit"/);
+  assert.match(family, /<div class="family-heading">\s*<h2 id="family-title">Our family<\/h2>\s*<button id="preferences-edit"/);
   assert.match(family, /aria-label="Edit family preferences"/);
   assert.equal((html.match(/id="preferences-edit"/g) || []).length, 1);
-  for (const name of ["Mike", "Debby", "Kimi"]) assert.ok(family.includes(name));
+  for (const name of ["Parent A", "Parent B", "Child"]) assert.ok(family.includes(name));
   assert.doesNotMatch(family, /Synthetic/);
   assert.ok(html.indexOf(family) < html.indexOf('id="calendar-host"'));
-  assert.match(family, /Kimi <span id="preference-age-summary"[^>]*>\(7\)/);
-  assert.match(html, /Kimi's age/);
+  assert.match(family, /class="member-name">Child<\/strong><p class="member-role">Child <span id="preference-age-summary"[^>]*>\(7\)/);
+  assert.equal((family.match(/class="member-role">Parent<\/p>/g) || []).length, 2);
+  assert.match(html, /Child's age/);
   assert.doesNotMatch(html, /Age preference|Add child/);
   assert.doesNotMatch(html, /Scripted reference:|id="activity-range"|class="reference"/);
   assert.doesNotMatch(html, /OUR CONVERSATION|Time for something together|Other suggestions welcome|class="mode"|<dt>Children<\/dt>/);

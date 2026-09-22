@@ -22,9 +22,9 @@ test("saved-only independently loads both snapshots with exact requests, origina
   assert.equal(h.get("child-calendar-section"), null); noProvider(h);
   assert.ok(h.childBlocks().some(n => n.textContent.startsWith(original.data.events[0].title)));
   assert.match(h.get("child-imported-access").textContent, /Saved access \(view only, not live authorization\).*2026-09-16T23:00:00Z.*Synthetic reviewed source/);
-  assert.match(text(h.get("availability-parent-details")), /Mike \(sample\).*Checked 2026-09-17T00:59:00Z/);
-  assert.match(text(h.get("availability-parent-details")), /Debby \(sample\).*Checked 2026-09-17T00:59:00Z/);
-  assert.doesNotMatch(h.get("availability-status").textContent, /Kimi|23:00/);
+  assert.match(text(h.get("availability-parent-details")), /Parent A \(sample\).*Checked 2026-09-17T00:59:00Z/);
+  assert.match(text(h.get("availability-parent-details")), /Parent B \(sample\).*Checked 2026-09-17T00:59:00Z/);
+  assert.doesNotMatch(h.get("availability-status").textContent, /Child|23:00/);
   const labels = h.childBlocks().map(n => n.title), stamp = h.get("child-imported-access").textContent;
   await h.fire("availability-display-next"); await h.fire("availability-display-previous");
   await h.advance(300001); await h.document.dispatchEvent({ type: "visibilitychange" });
@@ -94,7 +94,7 @@ for (const marker of [undefined, "CHILD_CACHE", "child-saved-v0", null]) test(`o
   await h.fire("availability-refresh"); assert.equal(count(h, "/api/availability"), 2);
   assert.equal(paths(h).some(p => p.startsWith("/api/child/")), false);
   await h.fire("availability-clear"); await settle();
-  assert.match(h.get("availability-status").textContent, /Mike \+ Debby only.*Kimi saved-data deletion is unconfirmed/);
+  assert.match(h.get("availability-status").textContent, /Parent A \+ Parent B only.*Child saved-data deletion is unconfirmed/);
   assert.match(h.get("availability-saved-help").textContent, /Clear here confirms parent deletion only/);
 });
 

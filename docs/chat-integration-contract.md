@@ -4,6 +4,64 @@ Published: 18 September 2026. Contract identifier: `familycopilot.chat.v1`.
 
 ## Status, inputs and authorization
 
+**Publication redaction, 22 September 2026:** Parent A, Parent B and Child are
+neutral display aliases, including explicit invitation wording and synthetic
+scenarios. Age 7, parent indices, ownership, disclosure, dates and consent gates
+are unchanged. Legacy identity/protocol bindings remain intact and block complete
+name removal. Historical prose is editorially anonymized, not a verbatim approval
+transcript; old hashes identify old evidence, not this tree. No private media or
+authorization record was changed. See [the publication review](publication-redaction.md).
+
+**Whole-month calendar, invitation preparation and first-typing repair, 21 September 2026:**
+the owner approved the product changes and a separate Producer video update,
+offline synthetic only, with existing narration and original images. October is
+now a five-week whole-month view, with optional day details initially closed.
+Parent markers identify Busy periods, not entire unavailable days. Child's four
+loaded events retain names/times through the existing private DOM renderer;
+redaction, cancelled/unknown/all-day states and source/freshness remain intact.
+No fixture, source metadata, data scope, consent or provider contract changed.
+
+Exact invitation consent now enters an abortable 700ms page-local UI preparation
+before synchronous Calendar revalidation and pending response. The existing
+polite status/spinner says `Preparing Parent A's invitation...`; reduced-motion stops
+animation. `coordinateMeeting` remains synchronous. Reset, disposal, changed
+context/preferences, failure and timeout fence late results. No real send or IO.
+Idle scroll padding is corrected after reproducing a 22px desktop first-focus
+scroll; the same typing run now stays at 0px with stable composer height.
+
+The [current handoff](chat-builder-handoff.md) pins **25 assets** at SHA-256
+`c626ab54ed20895f53ea6b458e6e6a2fde904fdca0e9f7b37fe2830c939c0a61`,
+including the four unchanged original images restored by Producer. The earlier
+missing-image statement below is historical. Final snapshot-bound focused checks
+passed **228/228**, bounded `npm run test:chat` **214/214**. Disposable offline
+1440x900 and 390x844 checks passed with zero unexpected requests, forbidden IO or
+page errors; browser and test hashes identify the same snapshot. No shared service,
+private data, provider, install, TTS, media edits, extra agents, commit or push.
+Producer's authorized re-record/edit is still separate work; old footage does not
+verify this revision. Parent and provider review remain separate gates.
+
+**Equal-interest preferences integrated, 21 September 2026:** the owner reviewed
+the static draft SHA-256 `c73b3096a59362228590b22378fc7c1d0d85aafe15c1535926bff91171debe74`
+and explicitly approved applying it to the actual chat, including isolated
+network-blocked desktop/mobile product checks. Prominent family initials/names
+and parent/child roles, seven equally weighted default interests, state-derived
+team typography, secondary location and the functioning composer are implemented.
+All original preference controls and edit/save/cancel/custom/reset/update/focus
+behavior remain; no readonly draft controls or automatic collapse were introduced.
+Unknown interests use a neutral icon, custom teams remain literal text. No domain,
+Calendar, fixture, consent, source, date, network or persistence change.
+
+The [current handoff](chat-builder-handoff.md) pins 21 read-only assets at SHA-256
+`a74147a68b7db1cba4725c29ba30c69859e4823582a22626775e5fdec39df8f7`.
+Four accepted missing third-party images are intentionally not packaged or replaced;
+existing fallback was tested. Baseline 38/38; focused final 39/39; bounded chat
+and final snapshot-bound checks **211/211**. In-memory browser validation passed
+1440x900 and 390x844, source hashes matched before/after, final screenshots inspected.
+No shared-service interaction, listener, private/live data, recording, media edit,
+TTS, installs, other agents or commit/push. This supersedes earlier statements that
+preference integration or these product browser checks were unapproved. Parent
+usability, provider verification and any media work remain separate gates.
+
 **Natural source labels without repetitive Demo wording, 21 September 2026:**
 the latest owner decision supersedes the standalone disclosure and DEMO badge
 requirements below. Calendar now retains `Sample calendars` in its header.
@@ -18,12 +76,12 @@ when the Calendar body is collapsed. Reset clears conversation history, not the
 source facts. Disposal retains the existing hide/fail-closed behavior.
 
 `#meeting-disclosure` is removed, not renamed to Invitation preview. Progress says
-`Preparing Mike's invitation...`; Calendar says `Mike pending response` and its
+`Preparing Parent A's invitation...`; Calendar says `Parent A pending response` and its
 result is awaiting his response, without claiming sent/delivered/accepted.
-The timeline note retains `Current user: Debby. Mike's response and travel are
+The timeline note retains `Current user: Parent B. Parent A's response and travel are
 not confirmed.` Real names are no longer described as fictional identities;
 the schedules remain explicitly sample data, not real authorization.
-Exact explicit consent, Kimi ownership, Debby's 30-minute overlap, busy-only
+Exact explicit consent, Child ownership, Parent B's 30-minute overlap, busy-only
 parents, expiry/revalidation, unknown availability and saved-source/showtime
 qualifications are unchanged. No fixtures, preferences or domain algorithms
 were changed; no real delivery, provider access or calendar writes were added.
@@ -47,7 +105,7 @@ supersedes earlier candidate-first presentation and the long simulation sentence
 This is a small presentation-only change: `Family calendars` opens the existing
 month overview and member day tracks before the shared candidate-times summary.
 It does not add three independent full-calendar screens or new data access.
-Mike and Debby remain busy-only; Kimi retains permitted sample event names/times.
+Parent A and Parent B remain busy-only; Child retains permitted sample event names/times.
 Candidate windows remain conditional on loaded, fresh, complete context, not
 guaranteed availability. Data, algorithms, consent and source coverage are unchanged.
 
@@ -58,11 +116,11 @@ saved public facts, with provenance visible elsewhere. No provider search,
 production delay, new parser or fixture change was introduced.
 
 `#meeting-disclosure` now says only `Demo invitation`, separately above the
-composer alongside the invitation exchange, including Mike's pending response.
+composer alongside the invitation exchange, including Parent A's pending response.
 It retains its visibility through No, Undo, stale context and return to activities,
 and clears on reset/disposal. Calendar DEMO context and its existing no-delivery
-details remain. Exact explicit consent, Kimi ownership (October 16, 2026,
-15:30-16:30 Taipei), Debby's 30-minute overlap and fail-closed checks are unchanged.
+details remain. Exact explicit consent, Child ownership (October 16, 2026,
+15:30-16:30 Taipei), Parent B's 30-minute overlap and fail-closed checks are unchanged.
 No real invitation has been implemented or authorized. Producer must retain
 visible simulation context, not crop it away.
 
@@ -77,13 +135,13 @@ other agents, commit or push. Visual review and Producer rehearsal/capture need
 separate approval; the five-scene Builder scenario is not a rehearsed B video.
 
 **School-event ownership correction, 21 September 2026:** the owner clarified
-that the school meeting belongs to a shared or Kimi calendar, not Debby's. The
-implemented sample uses Kimi's calendar as its single source: October 16, 2026,
-15:30-16:30 Asia/Taipei. It appears in Kimi's month marker and day details;
+that the school meeting belongs to a shared or Child calendar, not Parent B's. The
+implemented sample uses Child's calendar as its single source: October 16, 2026,
+15:30-16:30 Asia/Taipei. It appears in Child's month marker and day details;
 the comparison reads that event and fails closed when child context is missing.
-`Kimi / School meeting` remains the timeline owner before/after a proposal or
-invitation. Debby and Mike retain separate unchanged busy-only rows, with Debby's
-30-minute overlap preserved. Inviting Mike does not transfer event ownership or
+`Child / School meeting` remains the timeline owner before/after a proposal or
+invitation. Parent B and Parent A retain separate unchanged busy-only rows, with Parent B's
+30-minute overlap preserved. Inviting Parent A does not transfer event ownership or
 add a parent calendar event. Natural dialogue, explicit consent, pending response
 and the independent simulation disclosure below are unchanged.
 
@@ -97,9 +155,9 @@ writes; previous browser evidence does not verify this revision.
 
 **Natural invitation dialogue and separate simulation status, 21 September 2026:**
 the owner approved removing technical demo/no-real-send wording from invitation
-messages. The natural question retains Mike, Kimi's school meeting, Friday,
+messages. The natural question retains Parent A, Child's school meeting, Friday,
 October 16, 2026, 3:30-4:30 PM (Asia/Taipei), the one-parent attendance condition
-and the existing exact explicit-consent replies. The result says Mike's invitation
+and the existing exact explicit-consent replies. The result says Parent A's invitation
 is awaiting his response, never accepted or attendance confirmed. Cancellation,
 clarification and stale messages also omit technical simulation disclosures.
 The underlying page-local operation, Calendar revalidation, deduplication and
@@ -129,7 +187,7 @@ removing Stop and showing the other background actions instead of a generic
 activity-search label. The composer no longer contains a Stop button, listener or
 focus target. It shows the current action and a compact list of upcoming actions
 from the actual orchestrator: load family calendars, search saved activities,
-compare activity times, check both parents for the school meeting, or create Mike's
+compare activity times, check both parents for the school meeting, or create Parent A's
 page-local demo invitation. Only actions belonging to that request appear; upcoming
 steps are labelled `Next`, never presented as running or completed. Settlement,
 failure, reset and disposal clear the queue. Calendar failure still permits
@@ -165,7 +223,7 @@ now use `Message Family Copilot...`, including reset, processing, meeting replie
 cancellation and completion. Inputs remain empty on initial load/reset; actual
 typed October/weekend/school/invitation queries remain supported. No prefill,
 automatic submission, NLP expansion, date/data change or other-field copy change.
-Explicit demo-invitation consent, pending Mike, source/coverage and uncertainty
+Explicit demo-invitation consent, pending Parent A, source/coverage and uncertainty
 labels remain intact. This supersedes earlier composer-copy descriptions only.
 
 Baseline and post-edit conversation/integration checks passed 67/67. Final
@@ -182,26 +240,26 @@ old browser/media evidence does not verify the new product snapshot.
 
 **Explicit demo invitation and product copy, 20 September 2026:** the owner's
 new approval supersedes the three-turn proposal workflow below. On
-`Can you check my schedule for the school meeting?`, Calendar checks Debby's
-conflict and Mike's schedule together with the existing checked, fresh, complete
+`Can you check my schedule for the school meeting?`, Calendar checks Parent B's
+conflict and Parent A's schedule together with the existing checked, fresh, complete
 coverage and revision guards. The reply is:
 
-> Your work meeting overlaps by half an hour. Mike's calendar looks clear then.
-> If only one parent needs to attend, shall I invite him? Demo invitation to Mike:
-> Kimi's school meeting, Friday, October 16, 2026, 3:30-4:30 PM (Asia/Taipei).
+> Your work meeting overlaps by half an hour. Parent A's calendar looks clear then.
+> If only one parent needs to attend, shall I invite him? Demo invitation to Parent A:
+> Child's school meeting, Friday, October 16, 2026, 3:30-4:30 PM (Asia/Taipei).
 
-Only `Yes, one parent is enough. Please send Mike an invitation.` or
-`Yes, please send Mike an invitation.` in that established context creates the
+Only `Yes, one parent is enough. Please send Parent A an invitation.` or
+`Yes, please send Parent A an invitation.` in that established context creates the
 page-local synthetic invitation. The shorter reply accepts the preceding
 one-parent condition. Bare Yes, old proposal replies and ambiguous or conditional
 messages do not send. This is bounded exact dialogue, not general NLP.
 
 Calendar revalidates both parents on send. One stable page-local event/recipient
-ID prevents duplicate records; Mike remains pending, never accepted or assumed
-to attend. The result visibly says `Demo invitation sent to Mike for Kimi's school
+ID prevents duplicate records; Parent A remains pending, never accepted or assumed
+to attend. The result visibly says `Demo invitation sent to Parent A for Child's school
 meeting, Friday, October 16, 2026, 3:30-4:30 PM (Asia/Taipei). Waiting for his
 response. No real invitation or calendar change.` The supporting timeline retains
-Debby's overlap, since an invitation does not resolve attendance. No contact,
+Parent B's overlap, since an invitation does not resolve attendance. No contact,
 provider call, calendar write, reminder, storage or real delivery was added.
 
 No/Cancel/Undo, pause, reset, preferences, changed revision and expired or
@@ -238,22 +296,22 @@ browser, capture, TTS, install, delegation, commit or push was performed or
 authorized for follow-up. Parent review and separately approved desktop/Producer
 rehearsal remain pending.
 
-**Debby-initiated school meeting, 20 September 2026:** newer explicit approval
-supersedes the Mike-conflict/Debby-proposal direction and activity-first requirement
+**Parent B-initiated school meeting, 20 September 2026:** newer explicit approval
+supersedes the Parent A-conflict/Parent B-proposal direction and activity-first requirement
 in historical entries below. The exact opening
 `Can you check my schedule for the school meeting?` now loads only synthetic
-Calendar fixtures in a fresh conversation. Stable mappings remain Mike = person 0,
-Debby = person 1; Debby is the current user. Her October 16 15:00-16:00 busy interval
-overlaps the 15:30-16:30 school meeting by a computed 30 minutes. Mike's afternoon
+Calendar fixtures in a fresh conversation. Stable mappings remain Parent A = person 0,
+Parent B = person 1; Parent B is the current user. Her October 16 15:00-16:00 busy interval
+overlaps the 15:30-16:30 school meeting by a computed 30 minutes. Parent A's afternoon
 busy interval is 17:00-18:00, with no overlap. Other dates and live mappings are unchanged.
 
 The reply is `Your work meeting overlaps with the school meeting by 30 minutes.
 Does only one parent need to attend?` The bounded response
-`Yes. Could Mike go instead?` establishes one-parent attendance and asks Calendar
-to assess Mike; it does **not** create a proposal. With complete current coverage,
-the next reply is `Mike has no conflicting events in the loaded calendar. Shall I
+`Yes. Could Parent A go instead?` establishes one-parent attendance and asks Calendar
+to assess Parent A; it does **not** create a proposal. With complete current coverage,
+the next reply is `Parent A has no conflicting events in the loaded calendar. Shall I
 propose that he attend?` Only a subsequent explicit `Yes` creates a proposal pending
-Mike's confirmation. His willingness and travel remain unknown; no contact,
+Parent A's confirmation. His willingness and travel remain unknown; no contact,
 notification or calendar write exists. This is fixed dialogue, not general NLP.
 
 Calendar checks freshness, coverage, person status, alternate conflict and revision
@@ -287,9 +345,9 @@ closes this conversation without searching; a subsequent outing message advances
 the existing activity scene. This is bounded scripted dialogue, not general AI.
 
 Calendar retains the busy-only timeline and checks current coverage, freshness and
-revision again before proposing Debby. Missing, partial, revoked or changed context
+revision again before proposing Parent B. Missing, partial, revoked or changed context
 cannot authorize a proposal; Calendar changes retire earlier meeting messages.
-Willingness, travel and Debby's confirmation remain unknown. Nobody is contacted
+Willingness, travel and Parent B's confirmation remain unknown. Nobody is contacted
 and no calendar is written. Only bounded state and overlap minutes reach chat;
 meeting replies never reach activity search or change its dates or request budget.
 Bounded recent history keeps cancellation available during longer conversations.
@@ -331,7 +389,7 @@ include these new controls and must not be presented as evidence for this revisi
 the existing school-meeting flow's joint offline acceptance with visible processing
 feedback beside the fixed composer. Stop remains reachable while preparing or
 searching; live status, busy state and reduced-motion handling do not add artificial
-delay. Existing one-parent gating, pending Debby confirmation, Undo, reset and
+delay. Existing one-parent gating, pending Parent B confirmation, Undo, reset and
 fail-closed Calendar behavior remain unchanged. No contact or calendar write exists.
 
 The [fixed Builder handoff](chat-builder-handoff.md) pins 25 static assets and the
@@ -729,13 +787,13 @@ contracts and direct week fixtures remain unchanged.
 **Review a school meeting** is an independent, explicitly clicked Calendar-local
 scenario after loading, not a third input-order activity query or model inference.
 The fictional October 16 meeting is 15:30-16:30 Taipei. Parent busy slots compute
-Mike's 15:00-16:00 conflict as 30 overlapping minutes; Debby's 17:00-18:00 busy
+Parent A's 15:00-16:00 conflict as 30 overlapping minutes; Parent B's 17:00-18:00 busy
 interval does not overlap. A shared 14:00-18:00 time axis shows the meeting, busy-only
 parent intervals and hatched overlap. No work titles or child details leave Calendar.
 
-The parent must confirm **Only one parent needs to attend** before **Propose Debby
+The parent must confirm **Only one parent needs to attend** before **Propose Parent B
 attending** is enabled. Selection changes only the proposed attendee and shows the
-before/after comparison, with Debby's confirmation, willingness and travel unresolved.
+before/after comparison, with Parent B's confirmation, willingness and travel unresolved.
 Undo and removing the one-parent condition withdraw the proposal. No notification,
 contact, booking or calendar write is implemented. Freshness is rechecked on selection;
 Clear, date invalidation, partial/missing/stale/revoked data and session expiry fail
@@ -940,9 +998,9 @@ non-keyword wording produced two October cards then one distinct September movie
 occurrence, unchanged Calendar coverage, no overflow and zero fetch/XHR calls.
 
 **Latest presentation refinement, 19 September 2026:** the owner explicitly
-requested age beside Kimi, removal of the numbered Children block, interest bars,
+requested age beside Child, removal of the numbered Children block, interest bars,
 openness sentence, redundant headings/idle text and masthead Demo / Scripted badge.
-The single age preference now renders beside Kimi; this association is presentation
+The single age preference now renders beside Child; this association is presentation
 only and adds no identity field to requests or Calendar coupling. The interest plus
 control opens the existing editor, with comma-separated custom interests under the
 unchanged 12-item/40-character contract. Apply/Cancel, generation fencing and no
@@ -1039,7 +1097,7 @@ reviews; the following design boundaries remain:
   requests/results, reusable illustrated cards, no raw chat/private calendars,
   and `calendarFit: "not_checked"`. The explicit once-started scripted synthetic
   session is now approved as T1; no startup or live query is implied.
-- Calendar reports that the **second Kimi Sync remains stuck/unresolved**. This
+- Calendar reports that the **second Child Sync remains stuck/unresolved**. This
   blocks an actual calendar demonstration. It was not reproduced or diagnosed in
   this contract work; the approved synthetic work does not establish live success.
 
@@ -1565,7 +1623,7 @@ Milestone M1: one synthetic/scripted 1 → 2 → 3 conversation. **T1 and offlin
 implementation approved**, as recorded in section 10; each writer still
 acknowledges the exact v1 interface and file set before its implementation.
 It demonstrates interaction and privacy boundaries, not real AI, live discovery,
-actual calendar availability or resolution of the Kimi Sync blocker.
+actual calendar availability or resolution of the Child Sync blocker.
 
 | Area | Required observable acceptance |
 | --- | --- |
@@ -1597,7 +1655,7 @@ unrelated tests. Parent usability sign-off is separate from automated success.
 | Shared contract and synthetic Calendar stage 1 | Owner approved; pure shared module delivered; existing Calendar chat receives sole-writer handoff in section 9 |
 | T1 explicit scripted synthetic Start and offline M1 / stages 2–3 | Approved through the owner's Activities handoff message; this turn delivers prerequisites and hands stage 2 to the existing Activities chat, not a service activation |
 | Exact v1 interfaces/file reservations | Calendar + Activities acknowledge before coding; report incompatibility rather than editing shared paths |
-| Second Kimi Sync hang | Calendar-reported unresolved real-demo blocker; separate repair authorization/scope, no agent reproduction here |
+| Second Child Sync hang | Calendar-reported unresolved real-demo blocker; separate repair authorization/scope, no agent reproduction here |
 | Real calendar embedding/Sync | Separate approved path and operational validation after blocker resolution; no recorded-image fake success |
 | Real AI/proactive behavior | Provider/runtime/cost/tool/outbound-data/retention/trigger review required; no background or notification permission |
 | Movies, wider sources, posters/logos, routing | Source/licensing and bounded live validation decisions required; Xinyi district is not a routing origin |
@@ -1641,7 +1699,7 @@ exit. Export presentation controls only, not calendar state or the title-free
 bridge. Preserve current standalone behavior. Use Calendar-owned synthetic
 fixtures/transport and focused lifecycle/privacy tests. Do not touch Builder or
 Activities files, real tabs/snapshots, shared services or providers. Treat the
-second Kimi Sync hang as an unresolved real-demo blocker, not part of M1 repair.
+second Child Sync hang as an unresolved real-demo blocker, not part of M1 repair.
 Return exact changed files, contract version, executed tests and remaining gates.
 
 ### Activities handoff
@@ -1761,7 +1819,7 @@ browser/parent usability validation, real Sync, private-data inspection, service
 operation, provider call, dependency installation, commit or push occurred here.
 At that stage-1 handoff, T1/stages 2/3 and full M1 were still gated; section 10
 records their later offline approval. Service/browser-review setup remains
-separately gated. The second Kimi Sync blocker is not repaired by this delivery.
+separately gated. The second Child Sync blocker is not repaired by this delivery.
 
 ## 10. T1/M1 approval and Activities handoff
 
@@ -1964,7 +2022,7 @@ No services were started, stopped, restarted or probed; no live provider, real
 calendar/tab, private snapshot, model, new storage, dependency, commit or push was
 used. The bounded discovery runner was not rerun because it includes local-service
 tests; its reported pre-existing Calendar shell timezone failure was not changed.
-Real Calendar proof and the reported second Kimi Sync blocker remain separate from
+Real Calendar proof and the reported second Child Sync blocker remain separate from
 this synthetic integration. Real AI, movies/routing and calendar-fit assessment
 retain their existing approval gates; `calendarFit` remains `not_checked`.
 
@@ -2010,7 +2068,7 @@ query, real account access, dependency installation, commit or push occurred.
 The 99-per-timezone Node results in section 12 remain the earlier executed
 regression evidence, not a newly repeated test run. Browser keyboard events are
 not physical-device, assistive-technology or parent usability sign-off. Those
-reviews, actual calendar proof, the independently reported Kimi Sync issue, real
+reviews, actual calendar proof, the independently reported Child Sync issue, real
 AI/movie/routing sources and calendar-fit approval remain separate gates.
 
 ## 14. Editable preferences and docked composer
@@ -2094,7 +2152,7 @@ commit or push occurred.
 Mobile keyboard resize, overlay and viewport-panning geometry were simulated;
 **physical iOS/Android keyboards and assistive technology were not tested**.
 Human/device usability review remains distinct. Real AI, source expansion,
-routing, real Calendar proof and the separate Kimi issue retain their existing gates.
+routing, real Calendar proof and the separate Child issue retain their existing gates.
 
 ## 15. Activities handoff revalidation
 
@@ -2139,13 +2197,13 @@ this increment. Actual Calendar edits are limited to
 [test/chat-calendar.test.js](../test/chat-calendar.test.js). Existing changes in
 those files are preserved; this is not a continuing transfer of Calendar ownership.
 
-The upper shell now shows a wrapping `Our family` list of Mike, Debby and Kimi,
+The upper shell now shows a wrapping `Our family` list of Parent A, Parent B and Child,
 explicitly labeled synthetic. These are static demo labels, not extracted from
 Calendar or an authenticated family profile. A separate `Children` setting shows
 `Child 1` and its age; the editor calls the field `Child's age`. One editable age
 remains supported. The list-shaped presentation can accommodate more children
 later, but no nonfunctional Add child control or new multi-child schema is added.
-No automatic association between the age preference and Kimi is made.
+No automatic association between the age preference and Child is made.
 
 The earlier requested interest choices are now Basketball, Baseball, Ping-pong
 and Movie. The Movie checkbox keeps the existing `movies` request value for

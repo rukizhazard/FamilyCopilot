@@ -138,7 +138,7 @@ async function main() {
         await page.waitForFunction(() => document.documentElement.style.getPropertyValue("--composer-height"));
         assert.deepEqual(await page.evaluate(() => [review.requests.length, review.calendarCalls.length]), [0, 0]);
         await checkLayout(page);
-        assert.deepEqual(await page.locator(".family-members li").evaluateAll(elements => elements.map(element => [...element.childNodes].filter(node => node.nodeType === Node.TEXT_NODE).map(node => node.textContent).join("").trim())), ["Mike", "Debby", "Kimi"]);
+        assert.deepEqual(await page.locator(".family-members li").evaluateAll(elements => elements.map(element => [...element.childNodes].filter(node => node.nodeType === Node.TEXT_NODE).map(node => node.textContent).join("").trim())), ["Parent A", "Parent B", "Child"]);
         assert.ok(await page.locator(".family-section").isVisible());
         assert.equal(await page.locator("#calendar-conversation").isVisible(), false);
         assert.equal(await page.locator("#availability-load").isVisible(), false);
@@ -149,7 +149,7 @@ async function main() {
         await page.screenshot({ path: path.join(output, `family-${width}.png`) });
         await page.locator("#preferences-edit").press("Enter");
         assert.equal(await page.evaluate(() => document.activeElement.id), "preference-age");
-        assert.match(await page.locator('label[for="preference-age"]').textContent(), /Kimi's age/);
+        assert.match(await page.locator('label[for="preference-age"]').textContent(), /Child's age/);
         assert.deepEqual(await page.locator('.interest-options label:has(input[id^="interest-"])').allTextContents(), ["Basketball", "Baseball", "Ping-pong", "Movie", "Concerts", "Museums", "Outdoor play", "Science & discovery"]);
         assert.equal(await page.locator("#preference-age").evaluate(element => getComputedStyle(element).fontSize), "16px");
         await page.keyboard.press("ArrowUp"); assert.equal(await page.locator("#preference-age").inputValue(), "8");
@@ -203,8 +203,8 @@ async function main() {
         assert.equal(await page.evaluate(() => review.requests.length), 1);
         await page.evaluate(() => review.releaseActivities());
         await page.waitForFunction(() => document.querySelector("#availability-grid")?.firstElementChild &&
-          /Mike: Loaded/.test(document.querySelector("#chat-calendar-status").textContent) &&
-          /Debby: Loaded/.test(document.querySelector("#chat-calendar-status").textContent));
+          /Parent A: Loaded/.test(document.querySelector("#chat-calendar-status").textContent) &&
+          /Parent B: Loaded/.test(document.querySelector("#chat-calendar-status").textContent));
         assert.doesNotMatch(await page.locator("#chat-calendar-status").textContent(), /Unavailable/);
         assert.ok(await page.locator("#chat-calendar-status").isVisible());
         assert.equal(await page.locator("#calendar-month").isVisible(), true);
@@ -227,12 +227,12 @@ async function main() {
         assert.equal(await page.locator("#availability-load").isVisible(), false);
         await page.locator("#calendar-candidates").screenshot({ path: path.join(output, `weekend-times-${width}.png`) });
         await page.locator("#coordination-review").press("Enter");
-        assert.equal(await page.locator("#coordination-timeline .coordination-row > strong").first().textContent(), "Kimi / School meeting");
+        assert.equal(await page.locator("#coordination-timeline .coordination-row > strong").first().textContent(), "Child / School meeting");
         assert.match(await page.locator("#coordination-status").textContent(), /30 minutes of overlap/);
         assert.equal(await page.locator("#coordination-one-parent, #coordination-select, #coordination-undo").count(), 0);
         assert.equal(await page.evaluate(() => document.activeElement.id), "chat-input");
-        assert.match(await page.locator("#chat-messages li").last().textContent(), /half an hour.*Mike's calendar looks clear then.*If only one parent needs to attend, shall I invite Mike/);
-        assert.match(await page.locator("#chat-messages li").last().textContent(), /Kimi's school meeting on Friday, October 16, 2026, 3:30-4:30 PM \(Asia\/Taipei\)\?/);
+        assert.match(await page.locator("#chat-messages li").last().textContent(), /half an hour.*Parent A's calendar looks clear then.*If only one parent needs to attend, shall I invite Parent A/);
+        assert.match(await page.locator("#chat-messages li").last().textContent(), /Child's school meeting on Friday, October 16, 2026, 3:30-4:30 PM \(Asia\/Taipei\)\?/);
         assert.equal(await page.locator("#meeting-disclosure").count(), 0);
         assert.match(await page.locator("#chat-calendar-heading").textContent(), /Sample calendars/);
         assert.equal(await page.locator("#chat-calendar-source-details > summary").isVisible(), true);
@@ -244,14 +244,14 @@ async function main() {
         await page.locator("#chat-input").fill("Yes");
         await page.locator("#chat-input").press("Enter");
         assert.equal(await page.locator("#coordination-result").isVisible(), false);
-        await page.locator("#chat-input").fill("Yes, one parent is enough. Please send Mike an invitation.");
+        await page.locator("#chat-input").fill("Yes, one parent is enough. Please send Parent A an invitation.");
         await page.locator("#chat-input").press("Enter");
-        assert.match(await page.locator("#chat-messages li").last().textContent(), /Mike's invitation for Kimi's school meeting.*awaiting his response/);
+        assert.match(await page.locator("#chat-messages li").last().textContent(), /Parent A's invitation for Child's school meeting.*awaiting his response/);
         assert.equal(await page.locator("#meeting-disclosure").count(), 0);
         await page.screenshot({ path: path.join(output, `meeting-reply-${width}.png`) });
-        assert.match(await page.locator("#coordination-result").textContent(), /Mike's invitation.*awaiting his response/);
-        assert.equal(await page.locator("#coordination-status").textContent(), "Mike pending response");
-        assert.equal(await page.locator("#coordination-timeline .coordination-row > strong").first().textContent(), "Kimi / School meeting");
+        assert.match(await page.locator("#coordination-result").textContent(), /Parent A's invitation.*awaiting his response/);
+        assert.equal(await page.locator("#coordination-status").textContent(), "Parent A pending response");
+        assert.equal(await page.locator("#coordination-timeline .coordination-row > strong").first().textContent(), "Child / School meeting");
         assert.equal(await page.locator(".coordination-overlap").count(), 1);
         assert.equal(await page.evaluate(() => review.calendarCalls.length), candidateCalls);
         await page.locator("#calendar-coordination").screenshot({ path: path.join(output, `invitation-pending-${width}.png`) });
@@ -332,7 +332,7 @@ async function main() {
           assert.deepEqual(await page.evaluate(() => review.violations), []);
           assert.deepEqual(failures, []);
           reports.push({ width, calendarReview: true, candidateCount: 6, weeks: 5, overlapMinutes: 30,
-            processing: ["preparing", "loading", "weekend loading", "settled"], invitation: "explicit simulated send, Mike pending, Undo, Continue activities, reset, clear", forbiddenIO: 0 });
+            processing: ["preparing", "loading", "weekend loading", "settled"], invitation: "explicit simulated send, Parent A pending, Undo, Continue activities, reset, clear", forbiddenIO: 0 });
           continue;
         }
         await page.locator("#preferences-edit").press("Enter");
@@ -381,7 +381,7 @@ async function main() {
         assert.equal(await page.locator("#chat-retry").isVisible(), false);
         assert.doesNotMatch(await page.locator("#activity-results").textContent(), /Forgotten Island|Skybound|Comets vs Grove/);
         const requests = await page.evaluate(() => review.requests);
-        assert.doesNotMatch(JSON.stringify(requests), /Mike|Debby|Kimi/);
+        assert.doesNotMatch(JSON.stringify(requests), /Parent A|Parent B|Child/);
         assert.equal(requests.length, 3); assert.deepEqual(requests[1].preferences, requests[2].preferences);
         await page.locator("#chat-input").fill("What about another month?");
         await page.locator("#chat-send").press("Enter");

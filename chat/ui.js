@@ -8,13 +8,17 @@
     concerts: "Concerts", museums: "Museums", "outdoor-play": "Outdoor play", "science-discovery": "Science & discovery"
   };
   const teamLabels = { dea: "新北中信特攻", brothers: "中信兄弟" };
+  const teamPresentation = {
+    [teamLabels.dea]: { name: "New Taipei CTBC DEA", mark: "CT", sport: "basketball", style: "dea" },
+    [teamLabels.brothers]: { name: "CTBC Brothers", mark: "B", sport: "baseball", style: "brothers" }
+  };
   const labels = {
     preparing: "Loading family members' calendars...",
     preparation_timeout: "Calendar is taking longer than expected. You can update suggestions independently.",
     not_started: "", loading: "Finding activities that match your family's interests...",
     checking_calendar: "Checking activity times against your calendars...",
     checking_meeting: "Checking both parents' calendars for the school meeting...",
-    sending_demo_invitation: "Preparing Mike's invitation...",
+    sending_demo_invitation: "Preparing Parent A's invitation...",
     calendar_changed: "Calendar check expired or changed. Check again before continuing.",
     results: "", unknown: "",
     empty: "No matching activities found.", partial: "The search is incomplete.",
@@ -30,8 +34,16 @@
   const actionLabels = {
     load_calendars: "Load family members' calendars", search_saved_activities: "Find activities that match your family's interests",
     compare_activity_times: "Compare activity times with calendars", check_school_meeting: "Check both parents' calendars for the school meeting",
-    send_demo_invitation: "Prepare Mike's invitation"
+    send_demo_invitation: "Prepare Parent A's invitation"
   };
+  function prepareInvitation({ signal }) {
+    return new Promise(resolve => {
+      const finish = () => { root.clearTimeout(timer); signal.removeEventListener("abort", finish); resolve(); };
+      const timer = root.setTimeout(finish, 700);
+      signal.addEventListener("abort", finish, { once: true });
+      if (signal.aborted) finish();
+    });
+  }
   function mountChat(document, { calendar = null, activities = null, lifecycle = root } = {}) {
     if (mounted.has(document)) return mounted.get(document);
     const get = id => document.getElementById(id);
@@ -43,6 +55,16 @@
     const elements = Object.fromEntries(ids.map(id => [id, get(id)]));
     if (Object.values(elements).some(value => !value)) throw Error("chat_host_missing");
     const node = id => elements[id];
+    function preferenceIcon(value) {
+      const known = Object.hasOwn(interestLabels, value) && value !== "ping-pong";
+      const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+      icon.setAttribute("class", `preference-icon icon-${known ? value : "neutral"}`);
+      icon.setAttribute("aria-hidden", "true"); icon.setAttribute("focusable", "false");
+      icon.setAttribute("viewBox", "0 0 24 24");
+      use.setAttribute("href", `#preference-icon-${known ? value : "neutral"}`);
+      icon.append(use); return icon;
+    }
     let calendarController = null, cards = null, renderedId = null, core = null, closed = false, disposal = null;
     const removers = [];
     let preferenceOpener = "preferences-edit";
@@ -167,7 +189,7 @@
       const focused = document.activeElement;
       node("calendar-conversation").hidden = state.context.triggerState === "not_started";
       node("calendar-introduction").textContent = preparing ? labels.preparing :
-        state.meetingState ? "Debby, let's check your school meeting against the loaded October calendars." :
+        state.meetingState ? "Parent B, let's check your school meeting against the loaded October calendars." :
         "Let me check your October calendar and find some ideas.";
       const preferences = state.context.preferences;
       node("preferences-edit").disabled = closed;
@@ -175,18 +197,30 @@
       node("teams-edit").disabled = closed;
       node("preference-age-summary").textContent = `(${preferences.ages[0]})`;
       node("preference-teams-summary").replaceChildren(...(preferences.preferredTeams.length ? preferences.preferredTeams : ["No preference"]).map(value => {
-        const item = document.createElement("li");
-        item.className = `interest-tag${value === teamLabels.brothers ? " interest-baseball" : ""}`;
-        item.textContent = value;
+        const item = document.createElement("li"), name = document.createElement("span");
+        const presentation = Object.hasOwn(teamPresentation, value) ? teamPresentation[value] : null;
+        item.className = `team-summary${presentation ? ` team-${presentation.style}` : ""}`;
+        name.className = "team-domain"; name.textContent = value;
+        if (presentation) {
+          const mark = document.createElement("span"), description = document.createElement("div"), title = document.createElement("strong");
+          mark.className = "team-mark"; mark.textContent = presentation.mark; mark.setAttribute("aria-hidden", "true");
+          title.className = "team-name"; title.textContent = presentation.name;
+          name.setAttribute("lang", "zh-Hant"); description.append(title, name);
+          const sport = preferenceIcon(presentation.sport);
+          sport.setAttribute("aria-hidden", "false"); sport.setAttribute("role", "img");
+          sport.setAttribute("aria-label", interestLabels[presentation.sport]);
+          item.append(mark, description, sport);
+        } else item.append(name);
         return item;
       }));
       node("preference-age-summary").setAttribute("aria-label", `Age ${preferences.ages[0]}`);
       node("preference-area-summary").textContent = preferences.origin.area === "Xinyi District, Taipei City" ? "Xinyi, Taipei" : preferences.origin.area;
       node("preference-place-summary").hidden = preferences.origin.area !== "Xinyi District, Taipei City";
       node("preference-interests-summary").replaceChildren(...preferences.interests.map(value => {
-        const item = document.createElement("li");
-        item.className = `interest-tag${Object.hasOwn(interestLabels, value) ? ` interest-${value}` : ""}`;
-        item.textContent = interestLabels[value] || value;
+        const item = document.createElement("li"), name = document.createElement("span");
+        item.className = "interest-tag"; name.className = "interest-name";
+        name.textContent = Object.hasOwn(interestLabels, value) ? interestLabels[value] : value;
+        item.append(preferenceIcon(value), name);
         return item;
       }));
       const snapshotNeedsChecking = state.status === "partial" && state.result?.items.length > 0 &&
@@ -203,6 +237,7 @@
       node("chat-input").disabled = closed || !["not_started", "active", "paused"].includes(state.context.triggerState) || busy || !state.meetingState && state.messages.length > 16;
       node("chat-send").disabled = node("chat-input").disabled;
       node("chat-status").textContent = labels[state.status] ?? "Activity status unavailable.";
+      node("chat-status").setAttribute("data-action", state.processingActions[0] || "");
       node("chat-status").hidden = state.status === "not_started" || state.status === "results" || snapshotNeedsChecking;
       node("chat-progress").replaceChildren(...state.processingActions.slice(1).map(action => {
         const item = document.createElement("li"); item.textContent = `Next: ${actionLabels[action]}`; return item;
@@ -246,6 +281,7 @@
     if (activities && typeof activities.searchActivities === "function" && typeof activities.renderActivityCards === "function") {
       node("activity-connection").hidden = true;
       core = Core.createConversation({ searchActivities: (request, options) => activities.searchActivities(request, options), onChange: render,
+        prepareInvitation,
         coordinateMeeting: typeof calendarController?.coordinateMeeting === "function" ? action => calendarController.coordinateMeeting(action) : null,
         assessActivities: typeof calendarController?.assessOccurrences === "function" ? occurrences => calendarController.assessOccurrences(occurrences) : null,
         prepareSession: typeof calendarController?.loadSynthetic === "function" ? () => calendarController.loadSynthetic() : null });

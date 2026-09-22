@@ -15,14 +15,14 @@ test("demo members add, remove, restore and reset without calendar requests or s
   assert.equal(h.get("member-demo-list").children.length, 0);
   for (const i of [0, 1, 2]) await h.fire("member-remove-" + i);
   for (const i of [0, 1, 2]) assert.equal(h.visible("calendar-person-" + i), false);
-  await add(h, "kimi"); assert.equal(h.visible("calendar-person-2"), true);
+  await add(h, "child"); assert.equal(h.visible("calendar-person-2"), true);
   await h.fire("member-reset");
   for (const i of [0, 1, 2]) assert.equal(h.visible("calendar-person-" + i), true);
   assert.deepEqual(h.calls, []); assert.equal(h.storage.values.size, 0);
 });
 test("member input validates blank, duplicate, long, control names and capacity; treats markup as text", async t => {
   const h = harness(t);
-  for (const name of [" ", "Mike", "mIkE", "a".repeat(41), "bad\u202ename"]) {
+  for (const name of [" ", "Parent A", "pArEnT a", "a".repeat(41), "bad\u202ename"]) {
     await add(h, name);
     assert.equal(h.get("member-name").attributes["aria-invalid"], "true");
     assert.equal(h.get("member-demo-list").children.length, 0);

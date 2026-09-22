@@ -274,9 +274,10 @@ const chatStory = [
 function captureOptions(args) {
   assert.equal(args[0], "--chat-preview");
   if (args.length === 1) return {};
-  assert(args.length >= 5 && args.length <= 9, "Use --chat-preview --snapshot <file> --sha256 <reviewed manifest hash> [--review-frame|--review-scenes] [--simulate-loading] [--simulate-calendar] [--viewport=1440x900]");
+  assert(args.length >= 5 && args.length <= 10, "Use --chat-preview --snapshot <file> --sha256 <reviewed manifest hash> [--review-frame|--review-scenes] [--simulate-loading] [--simulate-calendar] [--viewport=1440x900] [--readable-pacing]");
   const flags = args.slice(5);
-  assert(flags.every(flag => ["--review-frame", "--review-scenes", "--simulate-loading", "--simulate-calendar", "--viewport=1440x900"].includes(flag)));
+  assert(flags.every(flag => ["--review-frame", "--review-scenes", "--simulate-loading", "--simulate-calendar", "--viewport=1440x900", "--readable-pacing"].includes(flag)));
+  assert(!flags.includes("--readable-pacing") || flags.includes("--simulate-calendar") && flags.includes("--viewport=1440x900"));
   assert(!flags.includes("--simulate-calendar") || flags.includes("--simulate-loading"));
   assert.equal(new Set(flags).size, flags.length);
   assert(!(flags.includes("--review-frame") && flags.includes("--review-scenes")));
@@ -284,7 +285,27 @@ function captureOptions(args) {
   assert.match(args[4], /^[a-f0-9]{64}$/, "Invalid reviewed snapshot hash");
   return { snapshot: path.resolve(args[2]), snapshotSha256: args[4], reviewFrame: flags.includes("--review-frame"),
     reviewScenes: flags.includes("--review-scenes"), simulateLoading: flags.includes("--simulate-loading"), simulateCalendar: flags.includes("--simulate-calendar"),
-    tallViewport: flags.includes("--viewport=1440x900") };
+    tallViewport: flags.includes("--viewport=1440x900"), readablePacing: flags.includes("--readable-pacing") };
+}
+
+function installInvitationDwell() {
+  let conversation;
+  window.demoInvitationDwellMs = 2500;
+  Object.defineProperty(window, "FamilyChatConversation", { configurable: true, get: () => conversation, set(value) {
+    conversation = { ...value, createConversation(options) {
+      const original = options.prepareInvitation;
+      return value.createConversation({ ...options, async prepareInvitation(context) {
+        const { signal } = context;
+        const dwell = new Promise(resolve => {
+          if (signal.aborted) return resolve();
+          const done = () => { window.clearTimeout(timer); signal.removeEventListener("abort", done); resolve(); };
+          const timer = window.setTimeout(done, 2500);
+          signal.addEventListener("abort", done, { once: true });
+        });
+        await Promise.all([original(context), dwell]);
+      } });
+    } };
+  } });
 }
 
 function captureLayout(options) {
@@ -396,7 +417,8 @@ async function chatPreview(options) {
   const layout = captureLayout(options);
   const reviewOnly = options.reviewFrame || options.reviewScenes;
   const output = await fs.mkdtemp(path.join(root, reviewOnly ? "browser-artifacts/demo/chat-review-" : "browser-artifacts/demo/chat-preview-"));
-  const failures = [], timeline = [];
+  const failures = [], timeline = [], expectedMissingImages = [], typingEvidence = [], processingEvidence = [], questionEvidence = [];
+  let offlineMovieClick = null;
   const browser = await chromium.launch({ headless: true });
   let context;
   try {
@@ -405,6 +427,11 @@ async function chatPreview(options) {
       ...(reviewOnly ? {} : { recordVideo: { dir: output, size: layout.viewport } }) });
     await context.route("**/*", async route => {
       const url = new URL(route.request().url());
+      if (url.origin === origin && !url.search && route.request().method() === "GET" &&
+        route.request().resourceType() === "image" && scenario?.missingImageAssets?.includes(url.pathname)) {
+        expectedMissingImages.push(url.pathname);
+        await route.fulfill({ status: 404, body: "", headers: { "Cache-Control": "no-store" } }); return;
+      }
       if (url.origin !== origin || url.search || !assets.has(url.pathname) || route.request().method() !== "GET") {
         failures.push("unexpected_request"); await route.abort(); return;
       }
@@ -424,6 +451,7 @@ async function chatPreview(options) {
       }
     });
     if (options.simulateLoading) await context.addInitScript(installDemoResponseDelay, { calendarPhases: Boolean(options.simulateCalendar) });
+    if (options.readablePacing) await context.addInitScript(installInvitationDwell);
     const page = await context.newPage();
     page.setDefaultTimeout(10000);
     page.on("pageerror", error => failures.push(error.message));
@@ -464,18 +492,48 @@ async function chatPreview(options) {
           for (const action of shot.actions) {
             const submission = options.simulateLoading && action.kind === "press" && action.selector === "#chat-input" && action.key === "Enter";
             const beforeCalls = submission ? await page.evaluate(() => window.demoTiming.calls) : null;
+            const submittedText = submission && options.readablePacing ? await page.locator("#chat-input").inputValue() : "";
+            const typing = action.kind === "type" && action.selector === "#chat-input";
+            const beforeTyping = typing ? await page.evaluate(() => ({ y: scrollY, composerHeight: document.querySelector("#chat-composer").getBoundingClientRect().height })) : null;
             await sceneAction(page, action);
+            if (typing) typingEvidence.push({ scene: index + 1, before: beforeTyping,
+              after: await page.evaluate(() => ({ y: scrollY, composerHeight: document.querySelector("#chat-composer").getBoundingClientRect().height })) });
             if (submission && options.simulateCalendar) {
+              if (options.readablePacing && submittedText === "Can you check my schedule for the school meeting?") {
+                await page.waitForFunction(() => document.querySelector("#chat-page").dataset.processing === "false");
+                const question = page.locator("#chat-opening .message-parent");
+                await question.waitFor({ state: "visible" });
+                await question.evaluate(smoothSceneScroll);
+                await question.evaluate(element => window.scrollTo({ top: scrollY + element.getBoundingClientRect().top - 180, behavior: "smooth" }));
+                await page.waitForTimeout(600);
+                const start = (Date.now() - started) / 1000;
+                await page.screenshot({ path: path.join(output, "school-question-visible.png") });
+                await page.waitForTimeout(2000);
+                const bounds = await question.boundingBox();
+                assert(bounds && bounds.y >= 0 && bounds.y + bounds.height < layout.viewport.height - 160);
+                assert.equal(await question.locator("p").innerText(), submittedText);
+                questionEvidence.push({ start, end: (Date.now() - started) / 1000, text: submittedText, bounds });
+              }
               const seen = new Set();
               const processingStarted = Date.now();
               while (await page.locator("#chat-page").getAttribute("data-processing") === "true") {
                 assert(Date.now() - processingStarted < 12000, "Capture-only processing did not settle");
                 const status = page.locator("#chat-status"), text = await status.innerText();
                 if (await page.locator("#chat-page").getAttribute("data-processing") !== "true" || !await status.isVisible()) break;
+                if (await status.getAttribute("data-action") === "send_demo_invitation") {
+                  const evidence = await status.evaluate(element => {
+                    const bounds = element.getBoundingClientRect();
+                    return { text: element.textContent, transform: getComputedStyle(element, "::before").transform,
+                      x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height,
+                      visible: bounds.y >= 0 && bounds.bottom <= innerHeight, at: Date.now() };
+                  });
+                  processingEvidence.push({ ...evidence, scene: index + 1, time: (evidence.at - started) / 1000 });
+                }
                 if (!seen.has(text)) {
                   seen.add(text);
                   const bounds = await status.boundingBox();
                   if (!bounds && await page.locator("#chat-page").getAttribute("data-processing") !== "true") break;
+                  if (options.readablePacing && (!bounds || bounds.y < 0 || bounds.y + bounds.height > layout.viewport.height)) { await page.waitForTimeout(100); continue; }
                   assert(bounds && bounds.y >= 0 && bounds.y + bounds.height <= layout.viewport.height);
                   await page.screenshot({ path: path.join(output, `processing-${index + 1}-${seen.size}.png`) });
                 }
@@ -502,7 +560,7 @@ async function chatPreview(options) {
     await scene(2, async () => {
       await page.locator("#chat-send").click();
       await page.waitForFunction(() => document.querySelectorAll("#activity-results article").length === 2);
-      assert.match(await page.locator("#chat-calendar-status").textContent(), /Mike: Loaded/);
+      assert.match(await page.locator("#chat-calendar-status").textContent(), /Parent A: Loaded/);
       await page.locator("#calendar-conversation").scrollIntoViewIfNeeded();
     });
     await scene(3, async () => {
@@ -522,19 +580,53 @@ async function chatPreview(options) {
       assert.equal(await page.locator("#availability-start").inputValue(), "2026-10-09");
     }, 7000);
     }
+    if (options.readablePacing) {
+      const scene = scenario.scenes.find(shot => shot.text === "Sharing school responsibilities.");
+      assert(scene);
+      for (const action of scene.actions) await sceneAction(page, action);
+      for (const shot of scenario.scenes.slice(0, 4)) for (const action of shot.actions) await sceneAction(page, action);
+      const link = page.locator('a[href="https://www.vscinemas.com.tw/vsweb/film/detail.aspx?id=8786"]').first();
+      await link.evaluate(smoothSceneScroll);
+      const bounds = await link.boundingBox(); assert(bounds);
+      await page.evaluate(() => {
+        const cursor = document.createElement("div"); cursor.id = "demo-cursor";
+        cursor.style.cssText = "position:fixed;z-index:2147483646;width:18px;height:18px;border:2px solid #355e50;background:#ffffff80;border-radius:50%;pointer-events:none;left:-40px;top:-40px;transform:translate(-50%,-50%)";
+        document.body.append(cursor);
+        document.addEventListener("mousemove", event => { cursor.style.left = `${event.clientX}px`; cursor.style.top = `${event.clientY}px`; });
+      });
+      const target = { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 };
+      const origin = { x: target.x - 200, y: target.y - 100 };
+      await page.mouse.move(origin.x, origin.y);
+      const start = (Date.now() - started) / 1000, positions = [];
+      for (let step = 1; step <= 25; step++) {
+        const fraction = step / 25, eased = fraction * fraction * (3 - 2 * fraction);
+        await page.mouse.move(origin.x + (target.x - origin.x) * eased, origin.y + (target.y - origin.y) * eased);
+        positions.push({ time: (Date.now() - started) / 1000, fraction });
+        await page.waitForTimeout(40);
+      }
+      const hoverStart = (Date.now() - started) / 1000;
+      await page.waitForTimeout(1000);
+      await page.screenshot({ path: path.join(output, "movie-hover.png") });
+      await link.evaluate(element => element.addEventListener("click", event => { event.preventDefault(); window.demoInterceptedMovieClick = true; }, { once: true }));
+      const clickAt = (Date.now() - started) / 1000;
+      await page.mouse.click(target.x, target.y);
+      assert(await page.evaluate(() => window.demoInterceptedMovieClick === true));
+      await page.waitForTimeout(240);
+      offlineMovieClick = { start, hoverStart, clickAt, end: (Date.now() - started) / 1000, positions, target, intercepted: true, navigationRequests: 0 };
+    }
     assert.deepEqual(await page.evaluate(() => window.demoViolations), []);
     assert.deepEqual(failures, []);
     const timing = options.simulateLoading ? await page.evaluate(() => window.demoTiming) : null;
     if (timing) {
-      assert.equal(timing.calls, 2); assert.equal(timing.completed, 2); assert.equal(timing.delayMs, 2000);
-      if (options.simulateCalendar) assert.equal(timing.calendarCalls, 2);
+      assert.equal(timing.calls, options.readablePacing ? 4 : 2); assert.equal(timing.completed, options.readablePacing ? 4 : 2); assert.equal(timing.delayMs, 2000);
+      if (options.simulateCalendar) assert.equal(timing.calendarCalls, options.readablePacing ? 3 : 2);
     }
     const scrollTrace = (await page.evaluate(() => window.demoScrollTrace)).map(sample => ({ time: (sample.at - started) / 1000, y: sample.y }));
     await fs.writeFile(path.join(output, "scroll-trace.json"), JSON.stringify(scrollTrace, null, 2) + "\n", { flag: "wx" });
     if (options.reviewScenes) {
       loadSnapshot(options.snapshot, options.snapshotSha256);
       const report = { output, snapshotSha256: options.snapshotSha256, viewport: layout.viewport, scenes: timeline.length,
-        forbiddenRequests: 0, browserErrors: 0, recording: false, simulatedResponseTiming: timing, humanVisualReview: "pending" };
+        forbiddenRequests: 0, expectedMissingImages, typingEvidence, processingEvidence, questionEvidence, offlineMovieClick, browserErrors: 0, recording: false, simulatedResponseTiming: timing, humanVisualReview: "pending" };
       await fs.writeFile(path.join(output, "review.json"), JSON.stringify(report, null, 2) + "\n", { flag: "wx" });
       console.log(JSON.stringify(report));
       return;
@@ -560,7 +652,7 @@ async function chatPreview(options) {
       snapshot: snapshot ? { path: options.snapshot, sha256: snapshot.manifestSha256, scenario } : null,
       rawFile: path.basename(raw), rawSha256: crypto.createHash("sha256").update(await fs.readFile(raw)).digest("hex"),
       videoSha256: crypto.createHash("sha256").update(await fs.readFile(path.join(output, "familycopilot-chat-preview.mp4"))).digest("hex"),
-      syntheticOnly: true, forbiddenRequests: failures.length, browserErrors: 0, fullDecodePassed: true,
+      syntheticOnly: true, forbiddenRequests: failures.length, expectedMissingImages, typingEvidence, processingEvidence, questionEvidence, offlineMovieClick, browserErrors: 0, fullDecodePassed: true,
       narration: "none: captioned review cut; English Jenny narration pending approval", liveServicesTouched: false,
       calendarFit: "not_checked", realTeamIncluded: snapshot ? null : false,
       activityEvidence: scenario?.activityEvidence || "synthetic", simulatedResponseTiming: timing,
@@ -669,7 +761,7 @@ async function recordMovieSource(options) {
     await save("failure.json", { message: error.message, documentRequests, allowed, blocked, automaticRetry: false }); throw error;
   } finally { if (context) await context.close(); await browser.close(); }
 }
-module.exports = { chatStory, timestamp, subtitleChunks, captureOptions, captureLayout, sceneAction, smoothSceneScroll, installDemoResponseDelay, simulatedSearchStarted, allowedMovieRequest };
+module.exports = { chatStory, timestamp, subtitleChunks, captureOptions, captureLayout, sceneAction, smoothSceneScroll, installDemoResponseDelay, installInvitationDwell, simulatedSearchStarted, allowedMovieRequest };
 if (require.main === module) {
   Promise.resolve().then(() => process.argv[2] === "--movie-source-approved" ? recordMovieSource(captureOptions(["--chat-preview", ...process.argv.slice(3)])) : process.argv.includes("--chat-preview") ? chatPreview(captureOptions(process.argv.slice(2))) : main()).catch(error => {
     console.error(`Demo stopped: ${error.message}`); process.exitCode = 1;

@@ -39,7 +39,7 @@ test("child activation validates exact metadata under one lock before stop, then
       assert.deepEqual(steps, ["lock", "parent", "child"]);
       assert.equal(d.identity(1), "start"); assert.equal((await d.inspect()).childProtocol, false);
       d.report({ stage: "await_existing_task_start" });
-      for (child of [undefined, "true", "synthetic", "kimi-calendar-v2"]) assert.throws(() => d.identity(2), /blocked/);
+      for (child of [undefined, "true", "synthetic", "child-calendar-v2"]) assert.throws(() => d.identity(2), /blocked/);
       child = "kimi-calendar-v1"; assert.equal(d.identity(2), "start");
       await assert.rejects(d.inspect(), /activation_unconfirmed/);
       localReady = true;
