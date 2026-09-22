@@ -2,7 +2,7 @@
 // Bounded, offline activity regression set. Never invoke the known-hanging full suite.
 const { spawnSync } = require("node:child_process");
 const path = require("node:path");
-const files = ["app", "activity-preview", "activity-preview-ui", "basketball", "basketball-ui", "basketball-teams", "date-selection", "shell", "activity-activation", "activity-search-server"].map(name => `test/${name}.test.js`);
+const files = ["app", "activity-preview", "activity-preview-ui", "basketball", "basketball-ui", "basketball-teams", "date-selection", "shell", "activity-activation", "activity-search-server", "chat-activity-search", "activity-cards"].map(name => `test/${name}.test.js`);
 const result = spawnSync(process.execPath, ["--test", ...files], {
   cwd: path.join(__dirname, ".."), env: process.env, encoding: "utf8", timeout: 120000, maxBuffer: 8 * 1024 * 1024
 });

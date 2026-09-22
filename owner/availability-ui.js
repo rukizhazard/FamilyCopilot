@@ -1,5 +1,15 @@
 "use strict";
-(() => {
+((root, initialize) => {
+  if (typeof module === "object" && module.exports) module.exports = initialize;
+  else {
+    root.FamilyCalendarControllers ||= {};
+    root.FamilyCalendarControllers.availability = initialize;
+    if (!root.document.getElementById("calendar-host")) initialize(root);
+  }
+})(globalThis, function initializeAvailability(globalThis) {
+  const { document, window, fetch, setTimeout, clearTimeout, Date, CustomEvent, Option, crypto } = globalThis;
+  const listen = globalThis.listen || ((target, type, handler) => target.addEventListener(type, handler));
+  const focus = globalThis.focusCalendar || ((target, options) => target.focus(options));
   const A = globalThis.OwnerAvailability, $ = id => document.getElementById(id);
   const csrf = document.querySelector('meta[name="owner-csrf"]').content;
   const synthetic = document.querySelector('meta[name="owner-mode"]').content === "synthetic";
@@ -11,17 +21,17 @@
   const childSyncAvailable = configurable && childCacheAvailable &&
     document.querySelector('meta[name="child-sync"]')?.content === "child-sync-v1" &&
     document.querySelector('meta[name="child-mode"]')?.content === (synthetic ? "synthetic" : "kimi-calendar-v1");
-  const people = A.displayPeople(synthetic), names = people.map(p => p.alias);
+  const people = A.displayPeople(synthetic), names = people.map(p => $("chat-calendar-scope") ? p.alias.replace(" (sample)", "") : p.alias);
   let state = A.initial(), controller, pending = false, blocked = false, storageBlocked = false, sessionRejected = false, globalClearing = false;
   // selectedWindow is the actual request/validation scope. Neither the dates-only
   // selection nor the clipped display window may relabel a response or snapshot.
   let selectedWindow, dateSelection, visibleWindow, confirmed = false, rangeClearing = false;
   let dateRevision = 0, childGeneration = 0, child = null, childLifecycle = "idle", childBlocked = !configurable, childTimer;
   const childExpires = Date.now() + 30 * 60000;
-  const childName = synthetic ? "Kimi (sample)" : "Kimi";
+  const childName = synthetic && !$("chat-calendar-scope") ? "Child (sample)" : "Child";
   // Page-local DOM renderer only: the child owns names and returns no data.
   // Independent of action coordination and the strictly title-free event bridge.
-  let childRenderer, gridPositioned = false;
+  let childRenderer, gridPositioned = false, displayedMonth, selectedCandidate = null;
   globalThis.FamilyWeekRenderer = Object.freeze({ register(renderer) {
     if (childRenderer || typeof renderer !== "function") throw new Error("Invalid week renderer");
     childRenderer = renderer;
@@ -80,7 +90,8 @@
     for (const id of ["availability-start", "availability-end"]) $(id).setAttribute("aria-invalid", "true");
   }
   // Refuse navigation with an obsolete selection if this tab cannot save edits.
-  document.addEventListener("click", event => {
+  listen(document, "click", event => {
+    if (globalThis.calendarDisposed) return;
     if (!event.target.closest?.('a[href="/activities"]')) return;
     if (!dates.write($("availability-start").value, $("availability-end").value)) {
       event.preventDefault();
@@ -106,18 +117,18 @@
     ? "Confirm opens a matching saved view if one exists; otherwise it checks the calendars once. Update checks again, without falling back to older results if it fails. A saved view survives closing or restarting the app and changing dates. It stays until replaced by a successful update, deleted with Clear, or removed because access changed or an update could not finish safely. The app must be running to open it. Saved views do not recheck Outlook permissions."
     : "Confirm opens a matching saved view if one exists; otherwise it checks the calendars once. Update checks again. This view is kept in memory only: restarting the app removes it; reloading the page does not. Saved views do not recheck Outlook permissions.";
   $("availability-storage").textContent = disk
-    ? "Parent busy times, their dates and original last-updated time are saved privately on this device, with information that ties the saved view to this setup. No sign-in credentials or event details are saved. Clear deletes this saved view, not backups, other open pages or Azure history; it is not secure erase. Kimi is never saved in this file."
+    ? "Parent busy times, their dates and original last-updated time are saved privately on this device, with information that ties the saved view to this setup. No sign-in credentials or event details are saved. Clear deletes this saved view, not backups, other open pages or Azure history; it is not secure erase. Child is never saved in this file."
     : "Parent busy times, their dates and original last-updated time stay in memory only. No calendar file or browser storage is used. Restarting the app removes them. Sample calendars never use your saved calendar data.";
   $("availability-identity").textContent = synthetic
-    ? "SYNTHETIC ONLY · Mike (sample) = fictional Alex; Debby (sample) = fictional Sam. No real identities or Azure calls."
-    : "Display labels: Mike = Mike Lee; Debby = Debby. These labels do not establish identity, parent relationships or guardian authority. The protected targets and existing owner authorization are unchanged.";
+    ? "SYNTHETIC ONLY · Parent A (sample) = fictional Alex; Parent B (sample) = fictional Sam. No real identities or Azure calls."
+    : "Neutral display labels: Parent A and Parent B. These labels do not establish identity, parent relationships or guardian authority. The protected targets and existing owner authorization are unchanged.";
   $("availability-targets").textContent = names.join(" + ") + " · Default calendars · Busy-only";
   $("availability-source").textContent = synthetic
     ? "Sample data · Not real calendars"
     : "Outlook · Default calendars only";
-  if (!childCacheAvailable) $("availability-saved-help").textContent = "This backend supports parent-only controls: Mike + Debby, busy-only, for the load scope above. View saved only never queries on a miss. Kimi saved viewing and saved-data deletion need a safe backend update; Clear here confirms parent deletion only. Reload alone cannot update the backend.";
+  if (!childCacheAvailable) $("availability-saved-help").textContent = "This backend supports parent-only controls: Parent A + Parent B, busy-only, for the load scope above. View saved only never queries on a miss. Child saved viewing and saved-data deletion need a safe backend update; Clear here confirms parent deletion only. Reload alone cannot update the backend.";
   if (childSyncAvailable) {
-    $("availability-saved-help").textContent = "Sync first opens a matching Kimi saved view or checks its remembered source, then loads Mike + Debby busy times. Later Sync checks Kimi first, then parents again. A missing source stays unknown; no source is selected automatically. View saved only never queries Outlook, even on a miss. Clear deletes both saved views and the remembered source.";
+    $("availability-saved-help").textContent = "Sync first opens a matching Child saved view or checks its remembered source, then loads Parent A + Parent B busy times. Later Sync checks Child first, then parents again. A missing source stays unknown; no source is selected automatically. View saved only never queries Outlook, even on a miss. Clear deletes both saved views and the remembered source.";
     $("child-event-help").textContent = "Our week shows consented event names, times and reported status. Private and Busy-only events stay unnamed. Events are not verified Busy slots; gaps are unknown. Sync uses only the previously confirmed remembered source; no new source import or setup is available here.";
   }
   const node = (tag, className, text) => {
@@ -126,9 +137,10 @@
     return element;
   };
   function status(text, urgent = false, detailsOnly = false) {
+    if (globalThis.calendarDisposed?.()) return;
     // Only explicitly routine outcomes move to Details; errors default visible.
     const hidden = detailsOnly && !urgent;
-    if (hidden && document.activeElement === $("availability-status")) $("availability-clear").focus();
+    if (hidden && document.activeElement === $("availability-status")) focus($("availability-clear"));
     $("availability-status").textContent = text;
     $("availability-status").dataset.urgent = String(urgent);
     $("availability-status").hidden = hidden;
@@ -136,6 +148,7 @@
     $("availability-status-details").hidden = !hidden || !text;
   }
   function sharingText() {
+    if (globalThis.calendarDisposed) return "Calendar dates stay in memory for this view only. Activity dates and conversation state are unchanged.";
     return dateSelection
       ? `Activities selected dates: ${A.slotTime(0, dateSelection).date} through ${A.slotTime(dateSelection.slots - 1, dateSelection).date}, inclusive. Only these dates are remembered in this tab; no names, ages or calendar statuses are shared. Previous/Next do not change Activities dates.`
       : "Choose valid dates for Activities. No calendar access is needed.";
@@ -181,8 +194,8 @@
         : state.phase === "loading" ? "loading" : state.phase === "cleared" ? "cleared"
           : state.phase === "unavailable" || $("availability-status").dataset.urgent === "true" ? "unavailable" : "idle";
     const messages = {
-      idle: ["Your week, at a glance", "Choose your dates, then select Sync."],
-      loading: [synthetic ? "Loading your sample week…" : "Loading your week…", "The calendar load scope shown above is being loaded. Only the displayed days will appear here when the request finishes successfully."],
+      idle: [$("calendar-month-days") ? "Your month, at a glance" : "Your week, at a glance", $("calendar-month-days") ? "Select Sync to load calendars." : "Choose your dates, then select Sync."],
+      loading: [synthetic && !$("chat-calendar-scope") ? "Loading your sample week…" : "Loading your week…", "The calendar load scope shown above is being loaded. Only the displayed days will appear here when the request finishes successfully."],
       invalid: ["Choose dates for your week", "Select a valid range of 1–7 days above before loading calendars."],
       unsupported: ["These dates aren’t supported for calendars", "See the supported dates above. You can still explore Activities for your chosen dates without calendar access."],
       unavailable: ["No calendar view to show", "See the message above for what happened and the next step. No results are shown here."],
@@ -213,12 +226,21 @@
       button.disabled = !available;
       button.setAttribute("aria-label", `${name} · ${label}${available ? " · Show calendar" : ""}`);
       button.title = `${name} · ${label}`;
+      const summary = $("chat-calendar-person-" + index);
+      if (summary) {
+        const freshness = available ? index === 2 ? A.childFreshness(child) : A.freshness(state.data) : "";
+        const stateLabel = available && freshness.startsWith("Stale") ? `${label} / Stale` : label;
+        summary.textContent = `${name.replace(" (sample)", "")}: ${stateLabel}`;
+      }
     }
   }
-  for (const index of [0, 1, 2]) $("calendar-person-" + index)?.addEventListener("click", () => {
-    if (!$("availability-grid").hidden) $("availability-grid").focus();
+  for (const index of [0, 1, 2]) if ($("calendar-person-" + index)) listen($("calendar-person-" + index), "click", () => {
+    if (!$("availability-grid").hidden) {
+      if ($("calendar-day-details")) $("calendar-day-details").open = true;
+      focus($("availability-grid"));
+    }
   });
-  $("availability-grid").addEventListener("keydown", event => {
+  listen($("availability-grid"), "keydown", event => {
     const grid = $("availability-grid");
     if (event.target !== grid || !["Home", "End"].includes(event.key)) return;
     event.preventDefault();
@@ -228,7 +250,7 @@
   // consent changes. The real status buttons keep their existing bindings.
   if ($("member-add")) {
     const removed = new Set(), extras = [];
-    const labels = ["Mike", "Debby", "Kimi"];
+    const labels = ["Parent A", "Parent B", "Child"];
     const key = value => value.toLocaleLowerCase("en-US");
     const message = value => {
       $("member-message").textContent = value;
@@ -239,7 +261,7 @@
       $("member-add").setAttribute("aria-expanded", "false");
       $("member-name").value = "";
       $("member-name").setAttribute("aria-invalid", "false");
-      $("member-add").focus();
+      focus($("member-add"));
     };
     const roster = () => {
       for (const index of [0, 1, 2]) $("member-row-" + index).hidden = removed.has(index);
@@ -250,24 +272,24 @@
         const remove = node("button", "member-remove", "−");
         remove.type = "button";
         remove.setAttribute("aria-label", `Remove ${name} from demo member list`);
-        remove.addEventListener("click", () => {
+        listen(remove, "click", () => {
           extras.splice(extras.indexOf(name), 1); roster();
           message(`${name} removed from the demo list. Calendars unchanged.`);
-          $("member-add").focus();
+          focus($("member-add"));
         });
         chip.append(label, remove); $("member-demo-list").append(chip);
       }
       $("member-reset").hidden = !removed.size && !extras.length;
     };
-    for (const index of [0, 1, 2]) $("member-remove-" + index).addEventListener("click", () => {
+    for (const index of [0, 1, 2]) listen($("member-remove-" + index), "click", () => {
       removed.add(index); roster();
       message(`${labels[index]} removed from the demo list. Calendars unchanged.`);
-      $("member-add").focus();
+      focus($("member-add"));
     });
-    $("member-add").addEventListener("click", () => {
+    listen($("member-add"), "click", () => {
       $("member-editor").hidden = false;
       $("member-add").setAttribute("aria-expanded", "true");
-      message(""); $("member-name").focus();
+      message(""); focus($("member-name"));
     });
     const save = () => {
       const name = $("member-name").value.trim();
@@ -278,24 +300,148 @@
           ? "This member is already in the list."
           : 3 - removed.size + extras.length >= 12 ? "The demo supports up to 12 members." : "";
       if (error) {
-        message(error); $("member-name").setAttribute("aria-invalid", "true"); $("member-name").focus(); return;
+        message(error); $("member-name").setAttribute("aria-invalid", "true"); focus($("member-name")); return;
       }
       if (existing !== -1) removed.delete(existing); else extras.push(name);
       roster(); close();
       message(`${name} ${existing !== -1 ? "restored" : "added"} to the demo list. No calendar connected.`);
     };
-    $("member-save").addEventListener("click", save);
-    $("member-cancel").addEventListener("click", () => { close(); message(""); });
-    $("member-editor").addEventListener("keydown", event => {
+    listen($("member-save"), "click", save);
+    listen($("member-cancel"), "click", () => { close(); message(""); });
+    listen($("member-editor"), "keydown", event => {
       if (event.key === "Escape") { event.preventDefault(); close(); message(""); }
       else if (event.key === "Enter" && event.target === $("member-name")) { event.preventDefault(); save(); }
     });
-    $("member-reset").addEventListener("click", () => {
+    listen($("member-reset"), "click", () => {
       removed.clear(); extras.length = 0; roster(); close(); message("Demo member list reset. Calendars unchanged.");
     });
   }
+  const candidateDate = item => new Date(Date.parse(item.startAt) + 8 * 3600000).toISOString().slice(0, 10);
+  const candidateLabel = item => new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Taipei", hour: "2-digit", minute: "2-digit", hour12: false })
+    .formatRange(new Date(item.startAt), new Date(item.endAt));
+  function checkedCandidates() {
+    if (!parentLoaded() || !childLoaded() || pending || sharedActive || childWorking || childActionBlocked || rangeClearing) return null;
+    return globalThis.calendarCandidates?.() || null;
+  }
+  function renderCandidates() {
+    if (!$("calendar-candidates")) return;
+    const result = checkedCandidates(), items = result?.items || [];
+    const list = $("calendar-candidate-list");
+    const focusedDate = document.activeElement?.dataset?.candidateDate;
+    list.replaceChildren();
+    if (!items.some(item => item.startAt === selectedCandidate?.startAt && item.endAt === selectedCandidate?.endAt)) selectedCandidate = null;
+    $("calendar-candidate-status").textContent = items.length ? `I found ${items.length} ${items.length === 1 ? "time" : "times"} to consider in October.` :
+      sharedActive || childWorking || state.phase === "loading" ? "Looking for time together..." :
+      result?.status === "empty" ? "No shared two-hour window found between 09:00 and 20:00." :
+      "I can't confirm a shared time from the current calendars. Some data is missing, incomplete or out of date.";
+    $("calendar-candidate-note").hidden = !items.length;
+    for (const item of items) {
+      const date = candidateDate(item), row = node("li", "calendar-candidate");
+      const button = node("button", "calendar-candidate-button");
+      button.type = "button"; button.dataset.candidateDate = date;
+      const label = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Taipei", weekday: "short", month: "short", day: "numeric" }).format(new Date(item.startAt));
+      button.setAttribute("aria-label", `View ${label}, ${candidateLabel(item)}, Taipei`);
+      button.setAttribute("aria-pressed", String(item.startAt === selectedCandidate?.startAt));
+      button.append(node("strong", "candidate-date", label), node("span", "candidate-time", candidateLabel(item)),
+        node("span", "candidate-action", "View day \u2192"));
+      row.append(button); list.append(row);
+      if (focusedDate === date) focus(button, { preventScroll: true });
+    }
+    $("calendar-candidate-selection").hidden = !selectedCandidate;
+    $("calendar-candidate-selection").textContent = selectedCandidate ? `Candidate window: ${candidateLabel(selectedCandidate)} / Taipei. No overlapping busy time reported.` : "";
+  }
+  function showDay(date, candidate = null) {
+    selectedCandidate = candidate;
+    visibleWindow = A.dateRange(date, date);
+    $("calendar-day-details").open = true;
+    render();
+    if (candidate) {
+      const minutes = (Date.parse(candidate.startAt) - Date.parse(visibleWindow.start)) / 60000;
+      $("availability-grid").scrollTop = Math.max(0, minutes / 30 * 24 - 48);
+    }
+    focus($("availability-grid"));
+  }
+  if ($("calendar-candidate-list")) listen($("calendar-candidate-list"), "click", event => {
+    let target = event.target;
+    while (target && target !== $("calendar-candidate-list") && !target.dataset?.candidateDate) target = target.parentNode;
+    if (!target?.dataset?.candidateDate || globalThis.calendarDisposed?.()) return;
+    const candidate = checkedCandidates()?.items.find(item => candidateDate(item) === target.dataset.candidateDate);
+    if (!candidate) { render(); return; }
+    showDay(target.dataset.candidateDate, candidate);
+  });
+  function renderMonth() {
+    const monthGrid = $("calendar-month-days");
+    if (!monthGrid) return;
+    const currentDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Taipei", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(Date.now()));
+    const initialDate = selectedWindow ? A.slotTime(0, selectedWindow).date : currentDate;
+    if (displayedMonth === undefined) displayedMonth = Number(initialDate.slice(0, 4)) * 12 + Number(initialDate.slice(5, 7)) - 1;
+    const year = Math.floor(displayedMonth / 12), monthIndex = displayedMonth % 12;
+    const first = new Date(Date.UTC(year, monthIndex, 1));
+    $("calendar-month-title").textContent = new Intl.DateTimeFormat("en-GB", { timeZone: "UTC", month: "long", year: "numeric" }).format(first);
+    $("calendar-month-previous").disabled = displayedMonth <= 2000 * 12;
+    $("calendar-month-next").disabled = displayedMonth >= 2100 * 12 + 11;
+    const parentDays = new Map(parentLoaded() ? A.weekLayout(state.data.people, selectedWindow).map(day => [day.date, day]) : []);
+    const childDays = new Map(childLoaded() ? A.childDayLayout(child, selectedWindow, synthetic).map(day => [day.date, day]) : []);
+    const focusedDate = document.activeElement?.dataset?.monthDate;
+    let focusTarget;
+    monthGrid.replaceChildren();
+    const cellCount = Math.ceil((first.getUTCDay() + new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate()) / 7) * 7;
+    for (let index = 0; index < cellCount; index++) {
+      const day = new Date(Date.UTC(year, monthIndex, 1 - first.getUTCDay() + index));
+      const date = day.toISOString().slice(0, 10);
+      const parentDay = parentDays.get(date), childDay = childDays.get(date);
+      const covered = !!parentDay || !!childDay;
+      const cell = node("button", "calendar-month-day");
+      cell.type = "button"; cell.dataset.monthDate = date;
+      cell.dataset.outside = String(day.getUTCMonth() !== monthIndex);
+      cell.dataset.covered = String(covered); cell.disabled = !covered;
+      if (date === currentDate) cell.setAttribute("aria-current", "date");
+      cell.append(node("span", "calendar-month-number", String(day.getUTCDate())));
+      const descriptions = [];
+      for (const track of parentDay?.tracks || []) {
+        if (!track.runs.some(run => ["busy", "tentative", "oof"].includes(run.status))) continue;
+        const marker = node("span", "calendar-month-marker");
+        marker.append(node("strong", "", names[track.person].replace(" (sample)", "")), node("span", "", "Busy periods"));
+        marker.dataset.person = String(track.person); cell.append(marker);
+        descriptions.push(`${names[track.person]}: busy or tentative time reported`);
+      }
+      for (const event of [...(childDay?.timed || []), ...(childDay?.allDay || [])]) {
+        const time = event.allDay === true ? "All-day" : `${event.startTime} - ${event.endTime}`;
+        const qualifier = `${A.childLabels[event.status]}${event.allDay === null ? " / All-day status unknown" : ""}`;
+        const detail = node("span", "calendar-month-event-name", `Event ${event.index + 1} · ${qualifier}`);
+        detail.title = `${date} · ${childName} · ${detail.textContent} · ${time} · Asia/Taipei · Not a Busy status`;
+        detail.setAttribute("aria-label", detail.title);
+        childRenderer?.(detail, event.index, child.generation, child.revision);
+        if (event.status === "scheduled" && event.allDay !== null) detail.textContent = detail.textContent.slice(0, -(` · ${qualifier}`).length);
+        const marker = node("span", "calendar-month-event");
+        marker.dataset.person = "2"; marker.dataset.status = event.status;
+        marker.append(node("strong", "", childName), detail, node("span", "calendar-month-event-time", time));
+        cell.append(marker); descriptions.push(`${childName}: ${detail.textContent}, ${time}`);
+      }
+      if (!descriptions.length) cell.append(node("span", "calendar-month-day-state", covered ? "Loaded" : "Unknown"));
+      cell.setAttribute("aria-label", `${date}. ${descriptions.join(". ") || (covered ? "Loaded snapshot; no markers" : "Not loaded")}. Missing time is unknown, not free.`);
+      if (date === focusedDate) focusTarget = cell;
+      monthGrid.append(cell);
+    }
+    $("calendar-day-details").hidden = !parentLoaded() && !childLoaded();
+    if (focusTarget) focus(focusTarget, { preventScroll: true });
+  }
+  for (const [id, direction] of [["calendar-month-previous", -1], ["calendar-month-next", 1]]) if ($(id)) listen($(id), "click", () => {
+    if ($(id).disabled || globalThis.calendarDisposed?.()) return;
+    displayedMonth += direction; renderMonth();
+  });
+  if ($("calendar-month-days")) listen($("calendar-month-days"), "click", event => {
+    let target = event.target;
+    while (target && target !== $("calendar-month-days") && !target.dataset?.monthDate) target = target.parentNode;
+    if (!target?.dataset?.monthDate || target.disabled || globalThis.calendarDisposed?.()) return;
+    showDay(target.dataset.monthDate);
+  });
   function render() {
+    if (globalThis.calendarDisposed?.()) return;
     renderPeople();
+    renderCandidates();
+    globalThis.renderCoordination?.(!!checkedCandidates());
+    renderMonth();
     const focusedChild = document.activeElement?.dataset?.childKey;
     let focusTarget;
     const disabled = !configurable || !selectedWindow || unsupported() || state.phase === "loading" || state.used && state.phase !== "loaded" || pending || blocked || storageBlocked || sessionRejected;
@@ -315,9 +461,28 @@
     $("availability-display-next").disabled = !canPage || visibleWindow.end >= selectedWindow.end;
     $("availability-clear").disabled = rangeClearing || globalClearing;
     const showWeek = renderWeekPresentation();
+    if ($("chat-calendar-panel")) {
+      const initial = !syncing && !showWeek && !confirmed && !state.used && state.phase === "idle" &&
+        !blocked && !storageBlocked && !sessionRejected && !childBlocked && !childActionBlocked &&
+        !["loading", "unavailable", "expired"].includes(childLifecycle) &&
+        $("availability-empty").dataset.state === "idle";
+      $("chat-calendar-status").hidden = initial;
+      $("chat-calendar-toggle").hidden = initial;
+      $("availability-clear").hidden = initial;
+      if (initial) $("availability-empty").hidden = true;
+      $("calendar-month").hidden = !showWeek;
+      $("calendar-month-overview").hidden = !showWeek;
+      $("calendar-candidates").hidden = initial;
+    }
+    const compactScope = $("chat-calendar-scope");
+    if (compactScope) {
+      compactScope.textContent = selectedWindow
+        ? `Calendars / ${A.slotTime(0, selectedWindow).date} - ${A.slotTime(selectedWindow.slots - 1, selectedWindow).date} / Taipei`
+        : "Calendars / Choose valid dates";
+    }
     $("child-week-status").textContent = childLoaded()
       ? `${childName} · ${childSyncAvailable ? "Bounded snapshot" : "Saved view only"} · ${synthetic ? "Sample shared source" : "Selected Outlook source"} · Checked ${child.checkedAt} · ${childSyncAvailable ? "Sync uses remembered source · " : ""}${A.childFreshness(child)} · ${child.partial ? "Partial context" : child.events.length ? "Bounded view returned" : "Loaded; no events returned"}. Missing time is unknown, not free.${childSyncAvailable ? " Cached results keep their original check time." : " Update refreshes parents only."}`
-      : `${childName} · ${childLifecycle === "loading" ? childSyncAvailable ? "Loading" : "Opening saved view only" : childLifecycle === "expired" ? "Page expired" : childLifecycle === "unavailable" ? "Unavailable" : "Not loaded"}. Missing time is unknown. ${childSyncAvailable ? "Sync uses only a previously confirmed remembered source." : "No live Kimi refresh."}`;
+      : `${childName} · ${childLifecycle === "loading" ? childSyncAvailable ? "Loading" : "Opening saved view only" : childLifecycle === "expired" ? "Page expired" : childLifecycle === "unavailable" ? "Unavailable" : "Not loaded"}. Missing time is unknown. ${childSyncAvailable ? "Sync uses only a previously confirmed remembered source." : "No live Child refresh."}`;
     if (!selectedWindow) {
       $("availability-grid").replaceChildren();
       $("availability-grid").setAttribute("aria-label", "Calendar · Choose valid dates; nothing checked");
@@ -332,12 +497,13 @@
     const label = range => new Intl.DateTimeFormat("en-GB", { timeZone: range.timezone, day: "numeric", month: "long", year: "numeric" })
       .formatRange(new Date(range.start), new Date(Date.parse(range.end) - 1)).replace(/ /g, "");
     const weekLabel = label(visibleWindow);
+    if ($("calendar-day-title")) $("calendar-day-title").textContent = weekLabel + " / Taipei";
     $("availability-display-label").textContent = `Display: ${weekLabel} · ${visibleWindow.slots / 48} ${visibleWindow.slots === 48 ? "day" : "days"} · Taipei (UTC+8). This is a view, not a shorter calendar query.`;
     $("availability-load-scope").textContent = unsupported()
       ? "Calendar load unavailable for this selection. Supported load scope: 9–15 October 2026 inclusive · Taipei (UTC+8), ending 16 October 00:00 exclusive · 336 half-hours per parent. Nothing checked."
-      : `Calendar load scope: ${label(selectedWindow)} inclusive · Taipei (UTC+8), ending ${A.slotTime(selectedWindow.slots, selectedWindow).date} 00:00 exclusive · ${selectedWindow.slots} half-hours per parent. Confirm / Update / View saved only cover this entire scope, not just the displayed days. ${childSyncAvailable ? "Sync uses Kimi's remembered source before parents; View saved only never queries." : "Kimi is saved-view only; Update refreshes parents only."}`;
+      : `Calendar load scope: ${label(selectedWindow)} inclusive · Taipei (UTC+8), ending ${A.slotTime(selectedWindow.slots, selectedWindow).date} 00:00 exclusive · ${selectedWindow.slots} half-hours per parent. Confirm / Update / View saved only cover this entire scope, not just the displayed days. ${childSyncAvailable ? "Sync uses Child's remembered source before parents; View saved only never queries." : "Child is saved-view only; Update refreshes parents only."}`;
     $("availability-grid").setAttribute("aria-label", `Weekly calendar, ${weekLabel}, ${[...names, childName].join(" and ")}, ${selectedWindow.timezone}`);
-    $("availability-window").textContent = `Calendar load window: ${A.slotTime(0, selectedWindow).date} 00:00 through ${A.slotTime(selectedWindow.slots, selectedWindow).date} 00:00 (end exclusive) · Asia/Taipei (UTC+8). All ${selectedWindow.slots} half-hour slots per parent, ${selectedWindow.slots * 2} total across the two parent calendars only. Only returned statuses are checked; missing data is unknown. ${childSyncAvailable ? "Kimi uses its separate remembered-source or saved-only view, not parent Busy slots." : "Kimi is saved-view only."}`;
+    $("availability-window").textContent = `Calendar load window: ${A.slotTime(0, selectedWindow).date} 00:00 through ${A.slotTime(selectedWindow.slots, selectedWindow).date} 00:00 (end exclusive) · Asia/Taipei (UTC+8). All ${selectedWindow.slots} half-hour slots per parent, ${selectedWindow.slots * 2} total across the two parent calendars only. Only returned statuses are checked; missing data is unknown. ${childSyncAvailable ? "Child uses its separate remembered-source or saved-only view, not parent Busy slots." : "Child is saved-view only."}`;
     $("availability-context").replaceChildren();
     $("availability-parent-details").replaceChildren();
     for (const person of [0, 1]) {
@@ -356,7 +522,8 @@
       const updated = new Date(state.data.checkedAt).toLocaleString("en-GB", {
         timeZone: "Asia/Taipei", day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false
       });
-      status(`${names.join(" + ")} · Updated ${updated} · Saved view${A.freshness(state.data).startsWith("Stale") ? " · May be out of date" : ""}`, false, true);
+      const provenance = globalThis.calendarDisposed ? state.cached ? "Saved fixture; original check time" : "Fresh fixture result" : "Saved view";
+      status(`${names.join(" + ")} · Updated ${updated} · ${provenance}${A.freshness(state.data).startsWith("Stale") ? " · May be out of date" : ""}`, false, true);
     }
     if (!showWeek) return;
     const visibleDates = new Set(A.days(visibleWindow).map(day => day.date));
@@ -404,6 +571,13 @@
         header.append(band);
       }
       const tracks = node("div", "day-tracks");
+      if (selectedCandidate && candidateDate(selectedCandidate) === day.date) {
+        const highlight = node("div", "candidate-window");
+        const midnight = Date.parse(day.date + "T00:00:00+08:00");
+        highlight.style.top = `${(Date.parse(selectedCandidate.startAt) - midnight) / 86400000 * 100}%`;
+        highlight.style.height = `${(Date.parse(selectedCandidate.endAt) - Date.parse(selectedCandidate.startAt)) / 86400000 * 100}%`;
+        highlight.setAttribute("aria-hidden", "true"); tracks.append(highlight);
+      }
       for (const track of day.tracks) {
         const list = node("ol", "week-track");
         list.setAttribute("aria-label", `${day.date} · ${names[track.person]} · Default calendar · Asia/Taipei (UTC+8)`);
@@ -446,7 +620,7 @@
     grid.scrollLeft = scrollLeft;
     gridPositioned = true;
     // Freshness/visibility redraws must not drop keyboard focus inside the grid.
-    if (focusTarget) focusTarget.focus({ preventScroll: true });
+    if (focusTarget) focus(focusTarget, { preventScroll: true });
   }
   async function post(path, body, signal, keepalive = false) {
     const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json", "X-Owner-CSRF": csrf }, body: JSON.stringify(body), signal,
@@ -459,7 +633,7 @@
     if (data.status === "cleanup_failed" || data.cleanup === "cleanup_failed") blocked = true;
     if (childStorageFailure(data)) {
       storageBlocked = true; childBlocked = true; hideChild("unavailable");
-      status("Kimi saved view or remembered source could not be read, saved or cleared. Calendar reuse is blocked until explicit Clear succeeds; reload cannot unblock storage.", true);
+      status("Child saved view or remembered source could not be read, saved or cleared. Calendar reuse is blocked until explicit Clear succeeds; reload cannot unblock storage.", true);
       safety();
     }
     const cacheStatus = data.cacheStatus || data.status;
@@ -489,29 +663,44 @@
       childBlocked = true; hideChild(sessionRejected ? "expired" : "unavailable"); safety();
     }
   }
-  async function clear(leaving = false, external = false) {
+  let clearingOperation;
+  function clear(leaving = false, external = false) {
+    if (!globalThis.calendarDisposed) return clearInternal(leaving, external);
+    if (clearingOperation) return leaving && globalThis.calendarDisposed
+      ? clearingOperation.then(() => clear(true, external), () => clear(true, external)) : clearingOperation;
+    const operation = clearInternal(leaving, external);
+    clearingOperation = operation;
+    operation.then(() => { clearingOperation = undefined; }, () => { clearingOperation = undefined; });
+    return operation;
+  }
+  async function clearInternal(leaving = false, external = false) {
     if (!configurable || globalClearing) return;
     globalClearing = true;
     fenceActions();
     const childSettled = childActions?.release();
     childBlocked = true; hideChild();
-    if (!external) window.dispatchEvent(new CustomEvent("owner-session-cleared", { detail: { source: "availability", leaving } }));
+    if (!external && !globalThis.calendarDisposed) window.dispatchEvent(new CustomEvent("owner-session-cleared", { detail: { source: "availability", leaving } }));
     const used = state.used;
     state = A.transition(state, { type: "clear" }); controller?.abort(); controller = undefined;
     confirmed = false; pending = true; render();
     status(leaving ? "View closed." : "Clearing saved view…");
-    if (!leaving && !external) $("availability-status").focus();
+    if (!leaving && !external) focus($("availability-status"));
     try {
       if (!(used || childActions || !leaving) || external) return;
-      if (childSettled) await childSettled;
+      let childCleanupFailed = false;
+      if (childSettled) await childSettled.catch(() => { childCleanupFailed = true; });
       const data = await post("/api/clear", leaving ? { reason: "leave" } : {}, AbortSignal.timeout(150000), leaving);
       cleanup(data);
+      if (leaving && globalThis.calendarDisposed && (childCleanupFailed || data.status !== "cleared" ||
+        !["workflow_disabled", "not_requested"].includes(data.cleanup) || blocked || storageBlocked)) {
+        throw new Error("calendar_cleanup_unconfirmed");
+      }
       if (!leaving && data.status === "cleared" && !childStorageFailure(data)) {
         storageBlocked = false;
         if (blocked) failure(data);
         else status(childCacheAvailable
-          ? "Saved view cleared. Parent and Kimi snapshots and reviewed child access removed. Reload page to start again; nothing loads automatically."
-          : "Saved view cleared for Mike + Debby only. Kimi saved-data deletion is unconfirmed on this backend. A safe backend update is needed before clearing Kimi; reload alone cannot update it.", !childCacheAvailable, childCacheAvailable);
+          ? "Saved view cleared. Parent and Child snapshots and reviewed child access removed. Reload page to start again; nothing loads automatically."
+          : "Saved view cleared for Parent A + Parent B only. Child saved-data deletion is unconfirmed on this backend. A safe backend update is needed before clearing Child; reload alone cannot update it.", !childCacheAvailable, childCacheAvailable);
       } else if (!leaving && !blocked && !storageBlocked && !sessionRejected) {
         status("Couldn’t confirm the saved view was cleared. Get help in Details.", true);
       }
@@ -519,6 +708,7 @@
     catch {
       cleanup({});
       if (!leaving) { storageBlocked = true; failure({ status: "cache_clear_failed" }); }
+      if (leaving && globalThis.calendarDisposed) throw new Error("calendar_cleanup_unconfirmed");
     }
     finally { pending = false; globalClearing = false; render(); }
   }
@@ -569,7 +759,7 @@
       safety(false); render();
     }
   }
-  for (const id of ["availability-start", "availability-end"]) $(id).addEventListener("input", changeRange);
+  for (const id of ["availability-start", "availability-end"]) listen($(id), "input", changeRange);
   function pageDisplay(direction) {
     const id = direction < 0 ? "availability-display-previous" : "availability-display-next";
     if ($(id).disabled || !visibleWindow || !selectedWindow) return;
@@ -580,10 +770,10 @@
     // Render only: never change selected Activities dates, consent or lifecycle.
     const focused = document.activeElement === $(id);
     render();
-    if (focused && $(id).disabled) $(direction < 0 ? "availability-display-next" : "availability-display-previous").focus();
+    if (focused && $(id).disabled) focus($(direction < 0 ? "availability-display-next" : "availability-display-previous"));
   }
-  $("availability-display-previous").addEventListener("click", () => pageDisplay(-1));
-  $("availability-display-next").addEventListener("click", () => pageDisplay(1));
+  listen($("availability-display-previous"), "click", () => pageDisplay(-1));
+  listen($("availability-display-next"), "click", () => pageDisplay(1));
   async function load(refresh = false, cacheOnly = false) {
     if (!configurable || !selectedWindow || blocked || storageBlocked || pending || sessionRejected || refresh && !confirmed) return;
     if (unsupported()) { status(rangeMessage, true); return; }
@@ -591,10 +781,10 @@
     const next = A.transition(state, { type: "load", refresh: refresh || cacheOnly, acknowledged: true }); if (next === state) return;
     confirmed = true;
     state = next; const generation = state.generation; controller = new AbortController(); render();
-    status(synthetic ? "Loading sample week…" : refresh ? "Updating week…" : "Opening week…");
+    status(synthetic && !$("chat-calendar-scope") ? "Loading sample week…" : refresh ? "Updating week…" : "Opening week…");
     $("availability-cleanup").textContent = "The update is still finishing. Keep the app running.";
     $("availability-cleanup").hidden = false;
-    $("availability-clear").focus();
+    focus($("availability-clear"));
     let response;
     try {
       const data = await post("/api/availability", { acknowledged: true, requestId: crypto.randomUUID(), refresh, ...(cacheOnly ? { cacheOnly: true } : {}),
@@ -607,10 +797,11 @@
       }
       response = data;
       cleanup(data);
-      if (storageBlocked) { render(); $("availability-status").focus(); return; }
+      if (storageBlocked) { render(); focus($("availability-status")); return; }
       if (data.synthetic !== synthetic || data.cleanup !== "workflow_disabled" || !data.people || cacheOnly && data.cached !== true) throw new Error();
       state = A.transition(state, { type: "loaded", generation, data, window: requestWindow });
       if (state.phase !== "loaded") throw new Error();
+      if (globalThis.calendarDisposed) setTimeout(render, Math.max(1, 300001 - (Date.now() - Date.parse(state.data.checkedAt))));
       status("", false, true);
     } catch {
       if (generation !== state.generation) return;
@@ -621,7 +812,7 @@
       failure(response);
     }
     render();
-    ($("availability-status").hidden ? $("availability-grid") : $("availability-status")).focus();
+    focus($("availability-status").hidden ? $("availability-grid") : $("availability-status"));
   }
   async function parentOperation(refresh, cacheOnly = false) {
     safety(true); // Native parent and child operations must never overlap.
@@ -634,7 +825,7 @@
     const version = ++actionRevision;
     sharedActive = true; render();
     try {
-      button.focus();
+      focus(button);
       // Await child completion (including independent cleanup) before parents.
       // Older runtimes retain saved-first/parent-only refresh, never a 404 probe.
       const choice = childActions.sync ? await childActions.sync(refresh) : refresh ? "skip" : await childActions.saved();
@@ -642,11 +833,11 @@
       await parentOperation(refresh);
     } finally {
       sharedActive = false; render();
-      if (canContinue(version)) (button.disabled ? $("availability-load") : button).focus();
+      if (canContinue(version)) focus(button.disabled ? $("availability-load") : button);
     }
   }
-  $("availability-load").addEventListener("click", () => sharedLoad(confirmed, $("availability-load")));
-  $("availability-saved").addEventListener("click", async () => {
+  listen($("availability-load"), "click", () => sharedLoad(confirmed, $("availability-load")));
+  listen($("availability-saved"), "click", async () => {
     if ($("availability-saved").disabled || sharedActive || childWorking) return;
     const version = ++actionRevision;
     sharedActive = true; render();
@@ -657,15 +848,15 @@
       if (canContinue(version)) await childActions?.saved();
     } finally { sharedActive = false; render(); }
   });
-  $("availability-supported-dates").addEventListener("click", async () => {
+  listen($("availability-supported-dates"), "click", async () => {
     $("availability-start").value = A.slotTime(0, A.liveWindow).date;
     $("availability-end").value = A.slotTime(A.liveWindow.slots - 1, A.liveWindow).date;
     await changeRange();
-    $("availability-load").focus();
+    focus($("availability-load"));
   });
-  $("availability-refresh").addEventListener("click", () => sharedLoad(true));
-  $("availability-clear").addEventListener("click", () => { void clear(); });
-  $("availability-check").addEventListener("click", async () => {
+  listen($("availability-refresh"), "click", () => sharedLoad(true));
+  listen($("availability-clear"), "click", () => { void clear(); });
+  listen($("availability-check"), "click", async () => {
     if (!configurable) return;
     try {
       const data = await post("/api/status", {}, AbortSignal.timeout(10000));
@@ -680,13 +871,15 @@
       }
     } catch { cleanup({}); status("Couldn’t check the page. Get help in Details.", true); }
     render();
-    if ($("availability-status").dataset.urgent === "true") $("availability-status").focus();
+    if ($("availability-status").dataset.urgent === "true") focus($("availability-status"));
   });
   // Either surface clearing the shared owner session also clears this grid.
-  window.addEventListener("owner-session-cleared", event => { if (event.detail.source !== "availability") void clear(event.detail.leaving, true); });
-  window.addEventListener("pagehide", () => { void clear(true); });
-  window.addEventListener("pageshow", e => { if (e.persisted) void clear(true); });
-  window.addEventListener("child-week-changed", event => {
+  listen(window, "owner-session-cleared", event => { if (event.detail.source !== "availability") void clear(event.detail.leaving, true); });
+  if (!globalThis.calendarDisposed) {
+    listen(window, "pagehide", () => { void clear(true); });
+    listen(window, "pageshow", e => { if (e.persisted) void clear(true); });
+  }
+  listen(window, "child-week-changed", event => {
     try {
       // Ignore old/replayed packets before validating their obsolete date window.
       if (Number.isSafeInteger(event.detail?.generation) && event.detail.generation <= childGeneration ||
@@ -701,6 +894,8 @@
     } catch { hideChild("unavailable"); }
     render();
   });
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
+  listen(document, "visibilitychange", () => { if (!document.hidden) render(); });
   render(); // No Azure, local API or credential access at startup.
-})();
+  return Object.freeze({ leave: () => clear(true), redraw: render,
+    ...(globalThis.calendarDisposed ? { loadSynthetic: () => sharedLoad(confirmed, $("availability-load")) } : {}) });
+});

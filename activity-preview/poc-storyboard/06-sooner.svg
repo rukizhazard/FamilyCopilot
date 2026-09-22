@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="840" viewBox="0 0 1100 840" role="img" aria-labelledby="title desc">
+  <title id="title">A conversational request brings the suggested date closer</title>
+  <desc id="desc">Scripted concept with no live calls. The parent says October is too far away and asks for this weekend. AI suggests a fictional September 20 screening with original poster art, retaining age eight and Xinyi context. It explicitly cannot verify calendar fit outside the loaded October window and does not invent a nearer basketball game.</desc>
+  <defs><linearGradient id="poster" x2="1" y2="1"><stop stop-color="#243c68"/><stop offset="1" stop-color="#9c7bc0"/></linearGradient></defs>
+  <rect width="1100" height="840" rx="30" fill="#fcf9f5"/>
+  <g font-family="Segoe UI, Arial, sans-serif" fill="#352e49">
+    <circle cx="62" cy="53" r="21" fill="#ffdc86"/><circle cx="55" cy="50" r="2.3"/><circle cx="69" cy="50" r="2.3"/><path d="M55 59 Q62 66 69 59" fill="none" stroke="#684b2b" stroke-width="2"/>
+    <text x="96" y="51" font-size="23" font-weight="700">Family Copilot</text><text x="96" y="73" font-size="13" fill="#625a70">A little more room for happy days.</text>
+    <text x="1056" y="50" text-anchor="end" font-size="12" fill="#625a70">03 / CONCEPT · SCRIPTED CONVERSATION</text>
+    <rect x="40" y="99" width="1020" height="51" rx="17" fill="white" stroke="#d8cde5"/>
+    <text x="62" y="131" font-size="16" font-weight="600">Our week · Calendar remains available</text><text x="933" y="131" font-size="15" fill="#624199">Expand ↓</text>
+    <rect x="392" y="177" width="668" height="74" rx="21" fill="#fff0e1"/>
+    <text x="416" y="206" font-size="12" fill="#625a70">YOU</text><text x="416" y="232" font-size="21">October feels too far away. How about this weekend?</text>
+    <circle cx="63" cy="293" r="21" fill="#ffdc86"/><text x="63" y="300" text-anchor="middle" font-size="23">✦</text>
+    <text x="102" y="300" font-size="26" font-weight="700">Let's make it sooner.</text>
+    <text x="102" y="333" font-size="18">Here is a Sunday screening, still near Xinyi and suited to age 8.</text>
+    <rect x="102" y="355" width="958" height="210" rx="23" fill="white" stroke="#d8cde5"/>
+    <rect x="118" y="371" width="148" height="178" rx="14" fill="url(#poster)"/>
+    <circle cx="238" cy="399" r="13" fill="#ffdc86"/><circle cx="140" cy="396" r="2" fill="white"/><circle cx="177" cy="418" r="2" fill="white"/>
+    <path d="M194 478 Q170 449 194 415 Q218 449 194 478Z" fill="#fff0e1"/><circle cx="194" cy="443" r="7" fill="#6b97be"/><path d="M187 479 L194 501 L201 479" fill="#ffdc86"/>
+    <path d="M118 520 Q156 497 187 521 Q217 501 266 523 V549 H118Z" fill="#d6ccec"/>
+    <text x="192" y="538" text-anchor="middle" font-size="16" font-weight="700">SKYBOUND</text>
+    <text x="289" y="395" font-size="12" fill="#624199" font-weight="700">SOONER DATE · SAME FAMILY CONTEXT</text>
+    <text x="289" y="428" font-size="25" font-weight="700">Skybound</text>
+    <text x="289" y="460" font-size="19">Sun, Sep 20 · 14:00</text>
+    <text x="289" y="490" font-size="16">~15 min transit from office · Sample guidance: 6+</text>
+    <text x="289" y="531" font-size="16" fill="#624199" font-weight="600">Screening details →</text>
+    <rect x="102" y="582" width="958" height="63" rx="16" fill="#faf2d9"/>
+    <text x="124" y="608" font-size="15" font-weight="600">Calendar fit is not verified for September 20.</text>
+    <text x="124" y="632" font-size="14" fill="#625a70">The loaded calendar covers October 9–15. I won't treat another date as free.</text>
+    <text x="102" y="677" font-size="15" fill="#625a70">No verified nearer basketball option in this example, so I haven't added one.</text>
+    <rect x="102" y="704" width="958" height="57" rx="18" fill="white" stroke="#d8cde5"/>
+    <text x="125" y="739" font-size="17" fill="#625a70">Keep the conversation going…</text><circle cx="1027" cy="732" r="20" fill="#624199"/><text x="1027" y="739" text-anchor="middle" font-size="23" fill="white">↑</text>
+    <text x="40" y="799" font-size="19" font-weight="600">Change the date with a sentence, not another settings screen.</text>
+    <text x="40" y="824" font-size="12" fill="#625a70">All listings, poster art, travel and guidance are fictional. No live search or calendar comparison performed.</text>
+  </g>
+</svg>

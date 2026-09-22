@@ -1,0 +1,143 @@
+<!doctype html>
+<html id="chat-page" lang="en" data-conversation="idle">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; font-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Family Copilot | Our conversation</title>
+  <link rel="stylesheet" href="chat.css">
+  <link rel="stylesheet" href="../owner/chat-calendar.css">
+  <link rel="stylesheet" href="../activity-preview/activity-cards.css">
+  <script defer src="../shared/chat-contract.js"></script>
+  <script defer src="../owner/availability-core.js"></script>
+  <script defer src="../owner/child-calendar-core.js"></script>
+  <script defer src="../shared/date-selection.js"></script>
+  <script defer src="../owner/availability-ui.js"></script>
+  <script defer src="../owner/child-calendar-ui.js"></script>
+  <script defer src="../owner/chat-calendar-template.js"></script>
+  <script defer src="../owner/chat-calendar-fixtures.js"></script>
+  <script defer src="../owner/chat-calendar.js"></script>
+  <script defer src="../activity-preview/chat-public-snapshot.js"></script>
+  <script defer src="../activity-preview/chat-assets.js"></script>
+  <script defer src="../activity-preview/chat-search.js"></script>
+  <script defer src="../activity-preview/activity-cards.js"></script>
+  <script defer src="conversation-core.js"></script>
+  <script defer src="ui.js"></script>
+</head>
+<body>
+  <svg class="preference-symbols" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <symbol id="preference-icon-basketball" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3v18M6 5.3c5 3.2 5 10.2 0 13.4M18 5.3c-5 3.2-5 10.2 0 13.4"/></symbol>
+      <symbol id="preference-icon-baseball" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M6 5.3c4 3.2 4 10.2 0 13.4M18 5.3c-4 3.2-4 10.2 0 13.4M7 8l2-1M8 12h2M7 16l2 1M17 8l-2-1M16 12h-2M17 16l-2 1"/></symbol>
+      <symbol id="preference-icon-movies" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4M7 12h10"/></symbol>
+      <symbol id="preference-icon-concerts" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 9l12-2"/><ellipse cx="6" cy="18" rx="3" ry="3"/><ellipse cx="18" cy="16" rx="3" ry="3"/></symbol>
+      <symbol id="preference-icon-museums" viewBox="0 0 24 24"><path d="m3 8 9-5 9 5H3ZM5 11v7M10 11v7M14 11v7M19 11v7M3 21h18"/></symbol>
+      <symbol id="preference-icon-outdoor-play" viewBox="0 0 24 24"><path d="m12 3-6 8h3l-5 7h16l-5-7h3L12 3ZM12 18v4"/></symbol>
+      <symbol id="preference-icon-science-discovery" viewBox="0 0 24 24"><path d="m4 10 13-6 3 7-13 5-3-6ZM4 11l-2 1 1 3 3-1M17 4l-1-2M20 11l1 2M12 14v7M12 16l-5 5M12 16l5 5"/></symbol>
+      <symbol id="preference-icon-neutral" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+    </defs>
+  </svg>
+  <main class="workspace">
+    <section class="introduction" aria-labelledby="conversation-title">
+      <div class="brand-heading"><span class="sun" aria-hidden="true">&#9728;</span><h1 id="conversation-title">Family <span>Copilot</span></h1></div>
+      <p class="brand-tagline">Your AI Chief of Staff at Home</p>
+      <section class="family-section" aria-labelledby="family-title">
+        <div class="family-heading">
+          <h2 id="family-title">Our family</h2>
+          <button id="preferences-edit" type="button" aria-label="Edit family preferences" title="Edit family preferences"
+            aria-controls="preferences-editor" aria-expanded="false" disabled><svg class="icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg></button>
+        </div>
+        <ul class="family-members" aria-label="Family members">
+          <li><span class="member-initial" aria-hidden="true">A</span><div><strong class="member-name">Parent A</strong><p class="member-role">Parent</p></div></li>
+          <li><span class="member-initial" aria-hidden="true">B</span><div><strong class="member-name">Parent B</strong><p class="member-role">Parent</p></div></li>
+          <li><span class="member-initial" aria-hidden="true">C</span><div><strong class="member-name">Child</strong><p class="member-role">Child <span id="preference-age-summary" class="member-age" aria-label="Age 7">(7)</span></p></div></li>
+        </ul>
+      <div class="context-heading">
+        <dl class="context-strip">
+          <div class="context-area"><dt class="visually-hidden">Location</dt><dd class="location-summary"><svg class="icon location-pin" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg><span><strong id="preference-place-summary">Microsoft Taiwan</strong><span id="preference-area-summary">Xinyi, Taipei</span></span></dd></div>
+          <div class="context-interests"><dt>Interests</dt><dd class="interest-summary"><ul id="preference-interests-summary" role="list" aria-label="Preferred activities"><li class="interest-tag interest-basketball">Basketball</li><li class="interest-tag interest-baseball">Baseball</li><li class="interest-tag interest-movies">Movie</li><li class="interest-tag interest-concerts">Concerts</li><li class="interest-tag interest-museums">Museums</li><li class="interest-tag interest-outdoor-play">Outdoor play</li><li class="interest-tag interest-science-discovery">Science &amp; discovery</li></ul><button id="interests-edit" type="button" title="Add or edit interests" aria-label="Add or edit interests" aria-controls="preferences-editor" aria-expanded="false" disabled><svg class="icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button></dd></div>
+          <div><dt>Preferred teams</dt><dd class="interest-summary"><ul id="preference-teams-summary" role="list" aria-label="Preferred teams"><li class="interest-tag">新北中信特攻</li><li class="interest-tag interest-baseball">中信兄弟</li></ul><button id="teams-edit" type="button" title="Add or edit teams" aria-label="Add or edit teams" aria-controls="preferences-editor" aria-expanded="false" disabled><svg class="icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button></dd></div>
+        </dl>
+      </div>
+      <form id="preferences-editor" hidden>
+        <div class="preference-fields">
+          <label for="preference-age">Child's age
+            <input id="preference-age" type="number" min="0" max="120" step="1" required inputmode="numeric" autocomplete="off">
+          </label>
+          <label for="preference-area">Location (district or area)
+            <input id="preference-area" type="text" maxlength="120" required autocomplete="off">
+          </label>
+        </div>
+        <fieldset><legend>Interests</legend>
+          <div class="interest-options">
+            <label><input id="interest-basketball" type="checkbox" value="basketball">Basketball</label>
+            <label><input id="interest-baseball" type="checkbox" value="baseball">Baseball</label>
+            <label><input id="interest-ping-pong" type="checkbox" value="ping-pong">Ping-pong</label>
+            <label><input id="interest-movies" type="checkbox" value="movies">Movie</label>
+            <label><input id="interest-concerts" type="checkbox" value="concerts">Concerts</label>
+            <label><input id="interest-museums" type="checkbox" value="museums">Museums</label>
+            <label><input id="interest-outdoor-play" type="checkbox" value="outdoor-play">Outdoor play</label>
+            <label><input id="interest-science-discovery" type="checkbox" value="science-discovery">Science &amp; discovery</label>
+          </div>
+          <label class="additional-interests" for="preference-other-interests">More interests
+            <input id="preference-other-interests" type="text" maxlength="490" placeholder="Hiking, music, science" autocomplete="off">
+          </label>
+        </fieldset>
+        <fieldset><legend>Preferred teams</legend>
+          <div class="interest-options">
+            <label><input id="team-dea" type="checkbox" value="新北中信特攻">新北中信特攻 (Basketball)</label>
+            <label><input id="team-brothers" type="checkbox" value="中信兄弟">中信兄弟 (Baseball)</label>
+          </div>
+          <ul id="preference-custom-teams" class="custom-teams" aria-label="Additional preferred teams"></ul>
+          <div class="team-entry">
+            <label class="additional-interests" for="preference-other-teams">Team name
+              <input id="preference-other-teams" type="text" maxlength="1950" placeholder="e.g. Formosa Dreamers" autocomplete="off">
+            </label>
+            <button id="preference-add-team" type="button"><svg class="icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Add team</button>
+          </div>
+        </fieldset>
+        <p id="preferences-error" role="alert" tabindex="-1" hidden></p>
+        <div class="preference-actions">
+          <button id="preferences-apply" type="submit">Apply</button>
+          <button id="preferences-cancel" type="button">Cancel</button>
+        </div>
+      </form>
+      </section>
+    </section>
+    <section class="conversation-region" aria-label="Outing conversation">
+      <details class="demo-details">
+        <summary>Details</summary>
+        <p>Sample calendars cover October 1-31, 2026. Activities use public information checked September 20, 2026, saved for offline viewing. There is no live search or AI. Movie titles are real; dated screenings are unverified. Game end time, admission, tickets and travel remain unknown. No fictional poster represents a real listing.</p>
+        <p>Activity results follow submission order; messages do not select dates or change preferences. The first request searches October 9-11, not all October. The second uses September 19-20, based on a fixed September 18 reference in Taipei, outside the loaded calendar range. The later public snapshot is not evidence of what was known on September 18. School-meeting responses also follow a fixed dialogue, not general language understanding.</p>
+      </details>
+      <p id="activity-connection" role="status">Activity component not connected.</p>
+      <details id="chat-options" class="conversation-options" hidden>
+        <summary id="chat-options-toggle" aria-label="Conversation options" title="Conversation options">&ctdot;</summary>
+        <button id="chat-reset" type="button" disabled>New conversation</button>
+      </details>
+      <button id="chat-retry" type="button" hidden disabled>Retry</button>
+      <ol id="chat-opening" aria-label="Opening message"></ol>
+      <section id="calendar-conversation" class="calendar-region" aria-label="Calendar in conversation" hidden>
+        <p class="calendar-speaker">Family Copilot</p>
+        <p id="calendar-introduction" role="status">Calendar source status will appear here.</p>
+        <p id="calendar-connection" role="status">Calendar component not connected. Activity suggestions are still available.</p>
+        <div id="calendar-host"></div>
+      </section>
+      <ol id="chat-messages" aria-label="Conversation messages"></ol>
+      <section id="calendar-assessment" aria-label="Calendar time check" hidden></section>
+      <div id="activity-results" aria-label="Activity results" tabindex="-1"></div>
+      <form id="chat-composer">
+        <div class="composer-status">
+          <p id="chat-status" role="status" aria-live="polite" aria-atomic="true" tabindex="-1">Waiting for activity component.</p>
+          <ol id="chat-progress" aria-label="Upcoming actions" hidden></ol>
+        </div>
+        <label for="chat-input">Your message</label>
+        <div class="composer-row">
+          <textarea id="chat-input" rows="2" maxlength="500" placeholder="Message Family Copilot..." disabled></textarea>
+          <button id="chat-send" type="submit" title="Send message" aria-label="Send message" disabled><svg class="icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg></button>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

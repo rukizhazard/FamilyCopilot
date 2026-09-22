@@ -10,6 +10,7 @@ const { OwnerFailure } = require("./owner-calendar");
 const { killNativeTree } = require("./windows-azure-cli");
 const { stageChildBundle } = require("./windows-child-bundle");
 const P = require("./windows-child-protocol");
+const C = require("../owner/child-calendar-core");
 const runtime = "/mnt/c/Users/weitan/AppData/Local/Programs/Microsoft VS Code/Code.exe";
 function interopEnvironment(env = process.env) {
   return { PATH: "/usr/bin:/bin", ...(env.WSL_INTEROP ? { WSL_INTEROP: env.WSL_INTEROP } : {}),
@@ -116,6 +117,8 @@ function createChildNativeAdapter({ exchange: communicate = exchange, lock = wit
   const key = randomBytes(32).toString("hex"); // Per adapter/server lifetime, never returned.
   let sticky = false;
   const run = async (mode, options = {}, payload = {}) => {
+    const startedAt = Date.now();
+    let diagnosticStage = "native_runtime";
     P.validateInput(mode, payload);
     if (sticky && mode !== "status") throw new OwnerFailure("cleanup_failed");
     try {
@@ -124,6 +127,7 @@ function createChildNativeAdapter({ exchange: communicate = exchange, lock = wit
         if (options.signal?.aborted) throw new OwnerFailure("cancelled");
         const progress = value => {
           if (!P.stages.includes(value)) throw new OwnerFailure("blocked");
+          if (C.diagnosticStages.includes(value)) diagnosticStage = value;
           if (["cleanup_pending", "workflow_disabled", "cleanup_failed"].includes(value)) options.record?.(value);
           options.stage?.(value);
         };
@@ -154,7 +158,11 @@ function createChildNativeAdapter({ exchange: communicate = exchange, lock = wit
           if (P.dataMode(mode)) return recover();
         }
         if (result.cleanup !== "not_requested") options.record?.(result.cleanup);
-        if (!result.ok) throw new OwnerFailure(result.code);
+        if (!result.ok) {
+          const error = new OwnerFailure(result.code);
+          if (mode === "sync" && result.diagnostic) error.diagnostic = C.syncDiagnostic(result.diagnostic);
+          throw error;
+        }
         if (P.dataMode(mode)) {
           P.validateSession(payload);
           if (options.signal?.aborted) throw new OwnerFailure("cancelled");
@@ -164,8 +172,16 @@ function createChildNativeAdapter({ exchange: communicate = exchange, lock = wit
           calendarQueries: 0, cloudChanges: mode === "deploy", automaticRetry: false };
       });
     } catch (error) {
-      if (error?.message === "owner_operation_busy") throw new OwnerFailure("busy");
-      throw error instanceof OwnerFailure ? error : new OwnerFailure("unavailable");
+      const failure = error?.message === "owner_operation_busy" ? new OwnerFailure("busy") : error instanceof OwnerFailure ? error : new OwnerFailure("unavailable");
+      if (mode === "sync") {
+        let diagnostic;
+        try { if (failure.diagnostic) diagnostic = C.syncDiagnostic(failure.diagnostic); } catch { /* Never forward arbitrary diagnostics. */ }
+        failure.diagnostic = diagnostic || C.syncDiagnostic({
+          stage: failure.code === "cleanup_failed" ? "cleanup" : diagnosticStage,
+          code: failure.code, elapsedMs: C.diagnosticElapsed(startedAt)
+        });
+      }
+      throw failure;
     }
   };
   const metadata = (mode, options = {}) => {
@@ -179,6 +195,7 @@ function createChildNativeAdapter({ exchange: communicate = exchange, lock = wit
       const allowed = ["action", "sessionId", "expires", "signal", "record", "stage", ...(mode === "find" ? [] : [mode === "sync" ? "reference" : "calendarId", "disclosure"])];
       if (!P.dataMode(mode) || !options || typeof options !== "object" || Array.isArray(options) || Object.keys(options).some(k => !allowed.includes(k))) throw new OwnerFailure("blocked");
       const payload = { action: mode, sessionId: options.sessionId, expires: options.expires, key,
+        ...(mode === "sync" ? { diagnostics: true } : {}),
         ...(mode === "find" ? {} : { ...(mode === "sync" ? { reference: options.reference } : { calendarId: options.calendarId }),
           disclosure: options.disclosure, person: "Kimi", guardian: true, confirmed: true }) };
       return run(mode, options, payload);

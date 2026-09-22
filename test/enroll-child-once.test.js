@@ -1,6 +1,6 @@
 "use strict";
 const test = require("node:test"), assert = require("node:assert/strict");
-const { enrollOnce, requestLocal } = require("../scripts/enroll-kimi-once");
+const { enrollOnce, requestLocal } = require("../scripts/enroll-child-once");
 const C = require("../owner/child-calendar-core");
 const h = "a".repeat(64), token = "b".repeat(64);
 const idle = { status: "idle", synthetic: false, cleanup: "not_requested", execution: "windows-native-v1", childExecution: "windows-child-v1" };

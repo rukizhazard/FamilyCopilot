@@ -51,7 +51,7 @@ selection rationale, audience restrictions, exact PDF SHA-256 and uncertainties.
    from page**, replacement files, owner Clear, page exit or reload remove the
    school page copy. Original PDF/JSON/ICS files remain until the owner deletes them.
 
-School events are a separate source-labelled list, never merged into Mike/Debby
+School events are a separate source-labelled list, never merged into Parent A/Parent B
 busy slots or saved snapshots. They work for any valid selected 1–7-day interval
 within the source coverage, independently of the provider's supported dates.
 Empty or outside-term dates do not establish availability. No school content is

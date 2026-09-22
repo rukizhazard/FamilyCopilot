@@ -5,7 +5,16 @@
   "scripts": {
     "build:picker": "node scripts/build-picker.js",
     "serve:picker": "node scripts/serve-picker.js",
-    "test": "node --test"
+    "test": "node scripts/test-workflow.js quick",
+    "test:quick": "node scripts/test-workflow.js quick",
+    "test:chat": "node scripts/test-workflow.js chat",
+    "test:production": "node scripts/test-workflow.js production",
+    "test:browser": "node scripts/test-chat-browser.js",
+    "demo:snapshot": "node scripts/demo-snapshot.js --create",
+    "demo:verify": "node scripts/demo-snapshot.js --verify",
+    "demo:record": "node scripts/record-demo.js --chat-preview --snapshot",
+    "demo:plan": "node scripts/finish-real-calendar-demo.js --plan-chat",
+    "demo:render": "node scripts/finish-real-calendar-demo.js --render-chat-manifest"
   },
   "dependencies": {
     "@azure/msal-browser": "5.21.0"

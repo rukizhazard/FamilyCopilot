@@ -13,7 +13,7 @@ The owner agreed to verify whether the existing Logic App connection supports av
 
 **Outcome: a viable candidate exists through the existing Office 365 Outlook `HttpRequest` operation targeting Graph `POST /v1.0/me/calendar/getSchedule`. Runtime authorization and actual two-person availability remain unverified.** No mailbox schedules, calendar lists, events, directory searches, connection tests, workflow invocations or run payloads were requested. No deployment, enable/disable, registration, permissions, mail or persistent data integration was added. The existing local owner page and fictional demo are unchanged.
 
-The owner's report/screenshots describe three own calendars and Debby under a team grouping, with Free/Busy access only. This is user-reported Outlook context, not proof of delegated sharing, a Graph-readable custom calendar, verified email identity or connector authorization. No loaded real browser page was inspected. Do not guess an address or search the directory to resolve the name.
+The owner's report/screenshots describe three own calendars and Parent B under a team grouping, with Free/Busy access only. This is user-reported Outlook context, not proof of delegated sharing, a Graph-readable custom calendar, verified email identity or connector authorization. No loaded real browser page was inspected. Do not guess an address or search the directory to resolve the name.
 
 ## Official API comparison
 
@@ -76,7 +76,7 @@ Before any future real request:
 
 Not implemented by this feasibility-only change:
 
-- Two distinct named rows: the owner's chosen label and the explicitly confirmed other adult (the owner currently intends Debby). Three calendars belonging to the owner do not meet this requirement. Tests and agent browser review must use synthetic Alex/Sam identities, never real schedules.
+- Two distinct named rows: the owner's chosen label and the explicitly confirmed other adult (the owner currently intends Parent B). Three calendars belonging to the owner do not meet this requirement. Tests and agent browser review must use synthetic Alex/Sam identities, never real schedules.
 - Each row independently records selected source, disclosure, exact checked range/timezone and successful retrieval timestamp. Idle/unselected rows say **Not checked**; an absent response says **Missing**; a provider failure says **Unavailable** or a verified **Access revoked** status, not empty/free. Keep loading, partial and stale states distinct and textual.
 - A successful owner lookup cannot mark the second person checked. Failed/missing rows remain visible. Global comparisons explicitly identify missing context; no shared-free claim if either participant is unresolved. Unchecked custom calendars remain disclosed as additional missing context.
 - Do not show invented event titles, meeting details or a fake connected status to satisfy the two-person goal. Activity discovery stays independent. No invitation, booking, event write, unattended polling or assistant ingestion is implicitly added.

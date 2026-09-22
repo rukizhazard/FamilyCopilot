@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "name": "October ideas and a nearer movie, draft for Builder review",
+  "executionMode": "synthetic",
+  "activityEvidence": "public_snapshot",
+  "referenceInstant": "2026-09-18T12:00:00+08:00",
+  "timezone": "Asia/Taipei",
+  "extraAssets": [],
+  "limitations": [
+    "Draft scenario: browser actions and framing have not been reviewed for this bundle.",
+    "Synthetic calendars and saved public activity facts, not a live query or model.",
+    "Movie showtimes, game end, admission, tickets and travel remain unknown.",
+    "Chinese glyph rendering requires verification before capture.",
+    "The separate meeting-conflict scenario is not included."
+  ],
+  "scenes": [
+    {
+      "text": "A little time together starts with the things your family enjoys.",
+      "holdMs": 5500,
+      "actions": []
+    },
+    {
+      "text": "What could we do together in October? Let's explore a few ideas.",
+      "holdMs": 1600,
+      "actions": [{ "kind": "type", "selector": "#chat-input", "text": "What could we do together in October?" }]
+    },
+    {
+      "text": "The family calendar appears in the conversation, alongside the planning journey.",
+      "holdMs": 5500,
+      "actions": [
+        { "kind": "click", "selector": "#chat-send" },
+        { "kind": "count", "selector": "#activity-results article", "value": 2 },
+        { "kind": "text", "selector": "#chat-calendar-status", "text": "Parent A: Loaded" },
+        { "kind": "scroll", "selector": "#calendar-conversation" }
+      ]
+    },
+    {
+      "text": "A basketball game or a movie? Two ideas to explore, with details still worth checking.",
+      "holdMs": 6500,
+      "actions": [{ "kind": "scroll", "selector": "#activity-results" }]
+    },
+    {
+      "text": "October feels too far away. How about this weekend?",
+      "holdMs": 1500,
+      "actions": [{ "kind": "type", "selector": "#chat-input", "text": "October feels too far away. How about this weekend?" }]
+    },
+    {
+      "text": "A closer movie option, ready to consider. You decide what happens next.",
+      "holdMs": 7000,
+      "actions": [
+        { "kind": "click", "selector": "#chat-send" },
+        { "kind": "count", "selector": "#activity-results article", "value": 1 },
+        { "kind": "text", "selector": "#activity-results", "text": "Chiikawa" },
+        { "kind": "scroll", "selector": "#activity-results" },
+        { "kind": "value", "selector": "#availability-start", "text": "2026-10-09" }
+      ]
+    }
+  ]
+}

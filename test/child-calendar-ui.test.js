@@ -5,10 +5,10 @@ const { harness, settle } = require("./fixtures/our-week-harness");
 const json = (data, status = 200) => new Response(JSON.stringify(data), { status });
 const removed = ["calendar-access", "child-calendar-section", "child-setup", "child-find", "child-source-select", "child-person", "child-disclosure", "child-guardian", "child-review", "child-review-panel", "child-summary", "child-import", "child-change", "child-clear", "child-skip", "child-cancel"];
 
-test("markup removes every Kimi operation and wizard rather than hiding reachable controls", t => {
+test("markup removes every Child operation and wizard rather than hiding reachable controls", t => {
   const h = harness(t), html = fs.readFileSync(require.resolve("../owner/index.html"), "utf8");
   for (const id of removed) { assert.equal(h.get(id), null, id); assert.doesNotMatch(html, new RegExp(`(?:id|aria-controls)="${id}"`)); }
-  assert.doesNotMatch(html, /<dialog|<button[^>]*id="child-|Continue without Kimi|Change Kimi access|Remove Kimi access/);
+  assert.doesNotMatch(html, /<dialog|<button[^>]*id="child-|Continue without Child|Change Child access|Remove Child access/);
   assert.ok(html.indexOf('id="child-retention"') > html.indexOf('<details class="availability-details">'));
   assert.match(html, /Update refreshes parents only/);
   assert.deepEqual(h.calls, []);

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="840" viewBox="0 0 1100 840" role="img" aria-labelledby="title desc">
+  <title id="title">AI starts the conversation with illustrated activity cards</title>
+  <desc id="desc">Fictional suggestions in the same chat. Calendar is collapsed. Broad interests and one child age eight inform two example suggestions, a basketball game and a movie. Original fictional team badges and a movie poster are thumbnails, not real provider assets. AI chooses dates without a look-ahead setting.</desc>
+  <defs><linearGradient id="poster" x2="1" y2="1"><stop stop-color="#243c68"/><stop offset="1" stop-color="#9c7bc0"/></linearGradient></defs>
+  <rect width="1100" height="840" rx="30" fill="#fcf9f5"/>
+  <g font-family="Segoe UI, Arial, sans-serif" fill="#352e49">
+    <circle cx="62" cy="53" r="21" fill="#ffdc86"/><circle cx="55" cy="50" r="2.3"/><circle cx="69" cy="50" r="2.3"/><path d="M55 59 Q62 66 69 59" fill="none" stroke="#684b2b" stroke-width="2"/>
+    <text x="96" y="51" font-size="23" font-weight="700">Family Copilot</text><text x="96" y="73" font-size="13" fill="#625a70">A little more room for happy days.</text>
+    <text x="1056" y="50" text-anchor="end" font-size="12" fill="#625a70">02 / CONCEPT · FICTIONAL PICKS + ART</text>
+    <rect x="40" y="99" width="1020" height="51" rx="17" fill="white" stroke="#d8cde5"/>
+    <text x="62" y="131" font-size="16" font-weight="600">Our week · Calendar tucked away, not gone</text><text x="933" y="131" font-size="15" fill="#624199">Expand ↓</text>
+    <circle cx="63" cy="194" r="21" fill="#ffdc86"/><text x="63" y="201" text-anchor="middle" font-size="23">✦</text>
+    <text x="102" y="200" font-size="26" font-weight="700">A little fun landed on my radar.</text>
+    <text x="102" y="234" font-size="18">A basketball game and a movie caught my eye for your family.</text>
+    <text x="102" y="261" font-size="14" fill="#625a70">From your wider interests · One child, age 8 · Near your office in Xinyi</text>
+    <rect x="102" y="281" width="467" height="384" rx="23" fill="white" stroke="#d8cde5"/>
+    <rect x="589" y="281" width="471" height="384" rx="23" fill="white" stroke="#d8cde5"/>
+    <rect x="118" y="297" width="435" height="158" rx="16" fill="#fff0e1"/>
+    <path d="M218 320 L260 336 V379 Q254 406 218 421 Q182 406 176 379 V336 Z" fill="#624199"/>
+    <path d="M449 320 L491 336 V379 Q485 406 449 421 Q413 406 407 379 V336 Z" fill="#377969"/>
+    <path d="M203 372 L216 345 L230 372 L217 391 Z" fill="#ffdc86"/><path d="M430 359 L449 345 L468 359 L459 381 L439 381 Z" fill="#c9eadc"/>
+    <text x="334" y="373" text-anchor="middle" font-size="24" font-weight="700" fill="#876326">VS</text>
+    <text x="218" y="443" text-anchor="middle" font-size="12">COMETS</text><text x="449" y="443" text-anchor="middle" font-size="12">GROVE</text>
+    <rect x="605" y="297" width="439" height="158" rx="16" fill="url(#poster)"/>
+    <circle cx="967" cy="332" r="17" fill="#ffdc86"/><g fill="#fff9e8"><circle cx="637" cy="325" r="2"/><circle cx="737" cy="346" r="2"/><circle cx="901" cy="321" r="2"/><circle cx="1005" cy="370" r="2"/></g>
+    <path d="M605 422 Q660 397 721 423 Q778 399 835 430 Q910 390 1044 424 V455 H605Z" fill="#d6ccec"/>
+    <path d="M811 396 Q784 363 811 324 Q838 363 811 396Z" fill="#fff0e1"/><circle cx="811" cy="355" r="8" fill="#6b97be"/><path d="M803 397 L811 420 L819 397" fill="#ffdc86"/>
+    <text x="629" y="386" font-size="23" fill="white" font-weight="700">SKYBOUND</text><text x="629" y="407" font-size="10" fill="white">A SMALL ADVENTURE. A VERY BIG SKY.</text>
+    <text x="124" y="484" font-size="12" fill="#624199" font-weight="700">BASKETBALL · AI PICK</text>
+    <text x="124" y="515" font-size="23" font-weight="700">Comets vs Grove</text>
+    <text x="124" y="543" font-size="16">Sat, Oct 10 · 17:00</text>
+    <text x="124" y="570" font-size="15">~35 min transit from office · Estimate</text>
+    <text x="124" y="596" font-size="14" fill="#625a70">A lively sports outing · Age guidance unknown</text>
+    <text x="124" y="633" font-size="16" fill="#624199" font-weight="600">Game details →</text>
+    <text x="611" y="484" font-size="12" fill="#624199" font-weight="700">MOVIE · AI PICK</text>
+    <text x="611" y="515" font-size="23" font-weight="700">Skybound</text>
+    <text x="611" y="543" font-size="16">Sun, Oct 11 · 14:30</text>
+    <text x="611" y="570" font-size="15">~15 min transit from office · Estimate</text>
+    <text x="611" y="596" font-size="14" fill="#625a70">Imaginative animation · Sample guidance: 6+</text>
+    <text x="611" y="633" font-size="16" fill="#624199" font-weight="600">Movie details →</text>
+    <text x="102" y="689" font-size="13" fill="#625a70">Illustrative dates, travel and age facts · Real calendar fit not checked in this concept</text>
+    <rect x="102" y="709" width="958" height="57" rx="18" fill="white" stroke="#d8cde5"/>
+    <text x="125" y="744" font-size="17" fill="#625a70">Tell me what you think…</text><circle cx="1027" cy="737" r="20" fill="#624199"/><text x="1027" y="744" text-anchor="middle" font-size="23" fill="white">↑</text>
+    <text x="40" y="808" font-size="19" font-weight="600">No Find button. No category selection. AI makes the first suggestion.</text>
+  </g>
+</svg>

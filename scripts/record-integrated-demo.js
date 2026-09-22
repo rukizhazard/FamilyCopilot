@@ -9,7 +9,7 @@ const A = require("../owner/availability-core"); // Pure validation only.
 const story = [
   { title: "Let's make time for each other.", text: "Between work, school, and everyday routines, family time can be easy to put off. This weekend, let's do something together. But when could we go, and what would everyone enjoy?" },
   { title: "Start with the family's week.", text: "Start with Family Copilot. Pick the days you have in mind and bring up the family calendar. Instead of piecing together separate plans, begin with a clearer view of the commitments ahead." },
-  { title: "Look for room in the week.", text: "Look through the commitments and consider where an outing might fit. Here, we still need to check Kimi's plans before settling on a time. For now, let's explore ideas for these three days." },
+  { title: "Look for room in the week.", text: "Look through the commitments and consider where an outing might fit. Here, we still need to check Child's plans before settling on a time. For now, let's explore ideas for these three days." },
   { title: "What would we enjoy together?", text: "With those days in mind, move to Activities. Now the question becomes: what would make this time together special? Start with what your family enjoys, and turn a broad idea into something to look forward to." },
   { title: "A shared favorite.", text: "Basketball it is. The family loves cheering for C T B C D E A. Add their favorite team, and a simple idea becomes more personal: a chance to watch them play together." },
   { title: "An idea becomes a possibility.", text: "Search for activities, and the idea starts to take shape. Here are games featuring the family's favorite team within the chosen dates. Now there are concrete options to bring back to the family." },

@@ -106,7 +106,7 @@ test("sync matches second source by reference despite rename and duplicate names
 });
 test("sync never guesses first/default/name: partial missing unavailable, complete missing revoked", async () => {
   for (const partial of [false, true]) {
-    for (const calendars of [[], [{ id: first, name: "Kimi" }]]) {
+    for (const calendars of [[], [{ id: first, name: "Child" }]]) {
       const f = fixture({ raw: { calendars, partial } }), r = await f.run("sync");
       assert.equal(r.code, partial ? "unavailable" : "revoked"); assert.equal(r.cleanup, "workflow_disabled");
       assert.equal(r.data, undefined); assert.equal(f.backends.length, 1); assert.equal(f.calls.includes("import"), false);
@@ -255,7 +255,8 @@ test("adapter enroll and fresh-session sync preserve one key, exact payloads and
   const fresh = { sessionId: "d".repeat(64), expires: c.expires + 1 };
   const synced = await adapter.perform({ action: "sync", ...fresh, reference: enrolled.reference, disclosure: "busy_only" });
   assert.deepEqual(synced, events("busy_only")); assert.equal(inputs[0].key, inputs[2].key);
-  assert.deepEqual(Object.keys(inputs[2]).sort(), ["action", "sessionId", "expires", "key", "reference", "disclosure", "person", "guardian", "confirmed"].sort());
+  assert.deepEqual(Object.keys(inputs[2]).sort(), ["action", "sessionId", "expires", "key", "reference", "disclosure", "person", "guardian", "confirmed", "diagnostics"].sort());
+  assert.equal(inputs[2].diagnostics, true);
   assert.equal(inputs[2].person, "Kimi"); assert.equal(inputs[2].guardian, true); assert.equal(inputs[2].confirmed, true);
   assert.doesNotMatch(JSON.stringify(outputs), /SYNTHETIC-(FIRST|SECOND)-ID|abcdef01|"key"|"caller"/);
   assert.deepEqual(await adapter.perform({ action: "import", sessionId: c.sessionId, expires: c.expires, calendarId: found.calendars[1].id, disclosure: "details" }), events());
@@ -266,7 +267,7 @@ test("adapter rejects unapproved fields and expired sessions before lock/dispatc
   for (const mode of ["enroll", "sync"]) {
     const p = payload(mode), base = { action: mode, sessionId: p.sessionId, expires: p.expires, disclosure: p.disclosure,
       ...(mode === "sync" ? { reference: p.reference } : { calendarId: p.calendarId }) };
-    for (const key of ["url", "caller", "token", "key", "sourceName", "guardian", "confirmed", "person", "window"]) await assert.rejects(adapter.perform({ ...base, [key]: "SYNTHETIC_SECRET" }), /blocked/);
+    for (const key of ["url", "caller", "token", "key", "sourceName", "guardian", "confirmed", "person", "window", "diagnostics"]) await assert.rejects(adapter.perform({ ...base, [key]: "SYNTHETIC_SECRET" }), /blocked/);
     await assert.rejects(adapter.perform({ ...base, expires: Date.now() - 1 }), /expired/);
   }
   for (const action of ["cleanup-sync", "cleanup-enroll", "sync-default"]) await assert.rejects(adapter.perform({ action }), /blocked/);

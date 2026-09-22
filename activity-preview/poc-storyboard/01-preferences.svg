@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="600" viewBox="0 0 960 600">
+  <rect width="960" height="600" rx="28" fill="#f7f5fb"/>
+  <g font-family="Segoe UI, Arial, sans-serif" fill="#302944">
+    <text x="48" y="55" font-size="17" font-weight="700" fill="#7155ac">FAMILY COPILOT</text>
+    <text x="912" y="55" text-anchor="end" font-size="13" fill="#766d85">CONCEPT · FICTIONAL DATA</text>
+    <text x="48" y="116" font-size="35" font-weight="700">01  Set it once. We take it from here.</text>
+    <text x="48" y="151" font-size="18" fill="#766d85">A quick look at preferences already set before the demo.</text>
+    <rect x="48" y="184" width="864" height="328" rx="24" fill="white" stroke="#e3dced"/>
+    <text x="78" y="225" font-size="15" fill="#766d85">STARTING POINT</text>
+    <text x="78" y="258" font-size="23" font-weight="600">Office · Xinyi, Taipei</text>
+    <text x="78" y="286" font-size="15" fill="#766d85">Taipei City Hall MRT · Transit · Up to 45 min</text>
+    <text x="520" y="225" font-size="15" fill="#766d85">FAMILY</text>
+    <text x="520" y="258" font-size="23" font-weight="600">Ages 8 + 12</text>
+    <text x="520" y="286" font-size="15" fill="#766d85">Selected family calendars · Read-only</text>
+    <path d="M78 312 H882" stroke="#eee8f4"/>
+    <text x="78" y="346" font-size="15" fill="#766d85">INTERESTS</text>
+    <rect x="78" y="361" width="193" height="43" rx="21" fill="#eee6fb"/>
+    <text x="174" y="389" text-anchor="middle" font-size="16" fill="#61428f">Basketball · My team</text>
+    <rect x="283" y="361" width="120" height="43" rx="21" fill="#fff0d8"/>
+    <text x="343" y="389" text-anchor="middle" font-size="16">Movies</text>
+    <text x="520" y="346" font-size="15" fill="#766d85">LOOK AHEAD</text>
+    <text x="520" y="390" font-size="22" font-weight="600">Weekends · Next 4 weeks</text>
+    <rect x="78" y="431" width="804" height="55" rx="14" fill="#eaf4ee"/>
+    <circle cx="104" cy="458" r="8" fill="#4c8664"/>
+    <text x="125" y="464" font-size="17" fill="#386249">New-listing suggestions enabled · Pause anytime</text>
+    <text x="48" y="555" font-size="19" font-weight="600">No date picking. No repeated filters.</text>
+    <text x="912" y="555" text-anchor="end" font-size="15" fill="#766d85">Proposed opt-in experience</text>
+  </g>
+</svg>

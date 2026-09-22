@@ -1,8 +1,14 @@
 "use strict";
-(function(root) {
+(function(root, factory) {
+  const api = factory();
+  api.forSyntheticOctober = () => factory(true);
+  if (typeof module !== "undefined" && module.exports) module.exports = api; else root.OwnerAvailability = api;
+})(globalThis, function(syntheticOctober = false) {
   const window = Object.freeze({ start: "2026-09-19T16:00:00Z", end: "2026-09-26T16:00:00Z", timezone: "Asia/Taipei", interval: 30, slots: 336 });
   // Historical September fixtures stay frozen; only this bounded live demo moves.
-  const liveWindow = Object.freeze({ start: "2026-10-08T16:00:00Z", end: "2026-10-15T16:00:00Z", timezone: "Asia/Taipei", interval: 30, slots: 336 });
+  const liveWindow = Object.freeze(syntheticOctober
+    ? { start: "2026-09-30T16:00:00Z", end: "2026-10-31T16:00:00Z", timezone: "Asia/Taipei", interval: 30, slots: 1488 }
+    : { start: "2026-10-08T16:00:00Z", end: "2026-10-15T16:00:00Z", timezone: "Asia/Taipei", interval: 30, slots: 336 });
   function dateRange(startDate, endDate) {
     const parse = value => {
       if (typeof value !== "string" || !/^(20\d\d|2100)-\d{2}-\d{2}$/.test(value)) throw new Error("invalid_date_range");
@@ -11,7 +17,8 @@
       return time;
     };
     const start = parse(startDate), end = parse(endDate), days = (end - start) / 86400000 + 1;
-    if (days < 1 || days > 7) throw new Error("invalid_date_range");
+    const limit = syntheticOctober && startDate >= "2026-10-01" && endDate <= "2026-10-31" ? 31 : 7;
+    if (days < 1 || days > limit) throw new Error("invalid_date_range");
     const iso = value => new Date(value).toISOString().replace(".000Z", "Z");
     return { start: iso(start - 8 * 3600000), end: iso(end + 16 * 3600000), timezone: "Asia/Taipei", interval: 30, slots: days * 48 };
   }
@@ -46,7 +53,7 @@
     return pages;
   }
   // Bounded allowance for two 336-element enum arrays, including service whitespace.
-  const responseLimit = 24 * 1024;
+  const responseLimit = (syntheticOctober ? 96 : 24) * 1024;
   const labels = Object.freeze({ free_or_elsewhere: "No busy block reported (may be working elsewhere)", tentative: "Tentative", busy: "Busy", oof: "Out of office", unknown: "Unknown" });
   const unknown = (person, status = "missing", selectedWindow = window) => ({ person, status, slots: Array(selectedWindow.slots).fill("unknown") });
   function project(data, window = api.window) {
@@ -121,8 +128,8 @@
   }
   // Presentation aliases only. Never used as provider identities or authorization.
   function displayPeople(synthetic = false) {
-    return ["Mike", "Debby"].map((alias, person) => ({ person, alias: synthetic ? `${alias} (sample)` : alias,
-      previous: (synthetic ? ["Alex (fictional)", "Sam (fictional)"] : ["Mike Lee", "Debby"])[person] }));
+    return ["Parent A", "Parent B"].map((alias, person) => ({ person, alias: synthetic ? `${alias} (sample)` : alias,
+      previous: (synthetic ? ["Alex (fictional)", "Sam (fictional)"] : ["Parent A", "Parent B"])[person] }));
   }
   const compactLabels = Object.freeze({ free_or_elsewhere: "No busy*", tentative: "Tent.", busy: "Busy", oof: "Away", unknown: "Unknown" });
   function dayTime(slot) {
@@ -219,5 +226,5 @@
   }
   const api = { window, liveWindow, dateRange, validateWindow, calendarWindow, displayWindow, displayPages, responseLimit, slotTime, days, labels, compactLabels, displayPeople, dayTime, weekLayout, unknown, project, initial, transition, freshness, sessionUnavailable, failureText, cleanupText,
     childDisplay, childDayLayout, childFreshness, childLabels };
-  if (typeof module !== "undefined" && module.exports) module.exports = api; else root.OwnerAvailability = api;
-})(globalThis);
+  return api;
+});

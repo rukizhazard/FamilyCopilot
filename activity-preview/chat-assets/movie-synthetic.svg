@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450" role="img" aria-labelledby="title desc">
+  <title id="title">Skybound, an original fictional movie poster</title>
+  <desc id="desc">A paper rocket above illustrated mountains, with the fictional title Skybound. Not a real movie poster.</desc>
+  <rect width="800" height="450" fill="#e6e1f0"/>
+  <circle cx="649" cy="103" r="48" fill="#ffd276"/>
+  <path d="M0 358L157 210L319 358L472 193L685 358L800 275V450H0Z" fill="#afcfc4"/>
+  <path d="M0 413L150 333L305 413L485 310L660 413L800 350V450H0Z" fill="#28665c"/>
+  <path d="M478 208L628 94L573 278L549 210Z" fill="#ffffff" stroke="#164d47" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M549 210L628 94" fill="none" stroke="#164d47" stroke-width="3"/>
+  <path d="M481 240Q420 298 443 319Q471 344 512 311" fill="none" stroke="#78679a" stroke-width="4" stroke-dasharray="8 9"/>
+  <g font-family="Trebuchet MS, sans-serif" fill="#164d47">
+    <text x="52" y="114" font-size="19">AN IMAGINED ADVENTURE</text>
+    <text x="48" y="181" font-size="60" font-weight="700">SKYBOUND</text>
+    <text x="52" y="226" font-size="20">A small journey. A very big sky.</text>
+  </g>
+  <text x="400" y="427" text-anchor="middle" font-family="Trebuchet MS, sans-serif" fill="#ffffff" font-size="16">FICTIONAL MOVIE</text>
+</svg>

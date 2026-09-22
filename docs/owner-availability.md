@@ -1,21 +1,21 @@
 # Bounded owner-only two-person availability
 
-## Kimi coexistence activation, 17 September 2026
+## Child coexistence activation, 17 September 2026
 
-The later user-coordinated restart enabled the separate native Kimi path in the
+The later user-coordinated restart enabled the separate native Child path in the
 existing Windows-auth task. Parent native execution, exact two-person bounds,
 snapshot location/semantics and cleanup gates are unchanged. Locked parent and
 child metadata preflight, exact process identity/mode, live/disk safe idle,
 date/saved/October/child markers and current `tpbl-teams-v2` assets passed.
 Full offline suite **786/786** passed. No parent refresh, child list/import or
 private snapshot read occurred in this activation; prior parent true-refresh
-approval remains consumed. Kimi's one-workflow deployment approval was separately
+approval remains consumed. Child's one-workflow deployment approval was separately
 used once, superseding the historical unused statements below.
-[Current child activation and user-only test](kimi-calendar-import.md#shared-local-service-activated-17-september-2026).
+[Current child activation and user-only test](child-calendar-import.md#shared-local-service-activated-17-september-2026).
 
 ## Windows-native parent Update repair, 17 September 2026
 
-The owner explicitly requested a true Mike/Debby Update to test existing access,
+The owner explicitly requested a true Parent A/Parent B Update to test existing access,
 then repair of the failing path. This later authorization supersedes the earlier
 October migration's no-agent-query restriction only for the parent repair test.
 The original WSL request returned HTTP 503/unavailable, cleanup not requested and
@@ -48,7 +48,7 @@ No PowerShell execution policy, Conditional Access or broker setting was changed
   its local checks, not native Azure preflight; the combined report is now fixed
   to state `cloudMetadataVerified: true` rather than claim zero cloud requests.
 - One explicit refresh through the running **8002** API returned HTTP **200**,
-  **cached false**, **Mike checked / Debby checked**, **336 slots each**, and
+  **cached false**, **Parent A checked / Parent B checked**, **336 slots each**, and
   **workflow_disabled**. No automatic calendar retry or cache fallback occurred.
 - Independent native readback after the response verified Disabled availability
   v5/owner-list v2, SAS Disabled, connector connected, invitation disabled,
@@ -77,7 +77,7 @@ busy state, cache/synthetic/cleanup/malformed failures, no retry/no Clear and
 independent readback. Two activation tests cover locked preflight, fail-before-stop
 and native-only handoff. Editor diagnostics and whitespace checks passed.
 Fresh browser/mobile/keyboard and parent usability are not newly established.
-Kimi still requires the native child operation boundary, verified connector
+Child still requires the native child operation boundary, verified connector
 capability, guarded deployment/readback and user-only selection/confirmation.
 The existing one-workflow child approval is unused; no new OAuth is currently
 needed for parent access. No commit or push was performed.
@@ -85,7 +85,7 @@ needed for parent access. No commit or push was performed.
 ## Approved October demo
 
 The owner explicitly approved one existing Azure workflow **v4 → v5** migration
-for Mike and Debby's **9–15 October 2026** demo, together with existing official
+for Parent A and Parent B's **9–15 October 2026** demo, together with existing official
 basketball discovery. It does not authorize agent-run calendar validation,
 arbitrary live dates, new resources, production readiness, or commit/push.
 The protected identities, caller authorization, connector and busy-only scope
@@ -258,7 +258,7 @@ A second explicit saved-only action restored identical grid, original timestamp
 and freshness text. Both successful requests used `cacheOnly: true, refresh: false`
 and the exact September dates. The disposable file remained byte-for-byte unchanged;
 instrumentation recorded zero provider-adapter calls and no store write/clear during
-review. Debby (sample) remained explicitly unavailable, not free. Layout had no
+review. Parent B (sample) remained explicitly unavailable, not free. Layout had no
 page overflow at 1280/320 CSS px; result focus and keyboard exit from the grid passed.
 
 Browser-injected responses separately verified **“Couldn’t load the week. Try
@@ -310,7 +310,7 @@ does not authorize other live calendar ranges. The original validation record
 below describes the preceding date-UX-only increment.
 
 The owner approved **select start and end dates → Confirm → load calendars**, with
-no separate owner checkbox. The visible scope remains Mike + Debby, default
+no separate owner checkbox. The visible scope remains Parent A + Parent B, default
 calendars, Busy-only. Confirm is the explicit access action; it is not identity
 verification, visitor sign-in or a change to the authorized account/audience.
 
@@ -368,7 +368,7 @@ The owner's explicit implementation/deployment approval supersedes the earlier
 this bounded local experiment. No repeat architecture or actor approval is needed.
 The two exact owner-supplied adult SMTP addresses are secure operator parameters,
 not repository fixtures, command-line arguments, browser inputs or directory probes.
-Person 0 is Mike Lee; person 1 is the owner's confirmed Debby target. Labels are
+Person 0 is Parent A; person 1 is the owner's confirmed Parent B target. Labels are
 not a claim of directory lookup or secure-value readback. The audience
 is the local owner for the explicitly authorized scheduling purpose, not an assistant.
 
@@ -388,7 +388,7 @@ is the local owner for the explicitly authorized scheduling purpose, not an assi
 
 16 September 2026. This presentation-only increment supersedes the earlier compact
 confirmation copy. The page leads with **Our week**, the fixed **20–26 September
-2026**, **Taipei (UTC+8)** and **Mike / Debby**. **Default calendars · Busy-only**
+2026**, **Taipei (UTC+8)** and **Parent A / Parent B**. **Default calendars · Busy-only**
 and one unchecked **I’m the owner, authorized to view this week** confirmation
 precede **View week**, **Update**, and secondary **Clear**. No provider/cache access
 occurs on startup or when the checkbox is checked alone.
@@ -398,7 +398,7 @@ It uses the original `checkedAt`, including on reuse, and adds **May be out of d
 after five minutes or when freshness is unknown. It does not claim continuous
 updates. The visible source is **Outlook · Default calendars only**, or **Sample
 data · Not real calendars** with the always-visible **SAMPLE DATA** badge and sample
-aliases. Missing people are named, for example **Debby’s schedule isn’t available**;
+aliases. Missing people are named, for example **Parent B’s schedule isn’t available**;
 Unknown keeps text and hatching. No missing time becomes free.
 
 **Details** remains closed below the calendar and contains exact source, access,
@@ -420,7 +420,7 @@ outside this increment.
 
 16 September 2026. Presentation-only simplification removes the dedicated
 **A quick access check** card and repeated facts. The visible summary is
-**Mike + Debby · Default calendars · Busy-only**, with one unchecked confirmation
+**Parent A + Parent B · Default calendars · Busy-only**, with one unchecked confirmation
 beside **Check week**: **I’m authorized to view these calendars for this week.**
 The existing heading supplies the week and Taipei timezone. Exact local/UTC bounds,
 336 slots each, display-target mapping, owner-only audience and dynamic storage/
@@ -449,15 +449,15 @@ usability approval remain separate from these checks.
 ### Our week presentation copy
 
 16 September 2026. The owner approved only **Our week** as the weekly heading and
-**Mike / Debby** as display labels. These supersede the historical Dad/Mom labels
-below, without changing **Mike → Mike Lee; Debby → Debby**, protected indices/targets,
+**Parent A / Parent B** as display labels. These supersede the historical Dad/Mom labels
+below, without changing **Parent A → Parent A; Parent B → Parent B**, protected indices/targets,
 authorization, the Sunday **20–26 September 2026 Taipei** window, 336 slots each,
 CSS geometry, legend, unknown/freshness semantics or snapshot retention/binding.
 Aliases are not cache keys; no cache migration or invalidation is needed.
 
 The access summary, daily tracks, per-person loading/missing context, grid region,
 block descriptions and tooltips use the same display mapping. Synthetic pages
-use **Mike (sample) / Debby (sample)** and explicitly map them to the existing
+use **Parent A (sample) / Parent B (sample)** and explicitly map them to the existing
 fictional Alex/Sam examples, with **SAMPLE DATA**, **SAMPLE calendars** and the
 adjacent source notice unchanged. The adversarial fixture statuses are unchanged.
 No family-role/relationship assertion, nickname settings, Add someone or multiuser
@@ -474,7 +474,7 @@ Isolated RAM-only synthetic review on port **8004**, at actual CSS widths
 **1279px / 319px**, confirmed the title, visible/accessibility sample names,
 Alex/Sam source mapping, unclipped track labels, unchanged seven-day/672-slot
 geometry, keyboard acknowledgement/load, status focus, mobile internal arrow-key
-scrolling and Tab exit. Partial context keeps Debby (sample) Unknown; Clear resets
+scrolling and Tab exit. Partial context keeps Parent B (sample) Unknown; Clear resets
 both samples. Startup made **zero API requests**, with no external resources.
 Only synthetic screenshots were inspected. The created tab was closed and its
 temporary server gracefully stopped with no cleanup failure. No real page/API,
@@ -713,8 +713,8 @@ screen-reader and production readiness remain separate; no commit or push.
 
 ### Historical presentation-only weekly diagram (15 September 2026)
 
-Approved presentation mapping: **Dad (previously Mike Lee)** and
-**Mom (previously Debby)**. These are user-chosen display aliases only. No new
+Approved presentation mapping: **Dad (previously Parent A)** and
+**Mom (previously Parent B)**. These are user-chosen display aliases only. No new
 identity, parent relationship, guardian authority, secure target, access policy
 or cloud contract is established or changed. The mapping is visible in the
 pre-query access summary without addresses. Synthetic review instead maps Dad
@@ -769,8 +769,8 @@ not establish Azure cleanup. The loaded real page was not inspected or changed.
 
 ### Approved fixed-week milestone (15 September 2026)
 
-The owner explicitly approved replacing the first protected target with Mike Lee,
-retaining Debby, this exact full-week range, and **one true live verification**.
+The owner explicitly approved replacing the first protected target with Parent A,
+retaining Parent B, this exact full-week range, and **one true live verification**.
 This is not permission for another list/query, mail, writes or background sync.
 The protected parameter value is supplied through the existing bounded operator
 stdin/in-memory path; no real addresses belong in files, fixtures, argv or logs.
@@ -789,8 +789,8 @@ invitation Disabled, connector Connected and invitation delivery off.
 | --- | --- |
 | Guarded update | `week_updated_disabled`, one PUT, no schedule query |
 | Anonymous/invalid-token denial gates | Passed before the authenticated request |
-| Mike Lee success / projected slot count | **true / 336** |
-| Debby success / projected slot count | **true / 336** |
+| Parent A success / projected slot count | **true / 336** |
+| Parent B success / projected slot count | **true / 336** |
 | Independent Disabled / exact SAS-disabled contract | **true / true** |
 | Preserved resources | Checks passed; no configuration writes |
 | Verification session cleared / proxy idle | **true / true** |

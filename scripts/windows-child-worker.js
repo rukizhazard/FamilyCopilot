@@ -27,6 +27,8 @@ async function executeOperation(mode, { payload = {}, signal, platform = process
   P.validateInput(mode, payload);
   const recovery = P.cleanupMode(mode);
   let reader, backend, calendarId, data, report, failure, cleanup = "not_requested", current = "native_runtime", extensionsRemoved = false;
+  const startedAt = Date.now();
+  let diagnosticStage = "native_runtime", observedFailure;
   const controller = new AbortController();
   const combined = recovery ? undefined : AbortSignal.any([controller.signal, ...(signal ? [signal] : [])]);
   const expiry = P.dataMode(mode) ? setTimeout(() => controller.abort(), Math.max(1, payload.expires - Date.now())) : undefined;
@@ -34,7 +36,13 @@ async function executeOperation(mode, { payload = {}, signal, platform = process
   // extension disposal. In particular a throwing cleanup_pending write cannot
   // be allowed to skip importEvents' subsequent independent disable.
   const publish = value => { try { stage(value); } catch { controller.abort(); } };
-  const progress = value => { if (!P.stages.includes(value)) throw new OwnerFailure("blocked"); current = value; publish(value); };
+  const progress = value => {
+    if (!P.stages.includes(value)) throw new OwnerFailure("blocked");
+    current = value;
+    // Successful cleanup must not overwrite the failing data/auth phase.
+    if (C.diagnosticStages.includes(value)) diagnosticStage = value;
+    publish(value);
+  };
   const fence = () => {
     if (!recovery && P.dataMode(mode) && Date.now() >= payload.expires) throw new OwnerFailure("expired");
     if (combined?.aborted) throw new OwnerFailure("cancelled");
@@ -62,9 +70,24 @@ async function executeOperation(mode, { payload = {}, signal, platform = process
     // Validate before importEvents can canonicalize/drop an invalid event. Raw
     // request bodies, bearer tokens and callbacks remain in this closure.
     const strictRequest = async (url, options) => {
-      const result = await request(url, options);
-      if (importing && options.maxBytes === C.maxBytes && result.status === 200) P.project(result.data, payload.disclosure);
-      return result;
+      const callback = options.maxBytes === C.maxBytes;
+      if (callback) diagnosticStage = importing ? "event_request" : "source_list_request";
+      try {
+        const result = await request(url, options);
+        if (Number.isInteger(result.status) && result.status >= 400 && result.status <= 599)
+          observedFailure ||= { stage: diagnosticStage, code: `http_${result.status}` };
+        if (importing && callback && result.status === 200) {
+          diagnosticStage = "event_validation";
+          P.project(result.data, payload.disclosure);
+        }
+        // Later preservation failures belong to the overall find/import phase,
+        // not the already completed callback. Keep only an observed failure.
+        if (callback) diagnosticStage = importing ? "import" : "find";
+        return result;
+      } catch (error) {
+        observedFailure ||= { stage: diagnosticStage, code: error instanceof OwnerFailure ? error.code : "request_failed" };
+        throw error;
+      }
     };
     let importing = mode === "import" || mode === "enroll";
     if (mode === "cleanup-sync") {
@@ -122,6 +145,7 @@ async function executeOperation(mode, { payload = {}, signal, platform = process
         try {
           progress("find"); fence();
           raw = rawSources(await find(backend, { signal: combined, record })); fence();
+          diagnosticStage = "source_match";
           for (const source of raw.calendars) {
             if (P.sourceReference(source.id, caller) === payload.reference) {
               if (calendarId !== undefined) throw new OwnerFailure("invalid_provider_response");
@@ -129,7 +153,10 @@ async function executeOperation(mode, { payload = {}, signal, platform = process
             }
           }
           if (cleanup !== "workflow_disabled") throw new OwnerFailure("cleanup_failed");
-          if (!calendarId) throw new OwnerFailure(raw.partial ? "unavailable" : "revoked");
+          if (!calendarId) {
+            observedFailure = { stage: "source_match", code: "source_not_found" };
+            throw new OwnerFailure(raw.partial ? "unavailable" : "revoked");
+          }
         } finally { raw = undefined; caller = undefined; await clearBackend(); }
         fence();
         // List cleanup must not count as import cleanup. A second backend can
@@ -137,6 +164,7 @@ async function executeOperation(mode, { payload = {}, signal, platform = process
         cleanup = "not_requested"; importing = true;
         backend = await makeBackend("import", { signal: combined, read, request: strictRequest, calendarId, disclosure: payload.disclosure });
         fence();
+        diagnosticStage = "source_match";
         if (P.sourceReference(calendarId, backend.caller) !== payload.reference) throw new OwnerFailure("revoked");
         calendarId = undefined;
       }
@@ -160,6 +188,11 @@ async function executeOperation(mode, { payload = {}, signal, platform = process
     !failure && P.dataMode(mode) && cleanup !== "workflow_disabled") { failure = "cleanup_failed"; cleanup = "cleanup_failed"; }
   const result = failure ? { ok: false, code: failure, cleanup, stage: current, extensionsRemoved } :
     { ok: true, cleanup, stage: "complete", extensionsRemoved, ...(P.dataMode(mode) ? { data } : { report }) };
+  if (failure && mode === "sync" && payload.diagnostics === true) result.diagnostic = C.syncDiagnostic({
+    ...(failure === "cleanup_failed" ? { stage: current === "extension_cleanup" ? "extension_cleanup" : "cleanup", code: failure }
+      : observedFailure || { stage: diagnosticStage, code: failure }),
+    elapsedMs: C.diagnosticElapsed(startedAt)
+  });
   data = undefined;
   return P.validateResult(result, mode, payload.disclosure);
 }

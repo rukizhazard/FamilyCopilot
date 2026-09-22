@@ -113,7 +113,7 @@ test("display/date subset edits retain saved child data without operations or ti
   const h = harness(t); await h.fire("availability-load");
   assert.equal(h.calls.length, 1);
   await h.openSaved(); const summary = h.get("child-imported-access").textContent;
-  assert.match(summary, /Saved access.*Kimi/);
+  assert.match(summary, /Saved access.*Child/);
   const before = h.calls.length, metadata = JSON.stringify(h.metadata);
   await h.fire("availability-display-next"); await h.range("2026-10-10", "2026-10-11");
   assert.equal(h.get("child-imported-access").textContent, summary); assert.equal(h.calls.length, before);
@@ -295,5 +295,5 @@ test("scope stays in Details and labelled controls retain descriptions without a
   for (const name of ["previous", "next"]) assert.match(html, new RegExp(`id="availability-display-${name}"[^>]*type="button"[^>]*aria-describedby="availability-display-help"`));
   assert.match(html, /Previous\/Next[^<]*do not load calendars, change consent or change the selected dates for Activities/);
   assert.doesNotMatch(html, /<dialog|id="child-(?:source-select|person|disclosure|guardian|review|import)"/);
-  assert.match(html, /Kimi is saved-view only; Update refreshes parents only/);
+  assert.match(html, /Child is saved-view only; Update refreshes parents only/);
 });

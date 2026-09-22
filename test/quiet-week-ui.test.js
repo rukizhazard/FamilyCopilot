@@ -89,7 +89,7 @@ test("fresh, cached and stale success summaries are visible only after opening D
     assert.doesNotMatch(h.visibleText(), /Updated|Saved only, checked|Display:|Previous\/Next only move|Default calendars only/);
     h.details.open = true;
     for (const id of ["availability-status-details", "child-status-details", ...detailIds]) assert.equal(h.visible(id), true, id);
-    assert.match(h.get("availability-status-details").textContent, /Mike.*Debby.*Updated.*Saved view/);
+    assert.match(h.get("availability-status-details").textContent, /Parent A.*Parent B.*Updated.*Saved view/);
     assert.match(h.get("child-status-details").textContent, /Fictional shared source.*Saved only, checked/);
     assert.equal(h.get("availability-source").textContent, meta["owner-mode"] === "live" ? "Outlook · Default calendars only" : "Sample data · Not real calendars");
     const original = h.get("child-imported-access").textContent;
@@ -134,7 +134,7 @@ test("missing saved views and partial parent context are still visible, never su
   } });
   await partial.fire("availability-load");
   assert.equal(partial.visible("availability-context"), true);
-  assert.match(text(partial.get("availability-context")), /Debby.*isn’t available/);
+  assert.match(text(partial.get("availability-context")), /Parent B.*isn’t available/);
 });
 
 test("child access, storage, session and cleanup errors remain visible outside Details", async t => {
